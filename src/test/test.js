@@ -2,10 +2,16 @@ import React, { Component } from "react";
 import {
     Typography,
     Box,
+    Checkbox,
+    Tooltip,
+    LinearProgress,
+    FormControlLabel,
 } from "@material-ui/core";
-import CustomTable from "./const/CustomTable";
+import CustomTable from "../components/CustomTable";
 import { ToRuDate } from "../utils/utils";
 import { withStyles } from "@material-ui/core/styles";
+import data, { dictionary } from "../test_data/data";
+import { HelpOutline } from "@material-ui/icons";
 
 const columns = classes => [
     {
@@ -15,45 +21,48 @@ const columns = classes => [
         }
     },
     {
-        name: "userName",
-        label: "Логин",
+        name: "name",
+        label: "Name",
         options: {
             customBodyRender: (value) => <div style={{ fontWeight: "bold" }}>{value}</div>
         }
     },
     {
-        name: "surname",
-        label: "Фамилия"
+        name: "price",
+        label: "Price, $"
     },
     {
-        name: "role",
-        label: "Группа",
+        name: "ingridients",
+        label: "Ingridients",
         options: {
-            customBodyRender: (value) => <div style={{ fontWeight: "bold" }}>{value}</div>
+            sort: false,
+            type: "array",
+            customBodyRender: v => v.join(", "),
         }
     },
     {
-        name: "modified",
-        label: "Изменено",
+        name: "createDate",
+        label: "Creation Date",
         options: {
-            customBodyRender: (value) => ToRuDate(value, true),
-            sortDirection: "desc"
+            customBodyRender: v => v ? ToRuDate(v, false) : "-",
+            transformData: v => v ? "Known" : "Unknown"
         }
     },
     {
-        name: "status",
-        label: "Статус",
+        name: "glassType",
+        label: "Type",
         options: {
-            customBodyRender: (value) => <div style={{ fontWeight: "bold" }}>{value}</div>,
-            customHeadRender: (classes) => <Box display="flex" alignItems="center">
-                Статус
+            customHeadRender: () => <Box display="flex" alignItems="center">
+                Type
                 <Tooltip
                     classes={{ tooltip: classes.tooltip }}
-                    title='Пользователи, характеризующиеся статусом = "Блокирован", не имеют возможности войти в систему'
+                    title='Glass type of cocktail'
                 >
                     <HelpOutline className={classes.question} />
                 </Tooltip>
-            </Box>
+            </Box>,
+            customBodyRender: v => dictionary.find(_ => _.id === v).label,
+            transformData: v => dictionary.find(_ => _.id === v).label
         }
     }
 ];
@@ -62,7 +71,8 @@ class TestComnonent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            globalLoading
+            multiFilter: true,
+            globalLoading: false
         };
     }
 
@@ -78,6 +88,7 @@ class TestComnonent extends Component {
                     ServerSide with custom filters and sorting
                 </Typography>
             </Box>
+            {/*
             <CustomTable
                 showLoader={() => this.setState({ globalLoading: true })}
                 stopLoader={() => this.setState({ globalLoading: false })}
@@ -92,18 +103,30 @@ class TestComnonent extends Component {
                 initialFilters={this.props.filters}
                 onSortingChanged={(sort) => this.props.changeSorting(sort)}
             />
+            */}
             <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
                 <Typography variant="h6">
                     ClientSide table
                 </Typography>
+                <FormControlLabel
+                    control={<Checkbox
+                        checked={this.state.multiFilter}
+                        onChange={() => this.setState({ multiFilter: !this.state.multiFilter })}
+                    />}
+                    label="Enable multifilter"
+                />                
             </Box>
             <CustomTable
-                data={this.state.rows}
+                data={data}
                 filterList={[
-                    { column: "status", value: ["Блокирована", "Активна"] },
+                    { column: "glassType", value: dictionary.map(_ => _.label).sort() },
+                    { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
+                    { column: "createDate", value: ["Known", "Unknown"] },
                 ]}
-                sortBy="date"
-                sortDir="desc"
+                multiFilter={this.state.multiFilter}
+                rowCount={10}
+                sortBy="name"
+                sortDir="asc"
                 columns={columns(this)}
             />
         </div>;

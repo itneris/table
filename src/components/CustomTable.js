@@ -31,8 +31,8 @@ import {
     Clear,
     GetApp,
     ViewColumn,
-    KeyboardArrowUpIcon,
-    KeyboardArrowDownIcon
+    KeyboardArrowUp as KeyboardArrowUpIcon,
+    KeyboardArrowDown as KeyboardArrowDownIcon
 } from '@material-ui/icons';
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { HttpUtil, CreateFile } from './utils';
@@ -780,8 +780,8 @@ class CustomTable extends Component {
                 data = data.filter(d => {
                     if (colOpts && colOpts.transformData) {
                         return colOpts.transformData(d[f.column], d) === f.value[0];
-                    } else if (colOpts && colOpts.type === "array"){
-                        return d[f.column].includes(f.value[0]);
+                    } else if (colOpts && colOpts.type === "array") {
+                        return d[f.column].find(_ => f.value.includes(_)) !== undefined;
                     } else {
                         return d[f.column] === f.value[0];
                     }                    
