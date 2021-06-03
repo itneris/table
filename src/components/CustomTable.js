@@ -38,6 +38,8 @@ import { KeyboardDatePicker } from '@material-ui/pickers';
 import { HttpUtil, CreateFile } from './utils';
 import moment from 'moment';
 
+import demoData, { dictionary } from "../test_data/data";
+
 const rowCount = 25;
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
 
@@ -316,10 +318,21 @@ class CustomTable extends Component {
 
         if (!this.props.filtersWithData) {
             if (this.props.filterList && typeof (this.props.filterList) === "string") {
-                const filtersData = await HttpUtil.fetchGetAsync(this.props.filterList);
-                this.setState({
-                    filters: filtersData.filters
-                });
+                if(this.props.demoData){
+                    var filtersData = [
+                        { column: "glassType", value: dictionary.map(_ => _.label).sort() },
+                        { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
+                        { column: "createDate", value: ["Known", "Unknown"] },
+                    ];
+                    this.setState({
+                        filters: filtersData
+                    });
+                } else {
+                    const filtersData = await HttpUtil.fetchGetAsync(this.props.filterList);
+                    this.setState({
+                        filters: filtersData.filters
+                    });
+                }
             } else if (this.props.filterList && typeof (this.props.filterList) === "object") {
                 this.setState({
                     filters: this.props.filterList
@@ -490,6 +503,10 @@ class CustomTable extends Component {
         }
     }
 
+    async sleep(msec){
+        return new Promise(resolve => setTimeout(resolve, msec));
+    }
+
     async _fetch() {
         if (typeof (this.props.data) === "string") {
             let tableState = { ...this.state.table };
@@ -503,15 +520,83 @@ class CustomTable extends Component {
 
             this.props.showLoader && this.props.showLoader();
             let filtersData = this.state.filters;
-            var rowData = await HttpUtil.fetchAsync(this.props.data, options, "POST");
-            if (this.props.filtersWithData)
-                filtersData = rowData.filters;
-            this.setState({
-                rows: rowData.rows,
-                total: rowData.total,
-                isLoading: false,
-                filters: filtersData
-            });
+            if (this.props.demoData) {
+                var data = demoData;
+
+                await this.sleep(2000);
+
+                let searchedColumns = tableState.searchedColumn || this.props.columns.map(c => c.name);
+                let rowsPerPage = tableState.rowsPerPage;
+                let page = tableState.page;
+                let search = this.props.search || tableState.search;
+                let filters = this.props.onFilterChanged ? (this.props.initialFilters ? this.props.initialFilters : tableState.filters) : tableState.filters;
+
+                if (search !== null && search !== "") {
+                    data = data.filter(d => {
+                        let result = false;
+                        for (let i = 0; i < searchedColumns.length; i++) {
+                            if (d[searchedColumns[i]]) {
+                                let colValue = d[searchedColumns[i]];
+                                let colOpts = this.props.columns.find(col => col.name === searchedColumns[i]).options;
+                                if (colOpts && colOpts.transformData) {
+                                    colValue = colOpts.transformData(colValue, d).toString().toLowerCase();
+                                } else {
+                                    colValue = colValue.toString().toLowerCase();
+                                }
+
+                                if (colValue.includes(search.toLowerCase())) {
+                                    result = true;
+                                    break;
+                                }
+                            }
+                        }
+                        return result;
+                    })
+                }
+
+                filters.forEach((f) => {
+                    if (f.value[0] === null) {
+                        return;
+                    }
+
+                    let colOpts = this.props.columns.find(col => col.name === f.column).options;
+
+                    data = data.filter(d => {
+                        if (colOpts && colOpts.transformData) {
+                            return colOpts.transformData(d[f.column], d) === f.value[0];
+                        } else if (colOpts && colOpts.type === "array") {
+                            return d[f.column].find(_ => f.value.includes(_)) !== undefined;
+                        } else {
+                            return d[f.column] === f.value[0];
+                        }
+                    });
+                });
+
+                data = data.sort(this._sort());
+                var total = data.length;
+                var rows = this.props.disablePaging === true ? data : data.slice(rowsPerPage * page, rowsPerPage * (page + 1));
+
+                // if (this.props.filtersWithData)
+                //     filtersData = rowData.filters;
+                this.setState({
+                    rows: rows,
+                    total: total,
+                    isLoading: false,
+                    filters: filtersData
+                });
+
+            } else {
+                var rowData = await HttpUtil.fetchAsync(this.props.data, options, "POST");
+
+                if (this.props.filtersWithData)
+                    filtersData = rowData.filters;
+                this.setState({
+                    rows: rowData.rows,
+                    total: rowData.total,
+                    isLoading: false,
+                    filters: filtersData
+                });
+            }
             this.props.stopLoader && this.props.stopLoader();
         } else {
             this.setState({
@@ -577,7 +662,7 @@ class CustomTable extends Component {
         let dataChanged = false;
         if (typeof (this.props.data) === "string" && this.props.data !== prevProps.data) {
             dataChanged = true;
-        } else if (typeof (this.props.data) === "object" && 
+        } else if (typeof (this.props.data) === "object" &&
             (this.props.data.length !== prevProps.data.length || !this.props.data.every((e, i) => e[this.props.idField || "id"] === prevProps.data[i][this.props.idField || "id"]))) {
             dataChanged = true;
         }
@@ -759,7 +844,7 @@ class CustomTable extends Component {
                             } else {
                                 colValue = colValue.toString().toLowerCase();
                             }
-                            
+
                             if (colValue.includes(search.toLowerCase())) {
                                 result = true;
                                 break;
@@ -784,7 +869,7 @@ class CustomTable extends Component {
                         return d[f.column].find(_ => f.value.includes(_)) !== undefined;
                     } else {
                         return d[f.column] === f.value[0];
-                    }                    
+                    }
                 });
             });
 

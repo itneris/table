@@ -72,8 +72,29 @@ class TestComnonent extends Component {
         super(props);
         this.state = {
             multiFilter: true,
-            globalLoading: false
+            globalLoading: false,
+            filters: [{ column: "ingridients", value: [ "Beer" ] }],
+            search: "",
+            sorting: [{ column: "createDate", dir: "desc" }]
         };
+    }
+
+    changeFilters (filters) {
+        this.setState({
+            filters: filters
+        })
+    }
+
+    changeSearch (search) {
+        this.setState({
+            search: search
+        })
+    }
+
+    changeSorting (sorting) {
+        this.setState({
+            sorting: sorting
+        })
     }
 
     render() {
@@ -88,22 +109,24 @@ class TestComnonent extends Component {
                     ServerSide with custom filters and sorting
                 </Typography>
             </Box>
-            {/*
+            
             <CustomTable
                 showLoader={() => this.setState({ globalLoading: true })}
                 stopLoader={() => this.setState({ globalLoading: false })}
-                //data="api/Users/List"
-                //filterList="api/Users/GetFilters"
+                data="api/GetTestData"
+                demoData
+                filterList="GetTestFilters"
                 columns={columns(classes)}
-                onRowClick={(n) => this.setState({ modal: n.id })}
-                sort={this.props.sorting}
-                search={this.props.search}
-                onSearchChanged={(searchVal) => this.props.changeSearch(searchVal)}
-                onFilterChanged={(filter) => this.props.changeFilters(filter)}
-                initialFilters={this.props.filters}
-                onSortingChanged={(sort) => this.props.changeSorting(sort)}
+                //onRowClick={(n) => this.setState({ modal: n.id })}
+                sort={this.state.sorting}
+                search={this.state.search}
+                onSearchChanged={(searchVal) => this.changeSearch(searchVal)}
+                onFilterChanged={(filter) => this.changeFilters(filter)}
+                initialFilters={this.state.filters}
+                onSortingChanged={(sort) => this.changeSorting(sort)}
+                rowCount={10}
             />
-            */}
+           
             <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
                 <Typography variant="h6">
                     ClientSide table
