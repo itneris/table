@@ -67,6 +67,12 @@ const columns = classes => [
     }
 ];
 
+const demoFilterList = [
+    { column: "glassType", value: dictionary.map(_ => _.label).sort() },
+    { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
+    { column: "createDate", value: ["Known", "Unknown"] }
+];
+
 class TestComnonent extends Component {
     constructor(props) {
         super(props);
@@ -114,8 +120,9 @@ class TestComnonent extends Component {
                 showLoader={() => this.setState({ globalLoading: true })}
                 stopLoader={() => this.setState({ globalLoading: false })}
                 data="api/GetTestData"
-                demoData
+                demoData = {data}
                 filterList="GetTestFilters"
+                demoFilterList={demoFilterList}
                 columns={columns(classes)}
                 //onRowClick={(n) => this.setState({ modal: n.id })}
                 sort={this.state.sorting}
@@ -141,11 +148,7 @@ class TestComnonent extends Component {
             </Box>
             <CustomTable
                 data={data}
-                filterList={[
-                    { column: "glassType", value: dictionary.map(_ => _.label).sort() },
-                    { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
-                    { column: "createDate", value: ["Known", "Unknown"] },
-                ]}
+                filterList={demoFilterList}
                 multiFilter={this.state.multiFilter}
                 rowCount={10}
                 sortBy="name"

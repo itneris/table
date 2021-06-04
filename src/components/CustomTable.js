@@ -38,8 +38,6 @@ import { KeyboardDatePicker } from '@material-ui/pickers';
 import { HttpUtil, CreateFile } from './utils';
 import moment from 'moment';
 
-import demoData, { dictionary } from "../test_data/data";
-
 const rowCount = 25;
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
 
@@ -318,12 +316,8 @@ class CustomTable extends Component {
 
         if (!this.props.filtersWithData) {
             if (this.props.filterList && typeof (this.props.filterList) === "string") {
-                if(this.props.demoData){
-                    var filtersData = [
-                        { column: "glassType", value: dictionary.map(_ => _.label).sort() },
-                        { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
-                        { column: "createDate", value: ["Known", "Unknown"] },
-                    ];
+                if (this.props.demoFilterList){
+                    var filtersData = this.props.demoFilterList;
                     this.setState({
                         filters: filtersData
                     });
@@ -521,7 +515,7 @@ class CustomTable extends Component {
             this.props.showLoader && this.props.showLoader();
             let filtersData = this.state.filters;
             if (this.props.demoData) {
-                var data = demoData;
+                var data = this.props.demoData;
 
                 await this.sleep(2000);
 
