@@ -114,7 +114,7 @@ options: {
 ```
 ____
 ## Additional classes
-### 1. Table options
+### Table options
 - **rowsPerPage: number** Ч количество строк на странице
 - **page: number** Ч текуща€ страница
 - **search: string** Ч поисковый запрос
@@ -122,10 +122,10 @@ ____
 - **filters: arrayOf(Filter)** Ч текуща€ фильтраци€
 - **columns: arrayOf(string)** Ч текущие отображаемые колонки
 - **headRows: arrayOf(string)** Ч текущие отображаемые строки заголовка
-### 2. File
+### File
 - **name** Ч наименование
 - **file** Ч бинарные данные
-### 2. Filter
+### Filter
 - **name: string** Ч наименование колонки
 - **value: arrayOf(string)** Ч значени€ фильтра
 ```js
@@ -134,7 +134,7 @@ ____
     value: ["¬ работе", "Ќовый"]
 }
 ```
-### 3. Sort
+### Sort
 - **column: string** Ч наименование колонки
 - **dir: "asc" || "desc"** Ч направление сортировки
 ```js
