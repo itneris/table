@@ -1591,37 +1591,23 @@ const styles = {
 
 export default withStyles(styles)(CustomTable);
 
-CustomTable.propTypes = {
-    showLoader: PropTypes.func,
-    stopLoader: PropTypes.func,
-    onSearchChanged: PropTypes.func,
-    onFilterChanged: PropTypes.func,
-    onDownload: PropTypes.func,
-    onSortingChanged: PropTypes.func,
-    data: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-    sortBy: PropTypes.string,
-    sortDir: PropTypes.oneOf(['asc', 'desc']),
-    onDownloadUrl: PropTypes.string,
-    downloadName: PropTypes.string,
-    filterList: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
-    search: PropTypes.string,
-    title: PropTypes.string,
-    mimeType: PropTypes.string,
-    showColNums: PropTypes.bool,
-    stickyHeader: PropTypes.bool,
-    disablePaging: PropTypes.bool,
-    showRowNums: PropTypes.bool,
-    multiFilter: PropTypes.bool,
-    disableSearch: PropTypes.bool,
-    downloadWithFilters: PropTypes.bool,
-    disableSortProps: PropTypes.bool,
-    overflow: PropTypes.bool,
-    filters: PropTypes.array,
-    sort: PropTypes.arrayOf(PropTypes.instanceOf(SortClass)),
-    rowCount: PropTypes.number,
-    initialFilters: PropTypes.arrayOf(PropTypes.instanceOf(FilterClass)),
-    columns: PropTypes.arrayOf(PropTypes.instanceOf(ColumnClass))
-};
+class ColumnOptionsClass {
+    display;
+    type;
+    sort;
+    trasformData;
+    customHeadRender;
+    customBodyRender;
+}
+
+ColumnOptionsClass.propTypes = {
+    display: PropTypes.bool,
+    type: PropTypes.oneOf(['array']),
+    sort: PropTypes.bool,
+    trasformData: PropTypes.func,
+    customHeadRender: PropTypes.func,
+    customBodyRender: PropTypes.func,
+}
 
 class SortClass {
     column;
@@ -1655,20 +1641,34 @@ ColumnClass.propTypes = {
     options: PropTypes.instanceOf(ColumnOptionsClass)
 }
 
-class ColumnOptionsClass {
-    display;
-    type;
-    sort;
-    trasformData;
-    customHeadRender;
-    customBodyRender;
-}
-
-ColumnOptionsClass.propTypes = {
-    display: PropTypes.bool,
-    type: PropTypes.oneOf(['array']),
-    sort: PropTypes.bool,
-    trasformData: PropTypes.func,
-    customHeadRender: PropTypes.func,
-    customBodyRender: PropTypes.func,
-}
+CustomTable.propTypes = {
+    showLoader: PropTypes.func,
+    stopLoader: PropTypes.func,
+    onSearchChanged: PropTypes.func,
+    onFilterChanged: PropTypes.func,
+    onDownload: PropTypes.func,
+    onSortingChanged: PropTypes.func,
+    data: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    sortBy: PropTypes.string,
+    sortDir: PropTypes.oneOf(['asc', 'desc']),
+    onDownloadUrl: PropTypes.string,
+    downloadName: PropTypes.string,
+    filterList: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
+    search: PropTypes.string,
+    title: PropTypes.string,
+    mimeType: PropTypes.string,
+    showColNums: PropTypes.bool,
+    stickyHeader: PropTypes.bool,
+    disablePaging: PropTypes.bool,
+    showRowNums: PropTypes.bool,
+    multiFilter: PropTypes.bool,
+    disableSearch: PropTypes.bool,
+    downloadWithFilters: PropTypes.bool,
+    disableSortProps: PropTypes.bool,
+    overflow: PropTypes.bool,
+    filters: PropTypes.array,
+    sort: PropTypes.arrayOf(PropTypes.instanceOf(SortClass)),
+    rowCount: PropTypes.number,
+    initialFilters: PropTypes.arrayOf(PropTypes.instanceOf(FilterClass)),
+    columns: PropTypes.arrayOf(PropTypes.instanceOf(ColumnClass))
+};
