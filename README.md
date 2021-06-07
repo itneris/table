@@ -4,7 +4,9 @@ ____
 ## Content
 1. [Common props](#Common-props)
 2. [Client-side](#Client-side)
+   - [Example](#Example-client)
 3. [Server-side](#Server-side)
+   - [Example](#Example-server)
 4. [Column properties](#Column-properties)
 5. [Custom actions and Redux compatability](#Custom-actions-and-Redux-compatability)
 6. [Additional classes](#Additional-classes)
@@ -45,6 +47,21 @@ ____
 ```
 2. **downloadName: string** Ч наименование файла выгрузки таблицы
 3. **filterList: arrayOf([Filter](#Filter))** - массив доступных фильтров дл€ таблицы
+### Example client
+```js
+<Table
+    data={this.state.rows}
+    filterList={[
+        { column: "status", value: ["Ѕлокировано", "јктивно"] },
+    ]}
+    initialFilters={[{ column: "status", value: ["јктивно"] }]}
+    onRowClick={(n) => this.props.history.push(`/entity/edit/` + n.id)}
+    sortBy="name"
+    sortDir="asc"
+    columns={columns}
+    onDownloadUrl={"api/Controller/Download"}
+/>
+```
 ____
 ## Server-side
 1. **showLoader: function()** Ч функци€ дл€ отображени€ глобальной загрузки во врем€ запроса к серверу
@@ -59,6 +76,19 @@ ____
  ]
 ```
 6. **filterList: string** Ч URL дл€ выполнени€ GET запроса к серверу дл€ получени€ массива доступных [фильтров](#Filter)
+### Example server
+```js
+<Table
+    showLoader={this.props.showLoader}
+    stopLoader={this.props.stopLoader}
+    data="api/Controller/List"
+    onDownloadUrl="api/Controller/Download"
+    filterList="api/Controller/GetFilters"
+    downloadWithFilters
+    columns={columns}
+    onRowClick={(n) => this.props.history.push("/entity/edit/" + n.id)}
+/>
+```
 ____
 ## Column properties
 1. **name: string** Ч наименование колонки в массиве data таблицы
@@ -78,6 +108,7 @@ customHeadRender: () => <Box display="flex" alignItems="center">
             </Box>
 ```
 - **type: "array"** Ч если задан, то по колонке будет производитс€ поиск и фильтраци€ как по массиву
+- **filterType: "and" || "or"** Ч если задан type = array, то определить "»" или "»Ћ»" фильтраци€ будет производитьс€ по массиву, значение по умолчанию "OR"
 - **trasformData: function(value)** Ч если задано, то по колонке будет производитс€ поиск, сортировка и фильтраци€ как значени€м, которые возвращает функци€
 ```js
 options: {

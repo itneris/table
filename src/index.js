@@ -86,11 +86,9 @@ const theme = createMuiTheme({
 const rootElement = document.getElementById('root');
 
 ReactDOM.render(
-    <React.StrictMode>
-        <MuiThemeProvider theme={theme}>
-            <MuiPickersUtilsProvider utils={MomentUtils}>
-                <Test />
-            </MuiPickersUtilsProvider>
-        </MuiThemeProvider>
-    </React.StrictMode>,
+    <MuiThemeProvider theme={theme}>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+            <Test />
+        </MuiPickersUtilsProvider>
+    </MuiThemeProvider>,
     rootElement);

@@ -517,7 +517,7 @@ class CustomTable extends Component {
             if (this.props.demoData) {
                 var data = this.props.demoData;
 
-                await this.sleep(2000);
+                await this.sleep(200);
 
                 let searchedColumns = tableState.searchedColumn || this.props.columns.map(c => c.name);
                 let rowsPerPage = tableState.rowsPerPage;
@@ -558,8 +558,19 @@ class CustomTable extends Component {
                     data = data.filter(d => {
                         if (colOpts && colOpts.transformData) {
                             return colOpts.transformData(d[f.column], d) === f.value[0];
-                        } else if (colOpts && colOpts.type === "array") {
-                            return d[f.column].find(_ => f.value.includes(_)) !== undefined;
+                        } else if (colOpts.type === "array") {
+                            if (colOpts.filterType === "and") {
+                                let includesAll = true;
+                                f.value.forEach(v => {
+                                    if (d[f.column].find(_ => _ === v) === undefined) {
+                                        includesAll = false;
+                                        return;
+                                    }
+                                });
+                                return includesAll;
+                            } else {
+                               return d[f.column].find(_ => f.value.includes(_)) !== undefined;
+                            }
                         } else {
                             return d[f.column] === f.value[0];
                         }
@@ -860,7 +871,17 @@ class CustomTable extends Component {
                     if (colOpts && colOpts.transformData) {
                         return colOpts.transformData(d[f.column], d) === f.value[0];
                     } else if (colOpts && colOpts.type === "array") {
-                        return d[f.column].find(_ => f.value.includes(_)) !== undefined;
+                        if (colOpts.filterType === "and") {
+                            let includesAll = true;
+                            f.value.forEach(v => {
+                                if (!d[f.column].includes(v)) {
+                                    includesAll = false;
+                                }
+                            });
+                            return includesAll;
+                        } else {
+                            return d[f.column].find(_ => f.value.includes(_)) !== undefined;
+                        }
                     } else {
                         return d[f.column] === f.value[0];
                     }
@@ -1588,6 +1609,7 @@ export default withStyles(styles)(CustomTable);
 class ColumnOptionsClass {
     display;
     type;
+    filterType;
     sort;
     trasformData;
     customHeadRender;
@@ -1597,6 +1619,7 @@ class ColumnOptionsClass {
 ColumnOptionsClass.propTypes = {
     display: PropTypes.bool,
     type: PropTypes.oneOf(['array']),
+    filterType: PropTypes.oneOf(['and', 'or']),
     sort: PropTypes.bool,
     trasformData: PropTypes.func,
     customHeadRender: PropTypes.func,
