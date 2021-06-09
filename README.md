@@ -13,8 +13,7 @@ ____
 ____
 ## Common props
 1. **onDownload: function([options](#Table-options))** Ч действие по нажатию на иконку скачивани€
-2. **sortBy: string** Ч если задано, то колонка начальной сортировки таблицы
-3. **sortDir: "asc" || "desc"** Ч если задано, то направление начальной сортировки таблицы
+2. **sort: arrayOf([Sort](#Sort))** Ч начальна€ сортировка таблицы
 4. **title: string** Ч если задано, то будет выведен заголовок страницы с иконкой поиска, в противном случае поиск будет доступен всегда
 5. **mimeType: string** Ч mime-type дл€ файла выгрузки таблицы, по умолчанию _text/csv_
 6. **showColNums: bool** Ч отображение номеров колонок таблицы, по умочанию _false_
@@ -54,10 +53,9 @@ ____
     filterList={[
         { column: "status", value: ["Ѕлокировано", "јктивно"] },
     ]}
-    initialFilters={[{ column: "status", value: ["јктивно"] }]}
+    filters={[{ column: "status", value: ["јктивно"] }]}
     onRowClick={(n) => this.props.history.push(`/entity/edit/` + n.id)}
-    sortBy="name"
-    sortDir="asc"
+    sort={[{ column: "name", dir: "desc" }]}
     columns={columns}
     onDownloadUrl={"api/Controller/Download"}
 />
@@ -127,15 +125,15 @@ options: {
     onSearchChanged={(searchVal) => this.props.changeSearch(searchVal)}
 />
 ```
-3. **initialFilters ([Filter](#Filter))** Ч текцщие фильтры по таблице
-4. **onFilterChanged (function(filters: arrayOf([Filter](#Filter))))** Ч если функци€ задана вместе с initialFilters, таблица дл€ поиска значений будет использовать initialFilters дл€ каждого обновлени€ и возвращать результат изменени€ фильтрации значени€ в родительский компоненет
+3. **filters (arrayOf([Filter](#Filter)))** Ч текущие фильтры по таблице
+4. **onFilterChanged (function(filters: arrayOf([Filter](#Filter))))** Ч если функци€ задана вместе с filters, таблица дл€ поиска значений будет использовать initialFilters дл€ каждого обновлени€ и возвращать результат изменени€ фильтрации значени€ в родительский компоненет
 ```js
 <Table
-    initialFilters={this.props.filter}
+    filters={this.props.filter}
     onFilterChanged={(filter) => this.props.changeFilters(filter)}
 />
 ```
-3. **sort ([Filter](#Filter))** Ч текуща€ сортировка таблицы
+3. **sort (arrayOf([Sort](#Sort)))** Ч текуща€ сортировка таблицы
 4. **onSortingChanged (function(sort: arrayOf([Sort](#Sort))))** Ч если функци€ задана вместе с sort, таблица дл€ сортировки значений будет использовать sort дл€ каждого обновлени€ и возвращать результат изменени€ сортировки значени€ в родительский компоненет
 ```js
 <Table
@@ -149,7 +147,7 @@ ____
 - **rowsPerPage: number** Ч количество строк на странице
 - **page: number** Ч текуща€ страница
 - **search: string** Ч поисковый запрос
-- **sort: string** Ч поисковый запрос
+- **sort: arrayOf(Sort)** Ч фильтраци€
 - **filters: arrayOf(Filter)** Ч текуща€ фильтраци€
 - **columns: arrayOf(string)** Ч текущие отображаемые колонки
 - **headRows: arrayOf(string)** Ч текущие отображаемые строки заголовка
