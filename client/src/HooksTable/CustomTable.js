@@ -388,6 +388,39 @@ function tableReducer(state, action) {
     }
 }
 
+/*const usePrevious = (value, initialValue) => {
+    const ref = useRef(initialValue);
+    useEffect(() => {
+        ref.current = value;
+    });
+    return ref.current;
+};
+
+const useEffectDebugger = (effectHook, dependencies, dependencyNames = []) => {
+    const previousDeps = usePrevious(dependencies, []);
+
+    const changedDeps = dependencies.reduce((accum, dependency, index) => {
+        if (dependency !== previousDeps[index]) {
+            const keyName = dependencyNames[index] || index;
+            return {
+                ...accum,
+                [keyName]: {
+                    before: previousDeps[index],
+                    after: dependency
+                }
+            };
+        }
+
+        return accum;
+    }, {});
+
+    if (Object.keys(changedDeps).length) {
+        console.log('[use-effect-debugger] ', changedDeps);
+    }
+
+    useEffect(effectHook, dependencies);
+};*/
+
 function NerisTable(props) {
     let menuButtonElement = useRef(null);
     let sectionsButtonElement = useRef(null);
@@ -442,7 +475,7 @@ function NerisTable(props) {
     const [ctrlIsClicked, setCtrlIsClicked] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [rows, setRows] = useState([]);
-    const [filters, setFilters] = useState(filterList || []);
+    const [filters, setFilters] = useState([]);
     const [total, setTotal] = useState(0);
     const [openTotals, setOpenTotals] = useState([]);
 
@@ -468,6 +501,7 @@ function NerisTable(props) {
         return returnHeadRows;
     }, [propHeadRows, columns]);
 
+    //useEffectDebugger(() => {
     useEffect(() => {
         if (typeof (data) === "string") {
             let options = {
@@ -549,11 +583,11 @@ function NerisTable(props) {
             setRows(disablePaging ? rows : rows.slice(table.rowsPerPage * table.page, table.rowsPerPage * (table.page + 1)));
         }
     }, [
-            showLoader,
-            stopLoader,
+            //showLoader,
+            //stopLoader,
+            //columns,
             data,
             filtersWithData,
-            columns,
             disablePaging,
             propSearchColumns,
             table.filters,
@@ -1419,8 +1453,8 @@ NerisTable.propTypes = {
     downloadWithFilters: PropTypes.bool,
     overflow: PropTypes.bool,
     filters: PropTypes.array,
-    sort: PropTypes.arrayOf(PropTypes.instanceOf(SortClass)),
+    sort: PropTypes.arrayOf(PropTypes.instanceOf(PropTypes.object)),
     rowCount: PropTypes.number,
-    fitlers: PropTypes.arrayOf(PropTypes.instanceOf(FilterClass)),
+    fitlers: PropTypes.arrayOf(PropTypes.instanceOf(PropTypes.object)),
     columns: PropTypes.arrayOf(PropTypes.object)
 };

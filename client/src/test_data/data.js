@@ -34,7 +34,7 @@ const data = [
     { id: 32, name: "Wine", price: 5.04, ingridients: ["Wine"], createDate: null, glassType: 2 },
 ]
 
-export const dictionary = [
+const dictionary = [
     { id: 1, label: "Cup" },
     { id: 2, label: "Highball" },
     { id: 3, label: "Rox" },
@@ -42,4 +42,5 @@ export const dictionary = [
     { id: 5, label: "Shot" },
 ]
 
-export default data;
+exports.data = data;
+exports.dictionary = dictionary;
