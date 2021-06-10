@@ -1025,7 +1025,7 @@ function NerisTable(props) {
                                     style={{ fontSize: 12, padding: "6px 8px" }}
                                     onClick={() => {
                                         dispatch({ type: RESET_FILTERS });
-                                        onFilterChanged([]);
+                                        onFilterChanged && onFilterChanged([]);
                                     }}
                                 >
                                     СБРОСИТЬ
