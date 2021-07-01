@@ -36,6 +36,7 @@ ____
 12. **overflow: bool** Ч позвол€ет таблице раст€гиватьс€ за границы экрана по оси X со скроллбаром, по умочанию _false_
 13. **rowCount: number** Ч количество строк на странице, по умолчанию _25_
 13. **columns: arrayOf([Column](#Column-properties))** Ч массив колонок таблицы
+13. **disableToken: bool** Ч отключить передачу accessToken на сервер, по умолчанию false
 ## Client-side
 1. **data: array** Ч данные таблицы, массив вида
 ```js

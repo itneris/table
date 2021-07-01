@@ -466,7 +466,8 @@ function NerisTable(props) {
         totalRow,
         rowsPerPageOptions,
         classes,
-        disableSearch
+        disableSearch,
+        disableToken
     } = props;
 
     const [showSearch, setShowSearch] = useState(title ? !!propSearch : true);
@@ -513,7 +514,7 @@ function NerisTable(props) {
             };
             async function fetchServer() {
                 showLoader && showLoader();
-                var rowData = await HttpUtil.fetchAsync(data, options, "POST");
+                var rowData = await HttpUtil.fetchAsync(data, options, "POST", disableToken ? true : false);
                 setIsLoading(false);
                 setRows(rowData.rows);
                 setTotal(rowData.total);
@@ -601,7 +602,7 @@ function NerisTable(props) {
         if (!filtersWithData) {
             if (filterList && typeof (filterList) === "string") {
                 async function fetchFiltersFromServer() {
-                    const filtersData = await HttpUtil.fetchGetAsync(filterList);
+                    const filtersData = await HttpUtil.fetchGetAsync(filterList, null, disableToken ? true : false);
                     setFilters(filtersData);
                 }
                 fetchFiltersFromServer();
@@ -940,9 +941,9 @@ function NerisTable(props) {
                                             sort: table.sort,
                                             filters: table.filters
                                         };
-                                        data = await HttpUtil.fetchAsync(onDownload, options, "POST");
+                                        data = await HttpUtil.fetchAsync(onDownload, options, "POST", disableToken ? true : false);
                                     } else {
-                                        data = await HttpUtil.fetchGetAsync(onDownload);
+                                        data = await HttpUtil.fetchGetAsync(onDownload, null, disableToken ? true : false);
                                     };
 
                                     if (data.error) {
@@ -1451,6 +1452,7 @@ NerisTable.propTypes = {
     multiFilter: PropTypes.bool,
     disableSearch: PropTypes.bool,
     downloadWithFilters: PropTypes.bool,
+    disableToken: PropTypes.bool,
     overflow: PropTypes.bool,
     filters: PropTypes.array,
     sort: PropTypes.arrayOf(PropTypes.instanceOf(PropTypes.object)),

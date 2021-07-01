@@ -322,7 +322,7 @@ class CustomTable extends Component {
                         filters: filtersData
                     });
                 } else {
-                    const filtersData = await HttpUtil.fetchGetAsync(this.props.filterList);
+                    const filtersData = await HttpUtil.fetchGetAsync(this.props.filterList, null, this.props.disableToken ? true : false);
                     this.setState({
                         filters: filtersData.filters
                     });
@@ -591,7 +591,7 @@ class CustomTable extends Component {
                 });
 
             } else {
-                var rowData = await HttpUtil.fetchAsync(this.props.data, options, "POST");
+                var rowData = await HttpUtil.fetchAsync(this.props.data, options, "POST", this.props.disableToken ? true : false);
 
                 if (this.props.filtersWithData)
                     filtersData = rowData.filters;
@@ -1067,9 +1067,9 @@ class CustomTable extends Component {
                                                 columns,
                                                 headRows: this.props.headRows
                                             };
-                                            data = await HttpUtil.fetchAsync(this.props.onDownloadUrl, options, "POST");
+                                            data = await HttpUtil.fetchAsync(this.props.onDownloadUrl, options, "POST", this.props.disableToken ? true : false);
                                         } else {
-                                            data = await HttpUtil.fetchGetAsync(this.props.onDownloadUrl);
+                                            data = await HttpUtil.fetchGetAsync(this.props.onDownloadUrl, null, this.props.disableToken ? true : false);
                                         };
 
                                         if (data.error) {
@@ -1682,6 +1682,7 @@ CustomTable.propTypes = {
     disableSearch: PropTypes.bool,
     downloadWithFilters: PropTypes.bool,
     disableSortProps: PropTypes.bool,
+    disableToken: PropTypes.bool,
     overflow: PropTypes.bool,
     filters: PropTypes.array,
     sort: PropTypes.arrayOf(PropTypes.instanceOf(SortClass)),

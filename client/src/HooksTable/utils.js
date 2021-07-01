@@ -1,5 +1,5 @@
 export const HttpUtil = {
-    fetchGetAsync: async (url, params) => {
+    fetchGetAsync: async (url, params, withCredentials) => {
         if (params) {
             url += "?";
             var paramsBody = Object.keys(params)
@@ -15,25 +15,37 @@ export const HttpUtil = {
             method: 'GET'
         };
 
-        var token = localStorage.getItem("accessToken");
-        options.headers = {
-            'Authorization': `Bearer ${token}`
+        if (withCredentials) {
+            options.withCredentials = "include";
+        } else {
+            var token = localStorage.getItem("accessToken");
+            options.headers = {
+                'Authorization': `Bearer ${token}`
+            }
         }
 
         var response = await fetch(url, options);
         return await response.json();
     },
 
-    fetchAsync: async (url, params, method) => {
-        var token = localStorage.getItem("accessToken");
+    fetchAsync: async (url, params, method, withCredentials) => {
         var options = {
             method: method,
-            body: `${JSON.stringify(params)}`,
-            headers: {
+            body: `${JSON.stringify(params)}`
+        };
+
+        if (withCredentials) {
+            options.withCredentials = "include";
+            options.headers = {
+                'Content-Type': 'application/json'
+            }
+        } else {
+            var token = localStorage.getItem("accessToken");
+            options.headers = {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
-        };
+        }
 
         var response = await fetch(url, options);
         return await response.json();
