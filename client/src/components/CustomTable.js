@@ -1,4 +1,4 @@
-import React, { useReducer, useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useReducer, useState, useMemo, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import {
@@ -424,7 +424,7 @@ const useEffectDebugger = (effectHook, dependencies, dependencyNames = []) => {
     useEffect(effectHook, dependencies);
 };*/
 
-function NerisTable(props) {
+const NerisTable = forwardRef((props, ref) => {
     let menuButtonElement = useRef(null);
     let sectionsButtonElement = useRef(null);
     let searchElement = useRef(null);
@@ -507,27 +507,40 @@ function NerisTable(props) {
         return returnHeadRows;
     }, [propHeadRows, columns]);
 
+    async function fetchServer() {
+        showLoader && showLoader();
+        let options = {
+            rowsPerPage: table.rowsPerPage,
+            page: table.page,
+            search: table.search,
+            sort: table.sort,
+            filters: table.filters
+        };
+        var rowData = await HttpUtil.fetchAsync(data, options, "POST", disableToken ? true : false);
+        setIsLoading(false);
+        setRows(rowData.rows);
+        setTotal(rowData.total);
+        if (filtersWithData) {
+            setFilters(rowData.filtersData);
+        }
+        stopLoader && stopLoader();
+    }
+
+    useImperativeHandle(ref, () => ({
+        fetch() {
+            fetchServer();
+        },
+        getData() {
+            return rows;
+        },
+        transformData(data) {
+            setRows(data)
+        }
+    }));
+
     //useEffectDebugger(() => {
     useEffect(() => {
         if (typeof (data) === "string") {
-            let options = {
-                rowsPerPage: table.rowsPerPage,
-                page: table.page,
-                search: table.search,
-                sort: table.sort,
-                filters: table.filters
-            };
-            async function fetchServer() {
-                showLoader && showLoader();
-                var rowData = await HttpUtil.fetchAsync(data, options, "POST", disableToken ? true : false);
-                setIsLoading(false);
-                setRows(rowData.rows);
-                setTotal(rowData.total);
-                if (filtersWithData) {
-                    setFilters(rowData.filtersData);
-                }
-                stopLoader && stopLoader();
-            }
             fetchServer();
         } else {
             let rows = [...data];
@@ -589,19 +602,19 @@ function NerisTable(props) {
             setRows(disablePaging ? rows : rows.slice(table.rowsPerPage * table.page, table.rowsPerPage * (table.page + 1)));
         }
     }, [
-            //showLoader,
-            //stopLoader,
-            //columns,
-            data,
-            filtersWithData,
-            disablePaging,
-            disableToken,
-            propSearchColumns,
-            table.filters,
-            table.rowsPerPage,
-            table.search,
-            table.sort,
-            table.page
+        //showLoader,
+        //stopLoader,
+        //columns,
+        data,
+        filtersWithData,
+        disablePaging,
+        disableToken,
+        propSearchColumns,
+        table.filters,
+        table.rowsPerPage,
+        table.search,
+        table.sort,
+        table.page
     ]);
 
     useEffect(() => {
@@ -911,7 +924,7 @@ function NerisTable(props) {
                             </div>
                     }
                     {
-                        (!title && disableSearch && table.filters.length > 0 ) &&
+                        (!title && disableSearch && table.filters.length > 0) &&
                         <Box display="flex" pl="24px" flexWrap="wrap">
                             {
                                 table.filters.map(f =>
@@ -1031,15 +1044,15 @@ function NerisTable(props) {
                                             color="secondary"
                                             checked={table.sections[c.options.section].expanded}
                                             onChange={() => dispatch({
-                                                type: SET_SECTIONS, 
+                                                type: SET_SECTIONS,
                                                 sections: {
-                                                        ...table.sections,
-                                                        [c.options.section]: {
-                                                            ...table.sections[c.options.section],
-                                                            expanded: !table.sections[c.options.section].expanded
-                                                        }
+                                                    ...table.sections,
+                                                    [c.options.section]: {
+                                                        ...table.sections[c.options.section],
+                                                        expanded: !table.sections[c.options.section].expanded
                                                     }
-                                                })
+                                                }
+                                            })
                                             }
                                         />
                                         <Box width="275px" ml="16px">
@@ -1276,12 +1289,15 @@ function NerisTable(props) {
                                             onClick={() => !n.totalRow && onRowClick && onRowClick(n)}
                                             onContextMenu={e => {
                                                 if (context) {
-                                                    e.preventDefault();                                                    
-                                                    setContextOptions(
-                                                        contextOptions === null ?
-                                                            { position: { x: e.clientX - 2, y: e.clientY - 4 }, context, id: n[idField], row: n } :
-                                                            {}
-                                                    );
+                                                    e.preventDefault();
+                                                    let visibleContext = context.filter(c => c.hidden === undefined || c.hidden === null || c.hidden(n) === false);
+                                                    if (visibleContext.length > 0) {
+                                                        setContextOptions(
+                                                            contextOptions === null ?
+                                                                { position: { x: e.clientX - 2, y: e.clientY - 4 }, context: visibleContext, id: n[idField], row: n } :
+                                                                {}
+                                                        );
+                                                    }
                                                 }
                                             }}
                                         >
@@ -1367,40 +1383,37 @@ function NerisTable(props) {
                 />
             }
         </Paper>
-        {
-            context !== undefined &&
-            <Menu
-                anchorReference="anchorPosition"
-                anchorPosition={
-                    contextOptions !== null
-                        ? { top: contextOptions.position.y, left: contextOptions.position.x }
-                        : undefined
-                }
-                open={contextOptions !== null}
-                onClose={() => setContextOptions(null)}
-            >
-                {
-                    contextOptions && contextOptions.context.map((o, i) => <MenuItem
-                        key={"cm-" + i}
-                        onClick={() => {
-                            if (o.prevContext) {
-                                setContextOptions({ ...contextOptions, context: o.prevContext });
-                            } else if (o.options) {
-                                setContextOptions({ ...contextOptions, context: [...o.options, { name: "<", prevContext: contextOptions.context }]});
-                            } else {
-                                setContextOptions(null);
-                                o.action(contextOptions.id, contextOptions.row);
-                            }
+        <Menu
+            anchorReference="anchorPosition"
+            anchorPosition={
+                contextOptions !== null
+                    ? { top: contextOptions.position.y, left: contextOptions.position.x }
+                    : undefined
+            }
+            open={contextOptions !== null}
+            onClose={() => setContextOptions(null)}
+        >
+            {
+                contextOptions && contextOptions.context.map((o, i) => <MenuItem
+                    key={"cm-" + i}
+                    onClick={() => {
+                        if (o.prevContext) {
+                            setContextOptions({ ...contextOptions, context: o.prevContext });
+                        } else if (o.options) {
+                            setContextOptions({ ...contextOptions, context: [...o.options, { name: "<", prevContext: contextOptions.context }] });
+                        } else {
+                            setContextOptions(null);
+                            o.action(contextOptions.id, contextOptions.row);
                         }
-                        }
-                    >
-                        {o.name}
-                    </MenuItem>)
-                }
-            </Menu>
-        }
+                    }
+                    }
+                >
+                    {o.name}
+                </MenuItem>)
+            }
+        </Menu>
     </>;
-}
+})
 
 const useStyles = makeStyles({
     inputRoot: {

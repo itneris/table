@@ -3,13 +3,14 @@ Custom ItNeris company grid based on MaterialUI
 ____
 ## Content
 1. [Common props](#Common-props)
-2. [Client-side](#Client-side)
+2. [Methods](#Methods)
+3. [Client-side](#Client-side)
    - [Example](#Example-client)
-3. [Server-side](#Server-side)
+4. [Server-side](#Server-side)
    - [Example](#Example-server)
-4. [Column properties](#Column-properties)
-5. [Custom actions and Redux compatability](#Custom-actions-and-Redux-compatability)
-6. [Additional classes](#Additional-classes)
+5. [Column properties](#Column-properties)
+6. [Custom actions and Redux compatability](#Custom-actions-and-Redux-compatability)
+7. [Additional classes](#Additional-classes)
 ____
 ## Common props
 1. **onDownload: function([options](#Table-options)) || string** — действие по нажатию на иконку скачивания, если функция, или URL для выполнения GET запроса к серверу для получения [файла выгрузки](#File) в случае строки
@@ -53,6 +54,10 @@ ____
  }
 ```
 20. **disableToken: bool** — отключить передачу accessToken на сервер, по умолчанию false
+## Methods
+1. **fetch()** — вызывает запрос на сервер для обновления данных
+2. **getData()** — возвращает список текущих строк
+3. **transformData(rows)** — заменяет список текущих строк
 ## Client-side
 1. **data: array** — данные таблицы, массив вида
 ```js
@@ -195,12 +200,14 @@ ____
 ### Context option
 - **name: string** — наименование пункта меню
 - **action: function(id, row)** — действие по нажатию
+- **hidden: bool** — скрывать пункт для строки
 - **options: arrayOf([Context option](#Context-option))** — вложенное суб-меню 
 ```js
 [
     {
         name: "Show row Id ",
         action: (id, row) => alert(id),
+        hidden: row => row.id % 2 === 0,
     },
     {
         name: "Show inner menu",
