@@ -23,6 +23,7 @@ ____
 10. **disableSearch: bool** — отключает возможность поиска по таблице, по умочанию _false_
 11. **disableSortProps: bool** — позволяет выполнять внутреннюю сортировку таблицы с включенным **onSortingChanged** для написания только связанных эффектов сортировки, по умочанию _false_
 12. **context: arrayOf([Context option](#Context-option))** — опции контекстного меню
+13. **stripedRows: bool** — подкрашивать четные строки, по умочанию _false_
 ```js
 <Table
     data={this.state.tableData}

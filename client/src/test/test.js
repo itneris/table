@@ -248,6 +248,7 @@ function TestComnonent(props) {
                     filterList={demoFilterList}
                     multiFilter={multiFilter}
                     rowCount={10}
+                    stripedRows={true}
                     sort={[{ column: "name", dir: "asc" }]}
                     columns={columns(classes, false, isFilterOr ? "or" : "and")}
                     context={[

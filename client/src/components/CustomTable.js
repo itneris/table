@@ -1,5 +1,5 @@
 import React, { useReducer, useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import {
     Paper,
@@ -428,6 +428,7 @@ function NerisTable(props) {
     let menuButtonElement = useRef(null);
     let sectionsButtonElement = useRef(null);
     let searchElement = useRef(null);
+    const classes = useStyles();
 
     const {
         showLoader,
@@ -468,7 +469,6 @@ function NerisTable(props) {
         stripedRows,
         totalRow,
         rowsPerPageOptions,
-        classes,
         disableSearch,
         disableToken,
         context
@@ -1402,7 +1402,7 @@ function NerisTable(props) {
     </>;
 }
 
-const styles = {
+const useStyles = makeStyles({
     inputRoot: {
         marginTop: "24px !important"
     },
@@ -1422,9 +1422,9 @@ const styles = {
         color: "rgba(0, 0, 0, 0.54)",
         marginRight: 8
     }
-}
+})
 
-export default withStyles(styles)(NerisTable);
+export default NerisTable;
 
 class ColumnOptionsClass {
     display;
@@ -1519,4 +1519,5 @@ NerisTable.propTypes = {
     filters: PropTypes.arrayOf(PropTypes.object),
     columns: PropTypes.arrayOf(PropTypes.object),
     context: PropTypes.arrayOf(PropTypes.object),
+    stripedRows: PropTypes.bool
 };
