@@ -934,7 +934,7 @@ function NerisTable(props) {
                             </IconButton>
                         }
                         {
-                            (onDownload && typeof onDownload === "function") &&
+                            (onDownload && typeof onDownload !== "function") &&
                             <IconButton
                                 onClick={async () => {
                                     showLoader && showLoader();
@@ -978,7 +978,7 @@ function NerisTable(props) {
                             </IconButton>
                         }
                         {
-                            (onDownload && typeof onDownload !== "function") &&
+                            (onDownload && typeof onDownload === "function") &&
                             <IconButton
                                 onClick={() => {
                                     let options = {
