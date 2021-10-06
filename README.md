@@ -22,6 +22,7 @@ ____
 9.  **multiFilter: bool** — позволяет выбирать множества значений в фильтрах таблицы, по умочанию _false_
 10. **disableSearch: bool** — отключает возможность поиска по таблице, по умочанию _false_
 11. **disableSortProps: bool** — позволяет выполнять внутреннюю сортировку таблицы с включенным **onSortingChanged** для написания только связанных эффектов сортировки, по умочанию _false_
+12. **context: arrayOf([Context option](#Context-option))** — опции контекстного меню
 ```js
 <Table
     data={this.state.tableData}
@@ -188,4 +189,26 @@ ____
     column: "date",
     dir: "desc"
 }
+```
+
+### Context option
+- **name: string** — наименование пункта меню
+- **action: function(id, row)** — действие по нажатию
+- **options: arrayOf([Context option](#Context-option))** — вложенное суб-меню 
+```js
+[
+    {
+        name: "Show row Id ",
+        action: (id, row) => alert(id),
+    },
+    {
+        name: "Show inner menu",
+        options: [
+            {
+                name: "Show row column 'name'",
+                action: (id, row) => alert(row[name])
+            }
+        ]
+    }
+]
 ```
