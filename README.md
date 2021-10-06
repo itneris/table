@@ -12,7 +12,7 @@ ____
 6. [Additional classes](#Additional-classes)
 ____
 ## Common props
-1. **onDownload: function([options](#Table-options))** — действие по нажатию на иконку скачивания
+1. **onDownload: function([options](#Table-options)) || string** — действие по нажатию на иконку скачивания, если функция, или URL для выполнения GET запроса к серверу для получения [файла выгрузки](#File) в случае строки
 2. **sort: arrayOf([Sort](#Sort))** — начальная сортировка таблицы
 4. **title: string** — если задано, то будет выведен заголовок страницы с иконкой поиска, в противном случае поиск будет доступен всегда
 5. **mimeType: string** — mime-type для файла выгрузки таблицы, по умолчанию _text/csv_
@@ -79,9 +79,8 @@ ____
 ## Server-side
 1. **showLoader: function()** — функция для отображения глобальной загрузки во время запроса к серверу
 2. **stopLoader: function()** — функция для скрытия глобальной загрузки во время запроса к серверу
-3. **onDownloadUrl: string** — URL для выполнения GET запроса к серверу для получения [файла выгрузки](#File)
-4. **downloadWithFilters: bool** — если true, то для получения Blob будет выполнен POST запрос с передачей [опций таблицы](#Table-options) в теле запроса
-5. **data: string** — URL для выполнения POST запроса с передачей [опций](#Table-options) в теле запроса, в ответ ожидает массив вида
+3. **downloadWithFilters: bool** — если true, то для получения Blob будет выполнен POST запрос с передачей [опций таблицы](#Table-options) в теле запроса
+4. **data: string** — URL для выполнения POST запроса с передачей [опций](#Table-options) в теле запроса, в ответ ожидает массив вида
 ```js
  [
     { id: 1, name: 'name 1', date: '2021-03-02T12:00:00' },
@@ -174,6 +173,7 @@ ____
 ### Filter
 - **name: string** — наименование колонки
 - **value: arrayOf(string)** — значения фильтра
+- **inToolbar: bool** — отобразить фильтр в тулбаре, по умолчанию _false_
 ```js
 {
     column: "status",

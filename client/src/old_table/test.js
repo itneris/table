@@ -10,13 +10,13 @@ import {
     Tabs,
     Tab,
 } from "@material-ui/core";
-import CustomTable from "./CustomTable";
+import CustomTable from "../components/CustomTable";
 import { ToRuDate } from "../utils/utils";
 import { withStyles } from "@material-ui/core/styles";
-import demo from "../test_data/data";
+import data, { dictionary } from "../test_data/data";
 import { HelpOutline } from "@material-ui/icons";
 
-const columns = (classes, isServer, filterType) => [
+const columns = (classes, filterType) => [
     {
         name: "id",
         options: {
@@ -36,8 +36,8 @@ const columns = (classes, isServer, filterType) => [
                     <HelpOutline className={classes.question} />
                 </Tooltip>
             </Box>,
-            customBodyRender: isServer ? undefined : v => demo.dictionary.find(_ => _.id === v).label,
-            transformData: isServer ? undefined : v => demo.dictionary.find(_ => _.id === v).label
+            customBodyRender: v => dictionary.find(_ => _.id === v).label,
+            transformData: v => dictionary.find(_ => _.id === v).label
         }
     },
     {
@@ -67,23 +67,6 @@ const columns = (classes, isServer, filterType) => [
         options: {
             customBodyRender: v => v ? ToRuDate(v, false) : "-",
             transformData: v => v ? "Known" : "Unknown"
-        }
-    }
-];
-
-const columsWithAction = (classes, isServer, filterType) => [
-    ...columns(classes, isServer, filterType), {
-        name: "action",
-        label: "Actions",
-        options: {
-            sort: false,
-            customBodyRender: (v, row) => <Button
-                color="secondary"
-                variant="text"
-                onClick={() => alert(row.id)}
-            >
-                Show ID
-            </Button>
         }
     }
 ];
@@ -125,8 +108,8 @@ const columnsMultiheader = classes => [
             rowSpan: 1,
             section: 1,
             customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)" },
-            customBodyRender: v => demo.dictionary.find(_ => _.id === v).label,
-            transformData: v => demo.dictionary.find(_ => _.id === v).label
+            customBodyRender: v => dictionary.find(_ => _.id === v).label,
+            transformData: v => dictionary.find(_ => _.id === v).label
         }
     },
     {
@@ -188,7 +171,7 @@ const columnsMultiheader = classes => [
 ];
 
 const demoFilterList = [
-    { column: "glassType", value: demo.dictionary.map(_ => _.label).sort() },
+    { column: "glassType", value: dictionary.map(_ => _.label).sort() },
     { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
     { column: "createDate", value: ["Known", "Unknown"] }
 ];
@@ -200,7 +183,6 @@ class TestComnonent extends Component {
             multiFilter: true,
             isFilterOr: false,
             globalLoading: false,
-            showAction: false,
             filters: [{ column: "ingridients", value: [ "Beer" ] }],
             search: "",
             sorting: [{ column: "createDate", dir: "desc" }],
@@ -208,16 +190,22 @@ class TestComnonent extends Component {
         };
     }
 
-    changeFilters(filters) {
-        localStorage.setItem("filters", JSON.stringify(filters));
+    changeFilters (filters) {
+        this.setState({
+            filters: filters
+        })
     }
 
-    changeSearch(search) {
-        localStorage.setItem("search", search);
+    changeSearch (search) {
+        this.setState({
+            search: search
+        })
     }
 
-    changeSorting(sorting) {
-        localStorage.setItem("sorting", JSON.stringify(sorting));
+    changeSorting (sorting) {
+        this.setState({
+            sorting: sorting
+        })
     }
 
     render() {
@@ -228,13 +216,39 @@ class TestComnonent extends Component {
                 <LinearProgress color='secondary' className={classes.globalLoader} />
             }
             <Tabs value={this.state.tab} onChange={(e, val) => this.setState({ tab: val })}>
-                <Tab label="Client" />
                 <Tab label="Server" />
+                <Tab label="Client" />
                 <Tab label="Headers"/>
-                <Tab label="Storage"/>
             </Tabs>        
             {
                 this.state.tab === 0 && <>
+                    <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
+                        <Typography variant="h6">
+                            ServerSide with custom filters and sorting
+                        </Typography>
+                    </Box>            
+                    <CustomTable
+                        showLoader={() => this.setState({ globalLoading: true })}
+                        stopLoader={() => this.setState({ globalLoading: false })}
+                        data="api/GetTestData"
+                        demoData = {data}
+                        filterList="GetTestFilters"
+                        demoFilterList={demoFilterList}
+                        columns={columns(classes)}
+                        //onRowClick={(n) => this.setState({ modal: n.id })}
+                        sort={this.state.sorting}
+                        search={this.state.search}
+                        onSearchChanged={(searchVal) => this.changeSearch(searchVal)}
+                        onFilterChanged={(filter) => this.changeFilters(filter)}
+                        initialFilters={this.state.filters}
+                        onSortingChanged={(sort) => this.changeSorting(sort)}
+                        rowCount={10}
+                    />
+                </>
+            }
+
+            {
+                this.state.tab === 1 && <>
                     <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
                         <Typography variant="h6">
                             ClientSide table
@@ -259,43 +273,13 @@ class TestComnonent extends Component {
                         </Box>
                     </Box>
                     <CustomTable
-                        data={demo.data}
+                        data={data}
                         filterList={demoFilterList}
                         multiFilter={this.state.multiFilter}
                         rowCount={10}
-                        sort={[{ column: "name", dir: "asc" }]}
-                        columns={columns(classes, false, this.state.isFilterOr ? "or" : "and")}
-                    />
-                </>
-            }
-
-            {
-                this.state.tab === 1 && <>
-                    <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                        <Typography variant="h6">
-                            ServerSide
-                        </Typography>
-                        <Box alignItems="center" display="flex">
-                            <FormControlLabel
-                                control={<Checkbox
-                                    checked={this.state.showAction}
-                                    onChange={() => this.setState({ showAction: !this.state.showAction })}
-                                />}
-                                label="Enable action column"
-                            />
-                        </Box>
-                    </Box>
-                    <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                        <Typography variant="h6">
-                        </Typography>
-                    </Box>
-                    <CustomTable
-                        showLoader={() => this.setState({ globalLoading: true })}
-                        stopLoader={() => this.setState({ globalLoading: false })}
-                        data="api/GetData"
-                        filterList="api/GetFilters"
-                        columns={this.state.showAction ? columsWithAction(classes, true) : columns(classes, true)}
-                        rowCount={10}
+                        sortBy="name"
+                        sortDir="asc"
+                        columns={columns(this, this.state.isFilterOr ? "or" : "and")}
                     />
                 </>
             }
@@ -306,7 +290,7 @@ class TestComnonent extends Component {
                         Table with custom headers
                     </Typography>
                     <CustomTable
-                        data={demo.data}
+                        data={data}
                         totalRow="rowNumber"
                         rowCount={100}
                         maxHeight={200}
@@ -354,27 +338,6 @@ class TestComnonent extends Component {
                                 </Button>
                             </Box>
                         }
-                    />
-                </>
-            }
-            {
-                this.state.tab === 3 && <>
-                    <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                        <Typography variant="h6">
-                            Local storage browser demo
-                        </Typography>
-                    </Box>
-                    <CustomTable
-                        data={demo.data}
-                        columns={columns(this)}
-                        filterList={demoFilterList}
-                        search={localStorage.getItem("search") || ""}
-                        sort={JSON.parse(localStorage.getItem("sorting")) || []}
-                        filters={JSON.parse(localStorage.getItem("filters")) || []}
-                        onSearchChanged={(searchVal) => this.changeSearch(searchVal)}
-                        onFilterChanged={(filter) => this.changeFilters(filter)}
-                        onSortingChanged={(sort) => this.changeSorting(sort)}
-                        rowCount={10}
                     />
                 </>
             }

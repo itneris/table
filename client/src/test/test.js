@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import {
     Typography,
     Box,
@@ -13,10 +13,10 @@ import {
 import CustomTable from "../components/CustomTable";
 import { ToRuDate } from "../utils/utils";
 import { withStyles } from "@material-ui/core/styles";
-import data, { dictionary } from "../test_data/data";
+import demo from "../test_data/data";
 import { HelpOutline } from "@material-ui/icons";
 
-const columns = (classes, filterType) => [
+const columns = (classes, isServer, filterType) => [
     {
         name: "id",
         options: {
@@ -36,8 +36,8 @@ const columns = (classes, filterType) => [
                     <HelpOutline className={classes.question} />
                 </Tooltip>
             </Box>,
-            customBodyRender: v => dictionary.find(_ => _.id === v).label,
-            transformData: v => dictionary.find(_ => _.id === v).label
+            customBodyRender: isServer ? undefined : v => demo.dictionary.find(_ => _.id === v).label,
+            transformData: isServer ? undefined : v => demo.dictionary.find(_ => _.id === v).label
         }
     },
     {
@@ -67,6 +67,23 @@ const columns = (classes, filterType) => [
         options: {
             customBodyRender: v => v ? ToRuDate(v, false) : "-",
             transformData: v => v ? "Known" : "Unknown"
+        }
+    }
+];
+
+const columsWithAction = (classes, isServer, filterType) => [
+    ...columns(classes, isServer, filterType), {
+        name: "action",
+        label: "Actions",
+        options: {
+            sort: false,
+            customBodyRender: (v, row) => <Button
+                color="secondary"
+                variant="text"
+                onClick={() => alert(row.id)}
+            >
+                Show ID
+            </Button>
         }
     }
 ];
@@ -108,8 +125,8 @@ const columnsMultiheader = classes => [
             rowSpan: 1,
             section: 1,
             customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)" },
-            customBodyRender: v => dictionary.find(_ => _.id === v).label,
-            transformData: v => dictionary.find(_ => _.id === v).label
+            customBodyRender: v => demo.dictionary.find(_ => _.id === v).label,
+            transformData: v => demo.dictionary.find(_ => _.id === v).label
         }
     },
     {
@@ -171,178 +188,192 @@ const columnsMultiheader = classes => [
 ];
 
 const demoFilterList = [
-    { column: "glassType", value: dictionary.map(_ => _.label).sort() },
+    { column: "glassType", value: demo.dictionary.map(_ => _.label).sort() },
     { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
     { column: "createDate", value: ["Known", "Unknown"] }
 ];
 
-class TestComnonent extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            multiFilter: true,
-            isFilterOr: false,
-            globalLoading: false,
-            filters: [{ column: "ingridients", value: [ "Beer" ] }],
-            search: "",
-            sorting: [{ column: "createDate", dir: "desc" }],
-            tab: 0
-        };
-    }
+function TestComnonent(props) {
+    const { classes } = props;
+    const [multiFilter, setMultiFilter] = useState(true);
+    const [isFilterOr, setIsFilterOr] = useState(false);
+    const [globalLoading, setGlobalLoading] = useState(false);
+    const [showAction, setShowAction] = useState(false);
+    const [tab, setTab] = useState(0);
 
-    changeFilters (filters) {
-        this.setState({
-            filters: filters
-        })
-    }
+    const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
+    const changeSearch = search => localStorage.setItem("search", search);
+    const changeSorting = sorting => localStorage.setItem("sorting", JSON.stringify(sorting));
+    const showLoader = () => setGlobalLoading(true);
+    const stopLoader = () => setGlobalLoading(false);
 
-    changeSearch (search) {
-        this.setState({
-            search: search
-        })
-    }
-
-    changeSorting (sorting) {
-        this.setState({
-            sorting: sorting
-        })
-    }
-
-    render() {
-        let { classes } = this.props;
-        return <div>
-            {
-                this.state.globalLoading &&
-                <LinearProgress color='secondary' className={classes.globalLoader} />
-            }
-            <Tabs value={this.state.tab} onChange={(e, val) => this.setState({ tab: val })}>
-                <Tab label="Server" />
-                <Tab label="Client" />
-                <Tab label="Headers"/>
-            </Tabs>        
-            {
-                this.state.tab === 0 && <>
-                    <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                        <Typography variant="h6">
-                            ServerSide with custom filters and sorting
-                        </Typography>
-                    </Box>            
-                    <CustomTable
-                        showLoader={() => this.setState({ globalLoading: true })}
-                        stopLoader={() => this.setState({ globalLoading: false })}
-                        data="api/GetTestData"
-                        demoData = {data}
-                        filterList="GetTestFilters"
-                        demoFilterList={demoFilterList}
-                        columns={columns(classes)}
-                        //onRowClick={(n) => this.setState({ modal: n.id })}
-                        sort={this.state.sorting}
-                        search={this.state.search}
-                        onSearchChanged={(searchVal) => this.changeSearch(searchVal)}
-                        onFilterChanged={(filter) => this.changeFilters(filter)}
-                        initialFilters={this.state.filters}
-                        onSortingChanged={(sort) => this.changeSorting(sort)}
-                        rowCount={10}
-                    />
-                </>
-            }
-
-            {
-                this.state.tab === 1 && <>
-                    <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                        <Typography variant="h6">
-                            ClientSide table
-                        </Typography>
-                        <Box alignItems="center" display="flex">
-                            <FormControlLabel
-                                control={<Checkbox
-                                    checked={this.state.multiFilter}
-                                    onChange={() => this.setState({ multiFilter: !this.state.multiFilter })}
-                                />}
-                                label="Enable multifilter"
-                            />                
-                            <FormControlLabel
-                                disabled={!this.state.multiFilter}
-                                style={{ marginLeft: 16 }}
-                                control={<Checkbox
-                                    checked={this.state.isFilterOr}
-                                    onChange={() => this.setState({ isFilterOr: !this.state.isFilterOr })}
-                                />}
-                                label='Filter type "OR"'
-                            />                
-                        </Box>
-                    </Box>
-                    <CustomTable
-                        data={data}
-                        filterList={demoFilterList}
-                        multiFilter={this.state.multiFilter}
-                        rowCount={10}
-                        sortBy="name"
-                        sortDir="asc"
-                        columns={columns(this, this.state.isFilterOr ? "or" : "and")}
-                    />
-                </>
-            }
-
-            {
-                this.state.tab === 2 && <>
+    return <div>
+        {
+            globalLoading &&
+            <LinearProgress color='secondary' className={classes.globalLoader} />
+        }
+        <Tabs value={tab} onChange={(e, val) => setTab(val)}>
+            <Tab label="Client" />
+            <Tab label="Server" />
+            <Tab label="Headers"/>
+            <Tab label="Storage"/>
+        </Tabs>        
+        {
+            tab === 0 && <>
+                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
                     <Typography variant="h6">
-                        Table with custom headers
+                        ClientSide table with context
                     </Typography>
-                    <CustomTable
-                        data={data}
-                        totalRow="rowNumber"
-                        rowCount={100}
-                        maxHeight={200}
-                        minWidth={2000}
-                        noDataMessage="No data"
-                        stickyHeader
-                        small
-                        sort={[
-                            { column: 'glassType', dir: 'asc' },
-                            { column: 'name', dir: 'asc' }
-                        ]}
-                        ref={c => this._table = c}
-                        showColNums={true}
-                        disablePaging={true}
-                        overflow
-                        columns={columnsMultiheader(classes)}
-                        sortBy="id"
-                        sortDir="asc"
-                        headRows={2}
-                        sections={{
-                            1: {
-                                expanded: true
-                            },
-                            2: {
-                                expanded: true
-                            },
-                        }}
-                        customToolbar={
-                            <Box alignItems="center" display="flex">
-                                <Button
-                                    style={{ height: 36, marginRight: 16 }}
-                                    variant='contained'
-                                    color='secondary'
-                                    onClick={() => alert("Button 1 clicked")}
-                                >
-                                    Alert 1
-                                </Button>
-                                <Button
-                                    style={{ height: 36, marginRight: 16 }}
-                                    variant='contained'
-                                    color='secondary'
-                                    onClick={() => alert("Button 2 clicked")}
-                                >
-                                    Alert 2
-                                </Button>
-                            </Box>
-                        }
-                    />
-                </>
-            }
-        </div>;
-    }
+                    <Box alignItems="center" display="flex">
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={multiFilter}
+                                onChange={() =>  setMultiFilter(!multiFilter)}
+                            />}
+                            label="Enable multifilter"
+                        />                
+                        <FormControlLabel
+                            disabled={!multiFilter}
+                            style={{ marginLeft: 16 }}
+                            control={<Checkbox
+                                checked={isFilterOr}
+                                onChange={() => setIsFilterOr(!isFilterOr)}
+                            />}
+                            label='Filter type "OR"'
+                        />                
+                    </Box>
+                </Box>
+                <CustomTable
+                    data={demo.data}
+                    filterList={demoFilterList}
+                    multiFilter={multiFilter}
+                    rowCount={10}
+                    sort={[{ column: "name", dir: "asc" }]}
+                    columns={columns(classes, false, isFilterOr ? "or" : "and")}
+                    context={[
+                        { name: "showId", action: (id) => alert(id) },
+                        {
+                            name: "inner",
+                            options: [
+                                { name: "showId_1", action: (id) => alert("show1: " + id) },
+                                { name: "showId_2", action: (id) => alert("show2: " + id) }
+                            ]
+                        },
+                    ]}
+                />
+            </>
+        }
+
+        {
+            tab === 1 && <>
+                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
+                    <Typography variant="h6">
+                        ServerSide
+                    </Typography>
+                    <Box alignItems="center" display="flex">
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={showAction}
+                                onChange={() => setShowAction(!showAction)}
+                            />}
+                            label="Enable action column"
+                        />
+                    </Box>
+                </Box>
+                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
+                    <Typography variant="h6">
+                    </Typography>
+                </Box>
+                <CustomTable
+                    showLoader={showLoader}
+                    stopLoader={stopLoader}
+                    data="api/GetData"
+                    filterList="api/GetFilters"
+                    columns={showAction ? columsWithAction(classes, true) : columns(classes, true)}
+                    rowCount={10}
+                />
+            </>
+        }
+
+        {
+            tab === 2 && <>
+                <Typography variant="h6">
+                    Table with custom headers
+                </Typography>
+                <CustomTable
+                    data={demo.data}
+                    totalRow="rowNumber"
+                    rowCount={100}
+                    maxHeight={200}
+                    minWidth={2000}
+                    noDataMessage="No data"
+                    stickyHeader
+                    small
+                    sort={[
+                        { column: 'glassType', dir: 'asc' },
+                        { column: 'name', dir: 'asc' }
+                    ]}
+                    ref={c => this._table = c}
+                    showColNums={true}
+                    disablePaging={true}
+                    overflow
+                    columns={columnsMultiheader(classes)}
+                    sortBy="id"
+                    sortDir="asc"
+                    headRows={2}
+                    sections={{
+                        1: {
+                            expanded: true
+                        },
+                        2: {
+                            expanded: true
+                        },
+                    }}
+                    customToolbar={
+                        <Box alignItems="center" display="flex">
+                            <Button
+                                style={{ height: 36, marginRight: 16 }}
+                                variant='contained'
+                                color='secondary'
+                                onClick={() => alert("Button 1 clicked")}
+                            >
+                                Alert 1
+                            </Button>
+                            <Button
+                                style={{ height: 36, marginRight: 16 }}
+                                variant='contained'
+                                color='secondary'
+                                onClick={() => alert("Button 2 clicked")}
+                            >
+                                Alert 2
+                            </Button>
+                        </Box>
+                    }
+                />
+            </>
+        }
+        {
+            tab === 3 && <>
+                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
+                    <Typography variant="h6">
+                        Local storage browser demo
+                    </Typography>
+                </Box>
+                <CustomTable
+                    data={demo.data}
+                    columns={columns(classes)}
+                    filterList={demoFilterList}
+                    search={localStorage.getItem("search") || ""}
+                    sort={JSON.parse(localStorage.getItem("sorting")) || []}
+                    filters={JSON.parse(localStorage.getItem("filters")) || []}
+                    onSearchChanged={changeSearch}
+                    onFilterChanged={changeFilters}
+                    onSortingChanged={changeSorting}
+                    rowCount={10}
+                />
+            </>
+        }
+    </div>;
 }
 
 const styles = theme => ({
