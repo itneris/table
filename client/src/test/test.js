@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
     Typography,
     Box,
@@ -251,6 +251,10 @@ function TestComnonent(props) {
                     stripedRows={true}
                     sort={[{ column: "name", dir: "asc" }]}
                     columns={columns(classes, false, isFilterOr ? "or" : "and")}
+                    searchProps={{
+                        variant: 'outlined',
+                        margin: 'dense'
+                    }}
                     context={[
                         { name: "showId", action: (id) => alert(id) },
                         {
@@ -314,7 +318,6 @@ function TestComnonent(props) {
                         { column: 'glassType', dir: 'asc' },
                         { column: 'name', dir: 'asc' }
                     ]}
-                    ref={c => this._table = c}
                     showColNums={true}
                     disablePaging={true}
                     overflow

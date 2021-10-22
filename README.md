@@ -45,6 +45,7 @@ ____
 17. **maxHeight: number** - свойство maxHeight таблицы будет расчитываться по формуле: 100vh - {значение}px, по умолчанию _null_
 18. **minWidth: number** - задает минимальную ширину таблицы в пикселях,по умолчанию _null_
 19. **sections: object** - массив секций в котором задаются параметры отображения секций
+20. **searchProps: object:TextFieldProps** - объект свойств Texfield
 ```js
  {
     1: { expanded: true },

@@ -900,10 +900,7 @@ const NerisTable = forwardRef((props, ref) => {
                             <Typography variant="h6">
                                 {title}
                             </Typography> :
-                            <div style={{ display: "flex" }}>
-                                <Icon classes={{ root: classes.icon }}>
-                                    <Search />
-                                </Icon>
+                            <div style={{ display: "flex", alignItems: 'center' }}>                                
                                 <TextField
                                     ref={searchElement}
                                     value={table.search}
@@ -913,6 +910,10 @@ const NerisTable = forwardRef((props, ref) => {
                                         dispatch({ type: SEARCH, search: searchVal });
                                         onSearchChanged && onSearchChanged(searchVal);
                                     }}
+                                    InputProps={{
+                                        startAdornment: <Search className={classes.icon} />
+                                    }}
+                                    {...props.searchProps}
                                 />
                                 {
                                     title &&
@@ -1430,7 +1431,6 @@ const useStyles = makeStyles({
         minWidth: 200
     },
     icon: {
-        marginTop: 10,
         color: "rgba(0, 0, 0, 0.54)",
         marginRight: 8
     }
