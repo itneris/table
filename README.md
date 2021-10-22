@@ -45,7 +45,6 @@ ____
 17. **maxHeight: number** - свойство maxHeight таблицы будет расчитываться по формуле: 100vh - {значение}px, по умолчанию _null_
 18. **minWidth: number** - задает минимальную ширину таблицы в пикселях,по умолчанию _null_
 19. **sections: object** - массив секций в котором задаются параметры отображения секций
-20. **searchProps: object:TextFieldProps** - объект свойств Texfield
 ```js
  {
     1: { expanded: true },
@@ -55,6 +54,8 @@ ____
  }
 ```
 20. **disableToken: bool** — отключить передачу accessToken на сервер, по умолчанию false
+21. **searchProps: object:TextFieldProps** — объект свойств Texfield
+22. **customToolbar: React.Element** — дополнительная строка с действиями грида, которая отобразится справа перед филтррами
 ## Methods
 1. **fetch()** — вызывает запрос на сервер для обновления данных
 2. **getData()** — возвращает список текущих строк
