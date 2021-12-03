@@ -294,6 +294,7 @@ function TestComnonent(props) {
                     stopLoader={stopLoader}
                     data="api/GetData"
                     filterList="api/GetFilters"
+                    disableSearch={true}
                     columns={showAction ? columsWithAction(classes, true) : columns(classes, true)}
                     rowCount={10}
                 />

@@ -900,28 +900,29 @@ const NerisTable = forwardRef((props, ref) => {
                             <Typography variant="h6">
                                 {title}
                             </Typography> :
-                            <div style={{ display: "flex", alignItems: 'center' }}>                                
-                                <TextField
-                                    ref={searchElement}
-                                    value={table.search}
-                                    onKeyUp={e => e.key === "Escape" && ResetSearch()}
-                                    onChange={e => {
-                                        var searchVal = e.currentTarget.value;
-                                        dispatch({ type: SEARCH, search: searchVal });
-                                        onSearchChanged && onSearchChanged(searchVal);
-                                    }}
-                                    InputProps={{
-                                        startAdornment: <Search className={classes.icon} />
-                                    }}
-                                    {...props.searchProps}
-                                />
-                                {
-                                    title &&
-                                    <IconButton onClick={() => ResetSearch()}>
-                                        <Clear />
-                                    </IconButton>
-                                }
-                            </div>
+                            !disableSearch ?
+                                <div style={{ display: "flex", alignItems: 'center' }}>                                
+                                    <TextField
+                                        ref={searchElement}
+                                        value={table.search}
+                                        onKeyUp={e => e.key === "Escape" && ResetSearch()}
+                                        onChange={e => {
+                                            var searchVal = e.currentTarget.value;
+                                            dispatch({ type: SEARCH, search: searchVal });
+                                            onSearchChanged && onSearchChanged(searchVal);
+                                        }}
+                                        InputProps={{
+                                            startAdornment: <Search className={classes.icon} />
+                                        }}
+                                        {...props.searchProps}
+                                    />
+                                    {
+                                        title &&
+                                        <IconButton onClick={() => ResetSearch()}>
+                                            <Clear />
+                                        </IconButton>
+                                    }
+                                </div> : <div />
                     }
                     {
                         (!title && disableSearch && table.filters.length > 0) &&
@@ -941,7 +942,7 @@ const NerisTable = forwardRef((props, ref) => {
                     <Box display="flex">
                         {customToolbar}
                         {
-                            (disableSearch && title) &&
+                            (!disableSearch && title) &&
                             <IconButton onClick={() => { setShowSearch(true); searchElement.focus() }}>
                                 <Search color={showSearch ? "primary" : undefined} />
                             </IconButton>
