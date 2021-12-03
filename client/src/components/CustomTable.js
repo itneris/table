@@ -832,50 +832,51 @@ const NerisTable = forwardRef((props, ref) => {
     }
 
     function RenderFilter(f) {
+        const chipStyle = { marginLeft: 8 };
         return {
             'bool': <Chip
                 key={"col-" + f.column + "-chip"}
-                style={{ marginLeft: 8, marginBottom: 8 }}
+                style={chipStyle}
                 label={f.checked ? 'Да' : 'Нет'}
                 onDelete={() => { DeleteFilter(f, 'checked'); }}
             />,
             'number': <>
                 {f.min && <Chip
                     key={"col-" + f.column + "-chip-min"}
-                    style={{ marginLeft: 8, marginBottom: 8 }}
+                    style={chipStyle}
                     label={"Больше " + f.min}
                     onDelete={() => { DeleteFilter(f, 'min'); }}
                 />}
                 {f.max && <Chip
                     key={"col-" + f.column + "-chip-max"}
-                    style={{ marginLeft: 8, marginBottom: 8 }}
+                    style={chipStyle}
                     label={"Меньше " + f.max}
                     onDelete={() => { DeleteFilter(f, 'max'); }}
                 />}</>,
             'date': <>
                 {f.start && <Chip
                     key={"col-" + f.column + "-chip-start"}
-                    style={{ marginLeft: 8, marginBottom: 8 }}
+                    style={chipStyle}
                     label={"Позже " + moment(f.start).format('L')}
                     onDelete={() => { DeleteFilter(f, 'start'); }}
                 />}
                 {f.end && <Chip
                     key={"col-" + f.column + "-chip-end"}
-                    style={{ marginLeft: 8, marginBottom: 8 }}
+                    style={chipStyle}
                     label={"Раньше " + moment(f.end).format('L')}
                     onDelete={() => { DeleteFilter(f, 'end'); }}
                 />}</>,
             null: f.value.map((fv, fvInd) =>
                 <Chip
                     key={"col-" + f.column + "-chip-" + fvInd}
-                    style={{ marginLeft: 8, marginBottom: 8 }}
+                    style={chipStyle}
                     label={fv}
                     onDelete={() => { DeleteFilter(f, fv); }}
                 />),
             undefined: f.value.map((fv, fvInd) =>
                 <Chip
                     key={"col-" + f.column + "-chip-" + fvInd}
-                    style={{ marginLeft: 8, marginBottom: 8 }}
+                    style={chipStyle}
                     label={fv}
                     onDelete={() => { DeleteFilter(f, fv); }}
                 />)
@@ -901,7 +902,7 @@ const NerisTable = forwardRef((props, ref) => {
                                 {title}
                             </Typography> :
                             !disableSearch ?
-                                <div style={{ display: "flex", alignItems: 'center' }}>                                
+                                <Box display="flex" alignItems='center'>                                
                                     <TextField
                                         ref={searchElement}
                                         value={table.search}
@@ -922,11 +923,12 @@ const NerisTable = forwardRef((props, ref) => {
                                             <Clear />
                                         </IconButton>
                                     }
-                                </div> : <div />
+                                </Box> :
+                                table.filters.length > 0 ? null : <div />
                     }
                     {
                         (!title && disableSearch && table.filters.length > 0) &&
-                        <Box display="flex" pl="24px" flexWrap="wrap">
+                        <Box display="flex" flexWrap="wrap">
                             {
                                 table.filters.map(f =>
                                     <Box key={"col-" + f.column} display="flex" alignItems="center" mr={1} flexWrap="wrap">
@@ -1108,7 +1110,7 @@ const NerisTable = forwardRef((props, ref) => {
             }
             {
                 filters.filter(f => f.inToolbar === true).length > 0 &&
-                <div style={{ display: "flex", flexWrap: "wrap" }} >
+                <Box display="flex" flexWrap="wrap">
                     {
                         filters.filter(f => f.inToolbar === true).map((filter, i) =>
                             <Filter
@@ -1123,7 +1125,7 @@ const NerisTable = forwardRef((props, ref) => {
                             />
                         )
                     }
-                </div>
+                </Box>
             }
             {
                 (
