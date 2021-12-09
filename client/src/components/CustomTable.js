@@ -39,6 +39,7 @@ import {
 import { KeyboardDatePicker } from '@material-ui/pickers';
 import { HttpUtil, CreateFile } from './utils';
 import moment from 'moment';
+import HtmlTooltip from './HtmlTooltip';
 
 const rowCount = 25;
 const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
@@ -470,7 +471,13 @@ const NerisTable = forwardRef((props, ref) => {
         rowsPerPageOptions,
         disableSearch,
         disableToken,
-        context
+        context,
+        tooltipElement,
+        searchTooltip,
+        filterTooltip,
+        resetSearchTooltip,
+        downloadTooltip,
+        viewColumnTooltip
     } = props;
 
     const [showSearch, setShowSearch] = useState(title ? !!propSearch : true);
@@ -483,6 +490,13 @@ const NerisTable = forwardRef((props, ref) => {
     const [total, setTotal] = useState(0);
     const [openTotals, setOpenTotals] = useState([]);
     const [contextOptions, setContextOptions] = useState(null);
+
+    const Tooltip = useMemo(() => tooltipElement || HtmlTooltip, []);
+    const searchTooltipText = useMemo(() => searchTooltip || "Поиск", []);
+    const filterTooltipText = useMemo(() => filterTooltip || "Фильтрация", []);
+    const resetSearchTooltipText = useMemo(() => resetSearchTooltip || "Сбросить поиск", []);
+    const downloadTooltipText = useMemo(() => downloadTooltip || "Экспорт", []);
+    const viewColumnTooltipText = useMemo(() => viewColumnTooltip || "Отображение секций", []);
 
     const [table, dispatch] = useReducer(tableReducer, {
         rowsPerPage: props.rowCount || rowCount,
@@ -919,9 +933,11 @@ const NerisTable = forwardRef((props, ref) => {
                                     />
                                     {
                                         title &&
-                                        <IconButton onClick={() => ResetSearch()}>
-                                            <Clear />
-                                        </IconButton>
+                                        <Tooltip title={resetSearchTooltipText}>
+                                            <IconButton onClick={() => ResetSearch()}>
+                                                <Clear />
+                                            </IconButton>
+                                        </Tooltip>
                                     }
                                 </Box> :
                                 table.filters.length > 0 ? null : <div />
@@ -945,17 +961,63 @@ const NerisTable = forwardRef((props, ref) => {
                         {customToolbar}
                         {
                             (!disableSearch && title) &&
-                            <IconButton onClick={() => { setShowSearch(true); searchElement.focus() }}>
-                                <Search color={showSearch ? "primary" : undefined} />
-                            </IconButton>
+                            <Tooltip title={searchTooltipText}>
+                                <IconButton onClick={() => { setShowSearch(true); searchElement.focus() }}>
+                                    <Search color={showSearch ? "primary" : undefined} />
+                                </IconButton>
+                            </Tooltip>
                         }
                         {
                             (onDownload && typeof onDownload !== "function") &&
-                            <IconButton
-                                onClick={async () => {
-                                    showLoader && showLoader();
-                                    let data;
-                                    if (downloadWithFilters) {
+                            <Tooltip title={downloadTooltipText}>
+                                <IconButton
+                                    onClick={async () => {
+                                        showLoader && showLoader();
+                                        let data;
+                                        if (downloadWithFilters) {
+                                            let options = {
+                                                rowsPerPage: table.rowsPerPage,
+                                                page: table.page,
+                                                search: table.search,
+                                                sort: table.sort,
+                                                filters: table.filters
+                                            };
+                                            data = await HttpUtil.fetchAsync(onDownload, options, "POST", disableToken ? true : false);
+                                        } else {
+                                            data = await HttpUtil.fetchGetAsync(onDownload, null, disableToken ? true : false);
+                                        };
+
+                                        if (data.error) {
+                                            alert(data.error);
+                                        } else {
+                                            var reqFile = data.file;
+                                            var file = CreateFile(reqFile, mimeType || 'text/csv;charset=utf-8');
+                                            var element = document.createElement('a');
+                                            var fName = data.name ||
+                                                downloadName + new Date().toLocaleString("ru-RU").replace(", ", "").replace(/\./g, "").replace(/:/g, "") + ".csv";
+                                            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                                                window.navigator.msSaveOrOpenBlob(file, fName);
+                                            } else {
+                                                element.setAttribute('href', file.preview);
+                                                element.setAttribute('download', fName);
+                                                element.style.display = 'none';
+                                                document.body.appendChild(element);
+                                                element.click();
+                                                document.body.removeChild(element);
+                                            }
+                                        }
+                                        stopLoader && stopLoader();
+                                    }}
+                                >
+                                    <GetApp />
+                                </IconButton>
+                            </Tooltip>
+                        }
+                        {
+                            (onDownload && typeof onDownload === "function") &&
+                            <Tooltip title={downloadTooltipText}>
+                                <IconButton
+                                    onClick={() => {
                                         let options = {
                                             rowsPerPage: table.rowsPerPage,
                                             page: table.page,
@@ -963,70 +1025,34 @@ const NerisTable = forwardRef((props, ref) => {
                                             sort: table.sort,
                                             filters: table.filters
                                         };
-                                        data = await HttpUtil.fetchAsync(onDownload, options, "POST", disableToken ? true : false);
-                                    } else {
-                                        data = await HttpUtil.fetchGetAsync(onDownload, null, disableToken ? true : false);
-                                    };
-
-                                    if (data.error) {
-                                        alert(data.error);
-                                    } else {
-                                        var reqFile = data.file;
-                                        var file = CreateFile(reqFile, mimeType || 'text/csv;charset=utf-8');
-                                        var element = document.createElement('a');
-                                        var fName = data.name ||
-                                            downloadName + new Date().toLocaleString("ru-RU").replace(", ", "").replace(/\./g, "").replace(/:/g, "") + ".csv";
-                                        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                                            window.navigator.msSaveOrOpenBlob(file, fName);
-                                        } else {
-                                            element.setAttribute('href', file.preview);
-                                            element.setAttribute('download', fName);
-                                            element.style.display = 'none';
-                                            document.body.appendChild(element);
-                                            element.click();
-                                            document.body.removeChild(element);
-                                        }
-                                    }
-                                    stopLoader && stopLoader();
-                                }}
-                            >
-                                <GetApp />
-                            </IconButton>
-                        }
-                        {
-                            (onDownload && typeof onDownload === "function") &&
-                            <IconButton
-                                onClick={() => {
-                                    let options = {
-                                        rowsPerPage: table.rowsPerPage,
-                                        page: table.page,
-                                        search: table.search,
-                                        sort: table.sort,
-                                        filters: table.filters
-                                    };
-                                    onDownload(options);
-                                }}
-                            >
-                                <GetApp />
-                            </IconButton>
+                                        onDownload(options);
+                                    }}
+                                >
+                                    <GetApp />
+                                </IconButton>
+                            </Tooltip>
                         }
                         {
                             table.sections &&
-                            <IconButton
-                                buttonRef={sectionsButtonElement}
-                                onClick={() => setSectionsOpen(true)}
-                            >
-                                <ViewColumn />
-                            </IconButton>
+                            <Tooltip title={viewColumnTooltipText}>
+                                <IconButton
+                                    buttonRef={sectionsButtonElement}
+                                    onClick={() => setSectionsOpen(true)}
+                                >
+                                    <ViewColumn />
+                                </IconButton>
+                            </Tooltip>
                         }
                         {
                             filters.filter(f => f.inToolbar === false || f.inToolbar === undefined).length > 0 &&
-                            <IconButton
-                                buttonRef={menuButtonElement}
-                                onClick={() => setFilterOpen(true)}
-                            >
-                                <FilterList />
-                            </IconButton>
+                            <Tooltip title={filterTooltipText}>
+                                <IconButton
+                                    buttonRef={menuButtonElement}
+                                    onClick={() => setFilterOpen(true)}
+                                >
+                                    <FilterList />
+                                </IconButton>
+                            </Tooltip>
                         }
                         <Popover
                             anchorEl={sectionsButtonElement.current}
@@ -1520,6 +1546,11 @@ NerisTable.propTypes = {
     search: PropTypes.string,
     title: PropTypes.string,
     mimeType: PropTypes.string,
+    searchTooltip: PropTypes.string,
+    filterTooltip: PropTypes.string,
+    resetSearchTooltip: PropTypes.string,
+    downloadTooltip: PropTypes.string,
+    viewColumnTooltip: PropTypes.string,
     showColNums: PropTypes.bool,
     stickyHeader: PropTypes.bool,
     disablePaging: PropTypes.bool,
@@ -1534,5 +1565,6 @@ NerisTable.propTypes = {
     filters: PropTypes.arrayOf(PropTypes.object),
     columns: PropTypes.arrayOf(PropTypes.object),
     context: PropTypes.arrayOf(PropTypes.object),
-    stripedRows: PropTypes.bool
+    stripedRows: PropTypes.bool,
+    tooltipElement: PropTypes.instanceOf(React.Component),
 };
