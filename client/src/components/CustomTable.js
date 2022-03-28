@@ -631,11 +631,11 @@ const NerisTable = forwardRef((props, ref) => {
     ]);
 
     useEffect(() => {
-        dispatch({ type: SET_SORT, sort: propSort });
+        dispatch({ type: SET_SORT, sort: propSort || [] });
     }, [propSort]);
 
     useEffect(() => {
-        dispatch({ type: SET_FILTERS, filters: propFilters });
+        dispatch({ type: SET_FILTERS, filters: propFilters || [] });
     }, [propFilters]);
 
     useEffect(() => {
