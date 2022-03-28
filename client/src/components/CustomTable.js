@@ -631,6 +631,14 @@ const NerisTable = forwardRef((props, ref) => {
     ]);
 
     useEffect(() => {
+        dispatch({ type: SET_SORT, sort: propSort });
+    }, [propSort]);
+
+    useEffect(() => {
+        dispatch({ type: SET_FILTERS, filters: propFilters });
+    }, [propFilters]);
+
+    useEffect(() => {
         if (!filtersWithData) {
             if (filterList && typeof (filterList) === "string") {
                 async function fetchFiltersFromServer() {
