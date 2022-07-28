@@ -548,6 +548,16 @@ const NerisTable = forwardRef((props, ref) => {
         },
         transformData(data) {
             setRows(data)
+        },
+        getState() {
+            const options = {
+                rowsPerPage: table.rowsPerPage,
+                page: table.page,
+                search: table.search,
+                sort: table.sort,
+                filters: table.filters
+            };
+            return options;
         }
     }));
 
