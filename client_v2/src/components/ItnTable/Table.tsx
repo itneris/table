@@ -4,12 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useReducer, useState, useMemo, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { ColumnDescription, ColumnDescriptionBase } from '../base/ColumnDescription';
 import { FilterProperties } from '../props/FilterProperties';
-import { ITableContext } from '../props/ITableContext';
+import { ITableContext, ITableContextBase } from '../props/ITableContext';
 import { TableProperties } from '../props/TableProperties';
 import { TableQueryState } from '../props/TableQueryState';
 import { TableState } from '../props/TableState';
 import { getFilters, getRows } from '../queries/dataQueries';
-import { tableReducer } from './tableReducer';
+import { SET_FILTERS, SET_SORT, tableReducer } from './tableReducer';
 import TableToolbar from './TableToolbar';
 
 /*const usePrevious = (value, initialValue) => {
@@ -46,15 +46,9 @@ const useEffectDebugger = (effectHook, dependencies, dependencyNames = []) => {
 };*/
 
 
-export const TableContext = React.createContext<ITableContext | null>(null);
+export const TableContext = React.createContext<ITableContextBase | null>(null);
 
 const Table = forwardRef(<T extends unknown>(props: TableProperties<T>, ref: React.ForwardedRef<any>) => {
-    let menuButtonElement = useRef(null);
-    let sectionsButtonElement = useRef(null);
-    let columnsButtonElement = useRef(null);
-
-    const [columnsOpen, setColumnsOpen] = useState<boolean>(false);
-    const [filterOpen, setFilterOpen] = useState<boolean>(false);
     const [ctrlIsClicked, setCtrlIsClicked] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [errorLoading, setErrorLoading] = useState<string|null>(null);
@@ -64,6 +58,8 @@ const Table = forwardRef(<T extends unknown>(props: TableProperties<T>, ref: Rea
     const [contextOptions, setContextOptions] = useState(null);
     const theme = useTheme();
     const [columns, setColumns] = useState<Array<ColumnDescription<T>>>([]);
+
+    const changeColumns = useCallback((newColumns: Array<ColumnDescription<T>>) => setColumns(newColumns), []);
 
     const [table, dispatch] = useReducer(tableReducer, {
         filtering: props.filtering,
@@ -209,11 +205,19 @@ const Table = forwardRef(<T extends unknown>(props: TableProperties<T>, ref: Rea
                         resetSearchTooltipText: props.restSearchTooltipText,
                         filters: filters,
                         filtering: table.filtering,
-                        onFilteringChnage: props.onFilteringChange,
+                        onFilteringChange: props.onFilteringChange,
                         columns: columns.map(c => c as ColumnDescriptionBase),
                         toolbarAdornment: props.toolbarAdornment,
-                        searchTooltipText: props.searchTooltipText
-                    } as ITableContext}
+                        searchTooltipText: props.searchTooltipText,
+                        enableHideColumns: props.enableHideColumns,
+                        hideColumnToolipText: props.hideColumnToolipText,
+                        columnsText: props.columnsText,
+                        changeColumns: changeColumns,
+                        filterTooltipText: props.filterTooltipText,
+                        filtersResetText: props.filtersResetText,
+                        filtersMinPlaceHolder: props.filtersMinPlaceHolder,
+                        filtersMaxPlaceHolder: props.filtersMaxPlaceHolder
+                    } as ITableContext<T>}
                 >
                     {
                         hasToolbar &&

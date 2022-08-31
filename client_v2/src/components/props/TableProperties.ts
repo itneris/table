@@ -26,6 +26,11 @@ export class TableProperties<T> {
     restSearchTooltipText: string = "Сбросить поиск";
     filterTooltipText: string = "Фильтры";
     filterText: string = "Фильтры";
+    hideColumnToolipText: string = "Отображение колонок";
+    columnsText: string = "Колонки";
+    filtersResetText: string = "Сбросить";
+    filtersMinPlaceHolder: string = "минимум";
+    filtersMaxPlaceHolder: string = "максимум";
 
     enableHideColumns: boolean = false;
 

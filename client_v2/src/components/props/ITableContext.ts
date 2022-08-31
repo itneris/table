@@ -1,9 +1,9 @@
-﻿import { ReactNode } from "react";
-import { ColumnDescriptionBase } from "../base/ColumnDescription";
+﻿import React, { ReactNode } from "react";
+import { ColumnDescription } from "../base/ColumnDescription";
 import { FilterProperties } from "./FilterProperties";
 import { FilterValueProperties } from "./FilterValueProperties";
 
-export interface ITableContext {
+export interface ITableContextBase {
     title: string | null;
     toolbarAdornment: ReactNode | null;
 
@@ -15,9 +15,20 @@ export interface ITableContext {
 
     filters: Array<FilterProperties>;
     filtering: Array<FilterValueProperties>;
-    onFilteringChnage: ((sorting: Array<FilterValueProperties>) => void) | null;
+    onFilteringChange: ((sorting: Array<FilterValueProperties>) => void) | null;
+    filterTooltipText: string;
+    filtersResetText: string;
+    filtersMinPlaceHolder: string;
+    filtersMaxPlaceHolder: string;
 
-    columns: Array<ColumnDescriptionBase>
+    hideColumnToolipText: string;
+    columnsText: string;
+    enableHideColumns: boolean;
 
     dispatch: React.Dispatch<any>;
+}
+
+export interface ITableContext<T> extends ITableContextBase {
+    columns: Array<ColumnDescription<T>>;
+    changeColumns: (newColumns: Array<ColumnDescription<T>>) => void;
 }

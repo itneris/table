@@ -1,5 +1,9 @@
-import { FilterType } from "./FilterType";
-
+export enum FilterType {
+    Select,
+    Bool,
+    Number,
+    Date
+}
 export class FilterValueProperties {
     column: string = "";
     label: string | null = null;

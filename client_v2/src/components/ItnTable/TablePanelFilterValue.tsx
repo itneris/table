@@ -4,9 +4,11 @@ import { TableContext } from './Table';
 import { FilterValueProperties, FilterType } from '../props/FilterValueProperties';
 import { SET_FILTERS } from './tableReducer';
 import { format } from 'date-fns/esm';
+import { ITableContext } from '../props/ITableContext';
 
-const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
-    const tableCtx = useContext(TableContext)!;
+const TablePanelFilterValue = <T extends unknown>(props: { filter: FilterValueProperties }) => {
+    const tableCtxBase = useContext(TableContext)!;
+    const tableCtx = tableCtxBase as ITableContext<T>;
     const column = useMemo(() => tableCtx.columns.find(tc => tc.property == props.filter.column), [props.filter]);
 
     const deleteFilter = useCallback((value: string) => {
