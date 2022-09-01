@@ -8,22 +8,28 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/api/GetData', (req, res) => {
+app.post('/api/test/list', (req, res) => {
     let tableState = req.body;
-    let rows = demo.data.map(_ => ({
-        ..._,
-        glassType: demo.dictionary.find(d => d.id === _.glassType).label
-    }));
+    let rows = demo.data;
 
-    if (tableState.search) {
+    let total = demo.data.length;
+    rows = [...rows].splice(tableState.page * tableState.pageSize, tableState.pageSize);
+
+    console.log(tableState.page);
+    res.send({
+        rows,
+        total
+    });
+    /*
+    if (tableState.searching && tableState.searching != "") {
         rows = rows.filter(_ => _.name.toLowerCase().includes(tableState.search.toLowerCase()))
     };
 
-    tableState.filters.forEach(_ => {
+    tableState.filtering.forEach(_ => {
         rows = rows.filter(r => _.value.includes(r.glassType));
     });
 
-    if (tableState.sort.length > 0) {
+    if (tableState.sorting.length > 0) {
         rows = rows.sort(SortData(tableState.sort));
     }
 
@@ -33,12 +39,12 @@ app.post('/api/GetData', (req, res) => {
     res.send({
         rows,
         total
-    });
+    });*/
 });
 
-app.get('/api/GetFilters', (req, res) => {
+app.get('/api/test/filters', (req, res) => {
     let filters = [
-        { column: "glassType", value: demo.dictionary.map(_ => _.label).sort() }
+        { column: "glassType", values: demo.dictionary.map(_ => _.label).sort() }
     ];
     res.send(filters);
 });
