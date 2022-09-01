@@ -129,7 +129,7 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
 
     const queryRows = useQuery(
         [props.apiUrl, 'list', queryOptions],
-        getRows<LooseObject>(props.apiUrl ?? "", queryOptions),
+        getRows(props.apiUrl ?? "", queryOptions),
         {
             enabled: props.useReactQuery,
             onError: () => {

@@ -3,7 +3,7 @@ import { TableRowsReponse } from "../base/TableRowsReponse";
 import { FilterProperties } from "../props/FilterProperties";
 import { TableQueryState } from "../props/TableQueryState";
 
-export const getRows = <T>(apiName: string, options: TableQueryState) => (): Promise<TableRowsReponse> => {
+export const getRows = (apiName: string, options: TableQueryState) => (): Promise<TableRowsReponse> => {
     return axios({
         method: "POST",
         url: `/api/${apiName}/List`,
