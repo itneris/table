@@ -1,4 +1,5 @@
 ﻿import { ReactNode } from "react";
+import { Type } from "typescript";
 import { AbstractColumnBuilder } from "../columnBuilder/AbstractColumnBuilder";
 import { DownloadFileProperties } from "./DownloadFileProperties";
 import { FilterProperties } from "./FilterProperties";
@@ -7,14 +8,16 @@ import { SortProperties } from "./SortProperties";
 import { TableState } from "./TableState";
 
 export class TableProperties<T> {
+    T?: Type;
     items: Array<T> | null = null;
 
     apiUrl: string | null = null;
     useReactQuery: boolean = true;
 
-    idField: string | null = null;
+    idField: string = "id";
 
     title: string | null = null;
+    dense: boolean = false;
 
     toolbarAdornment: ReactNode | null = null;
 

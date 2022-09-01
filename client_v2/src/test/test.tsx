@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+﻿import React, { useMemo, useRef, useState } from "react";
 import {
     Typography,
     Box,
@@ -10,11 +10,11 @@ import {
     Tabs,
     Tab,
 } from "@mui/material";
-import CustomTable from "components";
+import ItnTable, { AbstractColumnBuilder, FilterProperties } from "components";
 import demo from "../test_data/data";
 import { HelpOutline } from "@mui/icons-material";
 
-const columns = (isServer: boolean, filterType) => [
+/*const columns = (isServer: boolean, filterType) => [
     {
         name: "id",
         options: {
@@ -183,40 +183,105 @@ const columnsMultiheader = [
         }
     }
 ];
-
-const demoFilterList = [
-    { column: "glassType", value: demo.dictionary.map(_ => _.label).sort() },
-    { column: "ingridients", value: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
-    { column: "createDate", value: ["Known", "Unknown"] }
+*/
+const demoFilterList: Array<FilterProperties> = [
+    { column: "glassType", values: demo.dictionary.map(_ => _.label).sort() },
+    { column: "ingridients", values: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort() },
+    { column: "createDate", values: ["Known", "Unknown"] }
 ];
 
-function TestComnonent(props) {
-    const { classes } = props;
-    const [multiFilter, setMultiFilter] = useState(true);
-    const [isFilterOr, setIsFilterOr] = useState(false);
-    const [globalLoading, setGlobalLoading] = useState(false);
+
+interface ICocktailDTO {
+    id: string;
+    name: string;
+    price: number;
+    ingridients: string[];
+    createDate: Date | null;
+    glassType: number;
+}
+
+class ServerCocktailsColumnBuilder extends AbstractColumnBuilder<ICocktailDTO> {
+    constructor() {
+        super();
+        this.ColumnFor(_ => _.name)
+            .WithName("Наименование", true);
+
+        this.ColumnFor(_ => _.price)
+            .WithName("Цена");
+
+        this.ColumnFor(_ => _.ingridients)
+            .WithName("Ингридиенты");
+
+        this.ColumnFor(_ => _.createDate)
+            .WithName("Дата создания");
+
+        this.ColumnFor(_ => _.glassType)
+            .WithName("Тип стакана")
+            .WithBodyRenderer((val) => {
+                return <>{demo.dictionary.find(_ => _.id == val)?.label}</>;
+            });
+    }
+}
+
+function TestComnonent() {
+    //const [isFilterOr, setIsFilterOr] = useState(false);
+    //const [globalLoading, setGlobalLoading] = useState(false);
     const [showAction, setShowAction] = useState(false);
     const [tab, setTab] = useState(0);
 
-    const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
-    const changeSearch = search => localStorage.setItem("search", search);
-    const changeSorting = sorting => localStorage.setItem("sorting", JSON.stringify(sorting));
-    const showLoader = () => setGlobalLoading(true);
-    const stopLoader = () => setGlobalLoading(false);
+    //const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
+    //const changeSearch = search => localStorage.setItem("search", search);
+    //const changeSorting = sorting => localStorage.setItem("sorting", JSON.stringify(sorting));
+
+    const ItnTableTyped = ItnTable as ItnTable<ICocktailDTO>;
+    const serverColumnBuilder = useMemo(() => {
+        return new ServerCocktailsColumnBuilder();
+    }, []);
 
     return <div>
-        {
+        {/*
             globalLoading &&
             <LinearProgress color='secondary' className={classes.globalLoader} />
-        }
+        */}
         <Tabs value={tab} onChange={(e, val) => setTab(val)}>
-            <Tab label="Client" />
             <Tab label="Server" />
-            <Tab label="Headers"/>
-            <Tab label="Storage"/>
-        </Tabs>        
+            <Tab label="Storage" />
+            { /*<Tab label="Client" />
+            <Tab label="Headers"/> */}
+        </Tabs>
+
         {
-            tab === 0 && <>
+            tab === 1 && <>
+                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
+                    <Typography variant="h6">
+                        ServerSide
+                    </Typography>
+                    <Box alignItems="center" display="flex">
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={showAction}
+                                onChange={() => setShowAction(!showAction)}
+                            />}
+                            label="Enable action column"
+                        />
+                    </Box>
+                </Box>
+                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
+                    <Typography variant="h6">
+                    </Typography>
+                </Box>
+                <ItnTableTyped
+                    data="api/GetData"
+                    filterList="api/GetFilters"
+                    disableSearch={true}
+                    //columns={showAction ? columsWithAction(classes, true) : columns(classes, true)}
+                    columnsBuilder={serverColumnBuilder}
+                    rowCount={10}
+                />
+            </>
+        }      
+        {/*
+            tab === 2 && <>
                 <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
                     <Typography variant="h6">
                         ClientSide table with context
@@ -264,42 +329,10 @@ function TestComnonent(props) {
                     ]}
                 />
             </>
-        }
+        */}
 
-        {
-            tab === 1 && <>
-                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                    <Typography variant="h6">
-                        ServerSide
-                    </Typography>
-                    <Box alignItems="center" display="flex">
-                        <FormControlLabel
-                            control={<Checkbox
-                                checked={showAction}
-                                onChange={() => setShowAction(!showAction)}
-                            />}
-                            label="Enable action column"
-                        />
-                    </Box>
-                </Box>
-                <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
-                    <Typography variant="h6">
-                    </Typography>
-                </Box>
-                <CustomTable
-                    showLoader={showLoader}
-                    stopLoader={stopLoader}
-                    data="api/GetData"
-                    filterList="api/GetFilters"
-                    disableSearch={true}
-                    columns={showAction ? columsWithAction(classes, true) : columns(classes, true)}
-                    rowCount={10}
-                />
-            </>
-        }
-
-        {
-            tab === 2 && <>
+        {/*
+            tab === 3 && <>
                 <Typography variant="h6">
                     Table with custom headers
                 </Typography>
@@ -353,9 +386,9 @@ function TestComnonent(props) {
                     }
                 />
             </>
-        }
-        {
-            tab === 3 && <>
+        */}
+        {/*
+            tab === 1 && <>
                 <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
                     <Typography variant="h6">
                         Local storage browser demo
@@ -374,16 +407,6 @@ function TestComnonent(props) {
                     rowCount={10}
                 />
             </>
-        }
+        */}
     </div>;
 }
-
-const styles = theme => ({
-    globalLoader: {
-        zIndex: 9999,
-        width: '100%',
-        position: 'fixed'
-    },
-});
-
-export default withStyles(styles)(TestComnonent);

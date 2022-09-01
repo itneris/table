@@ -1,9 +1,12 @@
-﻿import { Autocomplete, Box, Checkbox, FormControlLabel, Radio, TextField, Typography } from '@mui/material';
-import React, { ReactNode, useContext, useMemo } from 'react';
+﻿import { Filter } from '@mui/icons-material';
+import { Autocomplete, Box, Checkbox, FormControlLabel, Radio, TextField, Typography } from '@mui/material';
+import React, { ReactNode, useCallback, useContext, useMemo } from 'react';
+import { LooseObject } from '../base/LooseObject';
 import { FilterProperties } from "../props/FilterProperties";
-import { FilterType } from '../props/FilterType';
+import { FilterType, FilterValueProperties } from '../props/FilterType';
 import { ITableContext } from '../props/ITableContext';
 import { TableContext } from './Table';
+import { SET_FILTERS } from './tableReducer';
 
 //TODO вынести все русские текстовки
 
@@ -14,6 +17,52 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
     const colName = useMemo(() => tableCtx.columns.find(_ => _.property == props.filter.column)!.displayName, []);
     const filterLabel = props.filter.label ?? colName;
 
+    const changeFilter = useCallback((prop: string, value: boolean | string | number | Date) => {
+        let tableFiltering = [...tableCtx.filtering];
+        const currentColumn = props.filter.column;
+        if (
+            value === "all" ||
+            value === "" ||
+            value === false ||
+            (Array.isArray(value) && tableFiltering.find(f => f.column === currentColumn) && value.includes(""))
+        ) {
+            tableFiltering = tableFiltering.filter(f => f.column !== currentColumn);
+        } else {
+            let newFilter = new FilterValueProperties();
+            newFilter.column = props.filter.column;
+            newFilter.type = props.filter.type;
+            newFilter.label = props.filter.label;
+
+            if (tableFiltering.some(f => f.column === currentColumn)) {
+                tableFiltering = tableFiltering.map(f => {
+                    if (f.column === currentColumn) {
+                        if (newFilter.type === FilterType.Bool) {
+                            newFilter.checked = value as boolean;
+                        } else if (newFilter.type === FilterType.Number) {
+                            (newFilter as LooseObject)[prop] = value as number;
+                        } else if (newFilter.type === FilterType.Date) {
+                            (newFilter as LooseObject)[prop] = value as Date;
+                        } else if (newFilter.type === FilterType.Select) {
+                            if (f.values!.includes(value as string)) {
+                                newFilter.values = f.values!.filter(val => val !== value);
+                            } else {
+                                newFilter.values = props.filter.multiple ? [...f.values!, value as string] : [value as string];
+                            }
+                        }
+                        return newFilter;
+                    }
+                    return f;
+                });
+            } else {
+                (newFilter as LooseObject)[prop] = value;
+                tableFiltering.push(newFilter);
+            }
+        }
+
+        tableCtx.onFilteringChange && tableCtx.onFilteringChange(tableFiltering);
+        tableCtx.dispatch({ type: SET_FILTERS, filters: tableFiltering });
+    }, [tableCtx.filtering]);
+
     let filterRender: ReactNode;
     switch (props.filter.type) {
         case FilterType.Bool:
@@ -21,7 +70,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                 control={
                     <Checkbox
                         checked={currentFilterValue ? currentFilterValue.checked! : false}
-                        //onChange={(e) => { props.changeFilter({ name: filter.column, type: "bool", checked: e.target.checked, label: filter.label }); }}
+                        onChange={(e) => changeFilter("checked", e.target.checked)}
                         color="secondary"
                     />
                 }
@@ -54,9 +103,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                         value={min}
                         placeholder={tableCtx.filtersMinPlaceHolder}
                         inputProps={{ 'min': 0 }}
-                        onChange={(e) => {
-                            //props.changeFilter({ name: filter.column, type: "number", min: e.target.value, label: filter.label });
-                        }}
+                        onChange={(e) => changeFilter("min", +e.target.value)}
                     />
                     <TextField
                         style={{ width: 160 }}
@@ -64,7 +111,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                         value={max}
                         placeholder={tableCtx.filtersMaxPlaceHolder}
                         inputProps={{ 'min': 0 }}
-                        //onChange={(e) => { props.changeFilter({ name: filter.column, type: "number", max: e.target.value, label: filter.label }); }}
+                        onChange={(e) => changeFilter("max", +e.target.value)}
                     />
                 </Box>
             </>;
@@ -117,12 +164,11 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                     disableCloseOnSelect
                     options={["Все", ...props.filter.values]}
                     autoHighlight
-                    //value={[]}
+                    value=""
                     getOptionLabel={(option) => option ? option.toString() : ""}
                     isOptionEqualToValue={() => false}
-                    renderOption={(renderProps, option, { selected }) => (
-                        //<Box display="flex" alignItems="center" justifyContent="space-between" {...renderProps}>
-                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                    renderOption={(renderProps, option, val) => (
+                        <li style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }} {...renderProps}>
                             {
                                 props.filter.multiple ?
                                     option !== "Все" &&
@@ -136,15 +182,15 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                                     />
                             }
                             {option}
-                        </Box>
+                        </li>
                     )}
-                    /*onChange={(e, val) => {
-                        if ((val && val === "Все") || (currentFilter && currentFilter.value.length === 1 && currentFilter.value.find(v => v === val))) {
-                            props.changeFilter({ name: filter.column, value: !multiFilter ? "" : "all", label: filter.label });
+                    onChange={(e, val) => {
+                        if (val === "Все" || (currentFilterValue?.values!.length === 1 && currentFilterValue.values.find(v => v === val))) {
+                            changeFilter("values", !props.filter.multiple ? "" : "all");
                         } else {
-                            val && props.changeFilter({ name: filter.column, value: val, label: filter.label });
+                            changeFilter("values", val);
                         }
-                    }}*/
+                    }}
                     noOptionsText="Ничего не найдено"
                     clearText="Очистить поиск"
                     closeText="Свернуть"

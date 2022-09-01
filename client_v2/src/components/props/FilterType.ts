@@ -1,10 +1,12 @@
+import { LooseObject } from "../base/LooseObject";
+
 export enum FilterType {
     Select,
     Bool,
     Number,
     Date
 }
-export class FilterValueProperties {
+export class FilterValueProperties implements LooseObject {
     column: string = "";
     label: string | null = null;
     values: Array<string> | null = null;

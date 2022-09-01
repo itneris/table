@@ -2,10 +2,14 @@
 import { ColumnDescription } from "../base/ColumnDescription";
 import { FilterProperties } from "./FilterProperties";
 import { FilterValueProperties } from "./FilterValueProperties";
+import { SortProperties } from "./SortProperties";
 
 export interface ITableContextBase {
+    idField: string | null;
+
     title: string | null;
     toolbarAdornment: ReactNode | null;
+    ctrlIsClicked: boolean;
 
     searching: string;
     disableSearch: boolean;
@@ -21,9 +25,15 @@ export interface ITableContextBase {
     filtersMinPlaceHolder: string;
     filtersMaxPlaceHolder: string;
 
+    sorting: Array<SortProperties>;
+    onSortingChange: ((sorting: Array<SortProperties>) => void) | null;
+
     hideColumnToolipText: string;
     columnsText: string;
     enableHideColumns: boolean;
+
+    pageSize: number;
+    page: number;
 
     dispatch: React.Dispatch<any>;
 }
@@ -31,4 +41,6 @@ export interface ITableContextBase {
 export interface ITableContext<T> extends ITableContextBase {
     columns: Array<ColumnDescription<T>>;
     changeColumns: (newColumns: Array<ColumnDescription<T>>) => void;
+
+    onRowClick: ((id: string, row: T) => void) | null;
 }

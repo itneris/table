@@ -61,7 +61,7 @@ const TablePanelFilterValue = <T extends unknown>(props: { filter: FilterValuePr
             });
         }
         tableCtx.dispatch({ type: SET_FILTERS, newFiltering });
-        tableCtx.onFilteringChnage && tableCtx.onFilteringChnage(newFiltering);
+        tableCtx.onFilteringChange && tableCtx.onFilteringChange(newFiltering);
     }, []);
 
     const filterRenderer = useMemo(() => {
