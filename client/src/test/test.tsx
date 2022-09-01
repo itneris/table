@@ -7,8 +7,9 @@ import {
     Tabs,
     Tab,
 } from "@mui/material";
-import ItnTable, { AbstractColumnBuilder } from "components";
+import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
 import demo from "../test_data/data";
+import { QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
 
 /*const columns = (isServer: boolean, filterType) => [
     {
@@ -235,6 +236,7 @@ export default function TestComnonent() {
     //const [globalLoading, setGlobalLoading] = useState(false);
     const [showAction, setShowAction] = useState(false);
     const [tab, setTab] = useState(0);
+    const queryClient = useQueryClient();
 
     //const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
     //const changeSearch = search => localStorage.setItem("search", search);
@@ -243,6 +245,10 @@ export default function TestComnonent() {
     const serverColumnBuilder = useMemo(() => {
         return new ServerCocktailsColumnBuilder();
     }, []);
+
+    useQuery(["qwe"], () => Promise.resolve(5), {
+        onSuccess: () => { }
+    });
 
     return <div>
         {/*
@@ -280,6 +286,7 @@ export default function TestComnonent() {
                     //data="api/GetData"
                     //filterList="api/GetFilters"
                     apiUrl="test"
+                    queryClient={queryClient}
                     //disableSearch={true}
                     //columns={showAction ? columsWithAction(classes, true) : columns(classes, true)}
                     columnsBuilder={serverColumnBuilder}

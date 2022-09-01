@@ -1,5 +1,5 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClientProvider, useQuery } from '@tanstack/react-query';
 import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, FunctionComponent } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { LooseObject } from '../base/LooseObject';
@@ -65,6 +65,12 @@ export const TableContext = React.createContext<ITableContext | null>(null);
             return table;
         }
     }));*/
+ 
+const ItnTableWithQuery: FunctionComponent<ITableProperties> = (props) => {
+    return <QueryClientProvider client={props.queryClient}>
+        <ItnTable {...props} />
+    </QueryClientProvider>
+};
 
 const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
@@ -131,7 +137,7 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
         [props.apiUrl, 'list', queryOptions],
         getRows(props.apiUrl ?? "", queryOptions),
         {
-            enabled: props.useReactQuery,
+            enabled: props.queryClient !== null,
             onError: () => {
                 setErrorLoading('Ошибка загрузки данных');
             },
@@ -159,7 +165,7 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
         [props.apiUrl, 'filters'],
         getFilters(props.apiUrl ?? ""),
         {
-            enabled: props.useReactQuery && props.filters == null && !props.disableQueryFilters,
+            enabled: props.queryClient != null && props.filters == null && !props.disableQueryFilters,
             onSuccess: (data) => {
                 setFilters(data);
             }
@@ -238,85 +244,83 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
     if (errorLoading) { return <div>{errorLoading}</div> }
 
     return (
-        <>
-            <Paper>
-                <TableContext.Provider value={contextValue}>
-                    {
-                        hasToolbar &&
-                        <TableToolbar />
-                    }
-                    {
-                        filters.some(f => f.inToolbar === true) &&
-                        <Box display="flex" flexWrap="wrap">
-                            {
-                                filters
-                                    .filter(f => f.inToolbar)
-                                    .map((filter, i) =>
-                                        <TableFilter
-                                            key={"tab-filt-" + i}
-                                            filter={filter}
-                                        />
-                                    )
-                            }
-                        </Box>
-                    }
-                    {
-                        ((props.title != null || !props.disableSearch) && table.filtering.length > 0) &&
-                        <Box display="flex" flexWrap="wrap">
-                            {
-                                table.filtering.map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
-                            }
-                        </Box>
-                    }
-                    <Box /*style={{ maxHeight: `calc(100vh - ${maxHeight}px)` }}*/ overflow="auto">
-                        <Box sx={{ width: "100%", height: 4 }}>
-                            {isLoading && <LinearProgress color="secondary" />}
-                        </Box>
-                        <Table
-                            size={props.dense ? "small" : "medium"}
-                        /*style={{
-                            minWidth: minWidth,
-                            overflowX: overflow ? "auto" : undefined,
-                            borderCollapse: stickyHeader ? "separate" : null,
-                            borderSpacing: stickyHeader ? 0 : null
-                        }}*/
-                        >
-                            <TableHead>
-                                <ItnTableHeader />
-                            </TableHead>
-                            <TableBody>
-                                {
-                                    rows.length === 0 ?
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
-                                                style={{ textAlign: "center" }}//, height: 36 }}
-                                            >
-                                                {props.noDataMessage}
-                                            </TableCell>
-                                        </TableRow> :
-                                        rows.map((row) => {
-                                            const idProp = props.idField as keyof typeof row;
-                                            return <ItnTableRow row={row} key={`row-${row[idProp]}`} />;
-                                        })
-                                }
-                            </TableBody>
-                        </Table>
+        <Paper>
+            <TableContext.Provider value={contextValue}>
+                {
+                    hasToolbar &&
+                    <TableToolbar />
+                }
+                {
+                    filters.some(f => f.inToolbar === true) &&
+                    <Box display="flex" flexWrap="wrap">
+                        {
+                            filters
+                                .filter(f => f.inToolbar)
+                                .map((filter, i) =>
+                                    <TableFilter
+                                        key={"tab-filt-" + i}
+                                        filter={filter}
+                                    />
+                                )
+                        }
                     </Box>
-                    {
-                        !props.disablePaging &&
-                        <ItnTablePagination total={total} />
-                    }
-                </TableContext.Provider>
-            </Paper>
-        </>
+                }
+                {
+                    ((props.title != null || !props.disableSearch) && table.filtering.length > 0) &&
+                    <Box display="flex" flexWrap="wrap">
+                        {
+                            table.filtering.map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
+                        }
+                    </Box>
+                }
+                <Box /*style={{ maxHeight: `calc(100vh - ${maxHeight}px)` }}*/ overflow="auto">
+                    <Box sx={{ width: "100%", height: 4 }}>
+                        {isLoading && <LinearProgress color="secondary" />}
+                    </Box>
+                    <Table
+                        size={props.dense ? "small" : "medium"}
+                    /*style={{
+                        minWidth: minWidth,
+                        overflowX: overflow ? "auto" : undefined,
+                        borderCollapse: stickyHeader ? "separate" : null,
+                        borderSpacing: stickyHeader ? 0 : null
+                    }}*/
+                    >
+                        <TableHead>
+                            <ItnTableHeader />
+                        </TableHead>
+                        <TableBody>
+                            {
+                                rows.length === 0 ?
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
+                                            style={{ textAlign: "center" }}//, height: 36 }}
+                                        >
+                                            {props.noDataMessage}
+                                        </TableCell>
+                                    </TableRow> :
+                                    rows.map((row) => {
+                                        const idProp = props.idField as keyof typeof row;
+                                        return <ItnTableRow row={row} key={`row-${row[idProp]}`} />;
+                                    })
+                            }
+                        </TableBody>
+                    </Table>
+                </Box>
+                {
+                    !props.disablePaging &&
+                    <ItnTablePagination total={total} />
+                }
+            </TableContext.Provider>
+        </Paper>
     );
 });
 
 ItnTable.defaultProps = {
     items:  null,
     apiUrl: null,
-    useReactQuery: true,
+    queryClient: null,
     idField: "id",
     disableQueryFilters: false,
 
@@ -359,4 +363,4 @@ ItnTable.defaultProps = {
     onRowClick: null
 }
 
-export default ItnTable;
+export default ItnTableWithQuery;
