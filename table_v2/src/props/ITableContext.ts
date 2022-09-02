@@ -35,6 +35,7 @@ export interface ITableContext {
 
     pageSize: number;
     page: number;
+    total: number;
 
     dispatch: React.Dispatch<any>;
 

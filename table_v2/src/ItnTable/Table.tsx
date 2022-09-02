@@ -1,8 +1,12 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { tab } from '@testing-library/user-event/dist/tab';
+import { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
+import { error } from 'console';
 import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, FunctionComponent } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { LooseObject } from '../base/LooseObject';
+import { TableRowsReponse } from '../base/TableRowsReponse';
 import { FilterProperties } from '../props/FilterProperties';
 import { ITableContext } from '../props/ITableContext';
 import { ITableProperties } from '../props/ITableProperties';
@@ -133,17 +137,17 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
     }, [table]);
 
 
-    const queryRows = useQuery(
+    const queryRows = useQuery<AxiosResponse<TableRowsReponse>, AxiosError>(
         [props.apiUrl, 'list', queryOptions],
         getRows(props.apiUrl ?? "", queryOptions),
         {
             enabled: props.queryClient !== null,
-            onError: () => {
-                setErrorLoading('Ошибка загрузки данных');
+            onError: (err) => {
+                setErrorLoading(`Ошибка загрузки данных: ${err.message || err.response.data.toString()}`);
             },
-            onSuccess: (data) => {
-                setRows(data.rows);
-                setTotal(data.total);
+            onSuccess: (response) => {
+                setRows(response.data.rows);
+                setTotal(response.data.total);
             },
             onSettled: () => {
                 setIsLoading(false);
@@ -161,13 +165,13 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
         }
     }, [props.filters]);
 
-    useQuery(
+    useQuery<AxiosResponse<FilterProperties[]>, AxiosError>(
         [props.apiUrl, 'filters'],
         getFilters(props.apiUrl ?? ""),
         {
             enabled: props.queryClient != null && props.filters == null && !props.disableQueryFilters,
-            onSuccess: (data) => {
-                setFilters(data);
+            onSuccess: (response) => {
+                setFilters(response.data);
             }
         }
     );
@@ -237,11 +241,10 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
         onSortingChange: props.onSortingChange!,
         onRowClick: props.onRowClick!,
         idField: props.idField!,
-        pageSize: props.pageSize!,
-        page: table.page
+        pageSize: table.pageSize!,
+        page: table.page,
+        total: total
     };
-
-    if (errorLoading) { return <div>{errorLoading}</div> }
 
     return (
         <Paper>
@@ -291,19 +294,27 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
                         </TableHead>
                         <TableBody>
                             {
-                                rows.length === 0 ?
-                                    <TableRow>
+                                errorLoading !== null ? <TableRow>
                                         <TableCell
                                             colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
                                             style={{ textAlign: "center" }}//, height: 36 }}
                                         >
-                                            {props.noDataMessage}
+                                            {errorLoading}
                                         </TableCell>
                                     </TableRow> :
-                                    rows.map((row) => {
-                                        const idProp = props.idField as keyof typeof row;
-                                        return <ItnTableRow row={row} key={`row-${row[idProp]}`} />;
-                                    })
+                                    rows.length === 0 ?
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
+                                                style={{ textAlign: "center" }}//, height: 36 }}
+                                            >
+                                                {props.noDataMessage}
+                                            </TableCell>
+                                        </TableRow> :
+                                        rows.map((row) => {
+                                            const idProp = props.idField as keyof typeof row;
+                                            return <ItnTableRow row={row} key={`row-${row[idProp]}`} />;
+                                        })
                             }
                         </TableBody>
                     </Table>
@@ -356,7 +367,7 @@ ItnTable.defaultProps = {
 
     disablePaging: false,
     pageSize: 10,
-    page: 1,
+    page: 0,
     onDownload: null,
     selectedRows: [],
     onRowSelect: null,

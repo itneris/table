@@ -19,13 +19,13 @@ export function tableReducer(state: TableState, action: any) {
             return {
                 ...state,
                 searching: "",
-                page: 1
+                page: 0
             } as TableState;
         case SEARCH:
             return {
                 ...state,
                 searching: action.searching,
-                page: 1
+                page: 0
             } as TableState;
         case SET_SELECT:
             return {
@@ -36,13 +36,13 @@ export function tableReducer(state: TableState, action: any) {
             return {
                 ...state,
                 filtering: action.filtering,
-                page: 1
+                page: 0
             } as TableState;
         case RESET_FILTERS:
             return {
                 ...state,
                 filtering: [],
-                page: 1
+                page: 0
             } as TableState;
         case SET_SORT:
             return {
@@ -68,7 +68,7 @@ export function tableReducer(state: TableState, action: any) {
             return {
                 ...state,
                 pageSize: action.pageSize,
-                page: 1
+                page: 0
             } as TableState;
         case SET_PAGE:
             return {

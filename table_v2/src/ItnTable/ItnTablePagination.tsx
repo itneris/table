@@ -12,14 +12,15 @@ function ItnTablePagination(props: { total: number }) {
         tableCtx.dispatch({ type: SET_PAGE, page });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const hanlePageSizeChange = useCallback((pageSize: number) => {
-        tableCtx.dispatch({ type: SET_ROWS_PER_PAGE, rowsPerPage: pageSize })
+    const hanlePageSizeChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const pageSize = parseInt(event.target.value, 10);
+        tableCtx.dispatch({ type: SET_ROWS_PER_PAGE, pageSize });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <TablePagination
             component="div"
-            count={props.total}
+            count={tableCtx.total}
             rowsPerPageOptions={/*rowsPerPageOptions || */[10, 25, 50, 100]}
             rowsPerPage={tableCtx.pageSize}
             labelRowsPerPage="Строк на странице"
@@ -28,7 +29,7 @@ function ItnTablePagination(props: { total: number }) {
             backIconButtonProps={{ 'aria-label': 'Пред. страница' }}
             nextIconButtonProps={{ 'aria-label': 'След. страница' }}
             onPageChange={(event, page) => hanlePageChange(page)}
-            onRowsPerPageChange={event => hanlePageSizeChange(+event.target.value)}
+            onRowsPerPageChange={hanlePageSizeChange}
         />
     );
 }

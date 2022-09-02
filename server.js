@@ -12,14 +12,18 @@ app.post('/api/test/list', (req, res) => {
     let tableState = req.body;
     let rows = demo.data;
 
-    let total = demo.data.length;
+    let total =  demo.data.length;
     rows = [...rows].splice(tableState.page * tableState.pageSize, tableState.pageSize);
 
-    console.log(tableState.page);
+    console.log(tableState.pageSize);
+    res.type('text/plain');
+    res.status(500);
+    res.send('Error error');
+    /*
     res.send({
         rows,
         total
-    });
+    });*/
     /*
     if (tableState.searching && tableState.searching != "") {
         rows = rows.filter(_ => _.name.toLowerCase().includes(tableState.search.toLowerCase()))
