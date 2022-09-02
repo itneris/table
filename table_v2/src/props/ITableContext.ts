@@ -7,6 +7,7 @@ import { SortProperties } from "./SortProperties";
 
 export interface ITableContext {
     idField: string | null;
+    dateParseRE: RegExp;
 
     title: string | null;
     toolbarAdornment: ReactNode | null;

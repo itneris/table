@@ -18,7 +18,7 @@ export class ColumnDescription implements LooseObject {
     display: boolean = true;
     systemHide: boolean = false;
 
-    nullValue: string | null = null;
+    nullValue: string | null = "-";
     width: number | null = null;
 
     filters: Array<string | null> = [];

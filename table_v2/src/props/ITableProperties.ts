@@ -14,6 +14,7 @@ export interface ITableProperties {
     apiUrl?: string | null;
     queryClient?: QueryClient | null;
     disableQueryFilters?: boolean;
+    dateParseRE?: RegExp;
 
     idField?: string;
 

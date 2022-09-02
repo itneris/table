@@ -1,12 +1,12 @@
 import { TableCell } from '@mui/material';
 import { format } from 'date-fns';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useContext, useMemo } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { LooseObject } from '../base/LooseObject';
-//import { TableContext } from './Table';
+import { TableContext } from './Table';
 
 function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
-    //const tableCtx = useContext(TableContext)!;
+    const tableCtx = useContext(TableContext)!;
 
     const valProp = props.column.property as keyof typeof props.row;
     const value = props.row[valProp];
@@ -15,7 +15,8 @@ function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
         if (props.column.bodyRenderer) {
             return props.column.bodyRenderer(value, props.row);
         }
-        if (typeof value === "string" && !isNaN(new Date(value).getTime())) {
+        if (typeof value === "string" && tableCtx.dateParseRE.test(value)) {
+            console.log(value);
             const dateFormat = props.column.dateFormat ??
                 (
                     props.column.dateWithTime ?
@@ -29,6 +30,9 @@ function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
         }
         if (Array.isArray(value)) {
             return value.join(", ") as string;
+        }
+        if (value === null || value.toString() === "") {
+            return props.column.nullValue;
         }
         return value as unknown as string;
     }, [value, props.column]); // eslint-disable-line react-hooks/exhaustive-deps

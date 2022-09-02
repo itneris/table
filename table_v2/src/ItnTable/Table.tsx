@@ -3,8 +3,9 @@ import { QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { tab } from '@testing-library/user-event/dist/tab';
 import { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
 import { error } from 'console';
-import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, FunctionComponent } from 'react';
+import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, FunctionComponent, useRef } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
+import { ITableRef } from '../base/ITableRef';
 import { LooseObject } from '../base/LooseObject';
 import { TableRowsReponse } from '../base/TableRowsReponse';
 import { FilterProperties } from '../props/FilterProperties';
@@ -70,13 +71,33 @@ export const TableContext = React.createContext<ITableContext | null>(null);
         }
     }));*/
  
-const ItnTableWithQuery: FunctionComponent<ITableProperties> = (props) => {
-    return <QueryClientProvider client={props.queryClient}>
-        <ItnTable {...props} />
-    </QueryClientProvider>
-};
+const ItnTableWithQuery = forwardRef<ITableRef, ITableProperties>((props, ref) => {
+    const table = useRef<ITableRef | null>(null);
 
-const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) => {
+    useImperativeHandle(ref, () => ({
+        fetch() {
+            table.current!.fetch();
+        },
+        getData() {
+            return table.current!.getData();
+        },
+        getState(): TableState {
+            return table.current!.getState();
+        }
+    }))
+
+    if (props.queryClient) { 
+        return (
+            <QueryClientProvider client={props.queryClient}>
+                <ItnTable ref={table} {...props} />
+            </QueryClientProvider>
+        );
+    } else {
+        return <ItnTable ref={table} {...props} />;
+    }
+});
+
+const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
     useImperativeHandle(ref, () => ({
         fetch() {
             queryRows.refetch();
@@ -243,7 +264,8 @@ const ItnTable: FunctionComponent<ITableProperties> = forwardRef((props, ref) =>
         idField: props.idField!,
         pageSize: table.pageSize!,
         page: table.page,
-        total: total
+        total: total,
+        dateParseRE: props.dateParseRE
     };
 
     return (
@@ -353,6 +375,7 @@ ItnTable.defaultProps = {
     filtersResetText: "Сбросить",
     filtersMinPlaceHolder: "минимум",
     filtersMaxPlaceHolder: "максимум",
+    dateParseRE: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*$/,
 
     enableHideColumns: false,
 
