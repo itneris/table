@@ -7,8 +7,6 @@ import { FilterValueProperties } from '../props/FilterValueProperties';
 import { TableContext } from './Table';
 import { SET_FILTERS } from './tableReducer';
 
-//TODO вынести все русские текстовки
-
 function TableFilter(props: { filter: FilterProperties }) {
     const tableCtx = useContext(TableContext)!;
     const currentFilterValue = useMemo(() => tableCtx.filtering.find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -189,10 +187,10 @@ function TableFilter(props: { filter: FilterProperties }) {
                             changeFilter("values", val);
                         }
                     }}
-                    noOptionsText="Ничего не найдено"
-                    clearText="Очистить поиск"
-                    closeText="Свернуть"
-                    openText="Развернуть"
+                    noOptionsText={tableCtx.filterNoOptionsText}
+                    clearText={tableCtx.filterClearText}
+                    closeText={tableCtx.filterCloseText}
+                    openText={tableCtx.filterOpenText}
                     renderInput={(params) => (
                         <TextField
                             {...params}
@@ -201,8 +199,8 @@ function TableFilter(props: { filter: FilterProperties }) {
                             InputLabelProps={{ shrink: true }}
                             label={filterLabel}
                             placeholder={!props.filter.multiple ?
-                                currentFilterValue === null ? "Все" : currentFilterValue.values![0] :
-                                `Выбрано значений: ${currentFilterValue === null ? "Все" : currentFilterValue.values!.length}`
+                                currentFilterValue === null ? tableCtx.filterAllText : currentFilterValue.values![0] :
+                                `${tableCtx.filterSelectValuesText}: ${currentFilterValue === null ? tableCtx.filterAllText : currentFilterValue.values!.length}`
                             }
                             inputProps={{
                                 ...params.inputProps,

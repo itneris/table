@@ -7,197 +7,9 @@ import {
     Tabs,
     Tab,
 } from "@mui/material";
-import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
+//import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
+import ItnTable, { AbstractColumnBuilder } from "../table/src";
 import demo from "../test_data/data";
-import { useQueryClient } from "@tanstack/react-query";
-
-/*const columns = (isServer: boolean, filterType) => [
-    {
-        name: "id",
-        options: {
-            display: false
-        }
-    },
-    {
-        name: "glassType",
-        label: "Type",
-        options: {
-            customHeadRender: () => <Box display="flex" alignItems="center">
-                Type
-                <Tooltip
-                    title='Glass type of cocktail'
-                >
-                    <HelpOutline />
-                </Tooltip>
-            </Box>,
-            customBodyRender: isServer ? undefined : v => (demo as any).dictionary.find((_ : any) => _.id === v).label,
-            transformData: isServer ? undefined : v => (demo as any).dictionary!.find((_: any) => _.id === v).label
-        }
-    },
-    {
-        name: "name",
-        label: "Name",
-        options: {
-            customBodyRender: (value: string) => <div style={{ fontWeight: "bold" }}>{value}</div>
-        }
-    },
-    {
-        name: "price",
-        label: "Price, $"
-    },
-    {
-        name: "ingridients",
-        label: "Ingridients",
-        options: {
-            sort: false,
-            type: "array",
-            filterType: filterType,
-            customBodyRender: v => v.join(", "),
-        }
-    },
-    {
-        name: "createDate",
-        label: "Creation Date",
-        options: {
-            customBodyRender: (v: string|null) => v ? new Date(v).toLocaleDateString() : "-",
-            transformData: (v: string|null) => v ? "Known" : "Unknown"
-        }
-    }
-];
-
-const columsWithAction = (classes, isServer, filterType) => [
-    ...columns(classes, isServer, filterType), {
-        name: "action",
-        label: "Actions",
-        options: {
-            sort: false,
-            customBodyRender: (v, row) => <Button
-                color="secondary"
-                variant="text"
-                onClick={() => alert(row.id)}
-            >
-                Show ID
-            </Button>
-        }
-    }
-];
-
-const columnsMultiheader = [
-    {
-        name: "id",
-        options: {
-            display: false
-        }
-    },
-    {
-        name: "rowNumber",
-        label: "Group",
-        options: {
-            customBodyRender: (value: Date | null) => <div style={{ zIndex: 2 }}>{value ? value.toLocaleString('ru-RU') : value}</div>,
-            headRow: 1,
-            rowSpan: 2
-        }
-    },
-    {
-        name: "section1",
-        label: "Section 1. Glass and name",
-        options: {
-            headRow: 1,
-            rowSpan: 1,
-            colSpan: 2,
-            section: 1,
-            onlyHead: true,
-            sectionFilterLabel: "Section 1. Glass and name",
-            customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)", fontWeight: "bold" }
-        }
-    },
-    {
-        name: "glassType",
-        label: "Type",
-        options: {
-            headRow: 2,
-            rowSpan: 1,
-            section: 1,
-            customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)" },
-            customBodyRender: (v: string | null) => (demo as any).dictionary.find((_ : any) => _.id === v).label,
-            transformData: (v: string | null) => (demo as any).dictionary.find((_: any) => _.id === v).label
-        }
-    },
-    {
-        name: "name",
-        label: "Name",
-        options: {
-            headRow: 2,
-            rowSpan: 1,
-            section: 1,
-            customBodyRender: (value: string) => <div style={{ fontWeight: "bold" }}>{value}</div>
-        }
-    },
-    {
-        name: "section2",
-        label: "Section 2. Bar",
-        options: {
-            headRow: 1,
-            rowSpan: 1,
-            colSpan: 2,
-            section: 2,
-            onlyHead: true,
-            sectionFilterLabel: "Section 2. Bar",
-            customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)", fontWeight: "bold" }
-        }
-    },
-    {
-        name: "price",
-        label: "Price, $",
-        options: {
-            headRow: 2,
-            rowSpan: 1,
-            section: 2,
-            customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)" }
-        }
-    },
-    {
-        name: "ingridients",
-        label: "Ingridients",
-        options: {
-            sort: false,
-            type: "array",
-            customBodyRender: v => v.join(", "),
-            headRow: 2,
-            rowSpan: 1,
-            section: 2
-        }
-    },
-    {
-        name: "createDate",
-        label: "Creation Date",
-        options: {
-            headRow: 1,
-            rowSpan: 2,
-            customHeadStyle: { borderLeft: "3px solid rgba(224, 224, 224, 1)" },
-            customBodyRender: v => v ? ToRuDate(v, false) : "-",
-            transformData: v => v ? "Known" : "Unknown",
-        }
-    }
-];
-*/
-/*const demoFilterList: Array<FilterProperties> = [
-    {
-        column: "glassType",
-        values: demo.dictionary.map(_ => _.label).sort(),
-        type: 0
-    },
-    {
-        column: "ingridients",
-        values: ["Beer", "Jhin", "Vodka", "Tequila", "Vermut", "Rum", "Cuantro", "Cola", "Liquor", "Juice", "Wine", "Apperetivo", "Jager", "Blue Curasao"].sort(),
-        type: 0
-    },
-    {
-        column: "createDate",
-        values: ["Known", "Unknown"],
-        type: 0 }
-];*/
-
 
 interface ICocktailDTO {
     id: string;
@@ -236,7 +48,6 @@ export default function TestComnonent() {
     //const [globalLoading, setGlobalLoading] = useState(false);
     const [showAction, setShowAction] = useState(false);
     const [tab, setTab] = useState(0);
-    const queryClient = useQueryClient();
 
     //const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
     //const changeSearch = search => localStorage.setItem("search", search);
@@ -281,8 +92,7 @@ export default function TestComnonent() {
                 <ItnTable
                     //data="api/GetData"
                     //filterList="api/GetFilters"
-                    apiUrl="test"
-                    queryClient={queryClient}
+                    apiUrl="api/test"
                     //disableSearch={true}
                     //columns={showAction ? columsWithAction(classes, true) : columns(classes, true)}
                     columnsBuilder={serverColumnBuilder}

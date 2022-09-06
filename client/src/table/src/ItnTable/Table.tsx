@@ -1,9 +1,7 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { tab } from '@testing-library/user-event/dist/tab';
-import { AxiosError, AxiosPromise, AxiosResponse } from 'axios';
-import { error } from 'console';
-import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, FunctionComponent, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError, AxiosResponse } from 'axios';
+import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { ITableRef } from '../base/ITableRef';
 import { LooseObject } from '../base/LooseObject';
@@ -136,7 +134,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         [props.apiUrl, 'list', queryOptions],
         getRows(props.apiUrl ?? "", queryOptions),
         {
-            enabled: props.queryClient !== null,
+            enabled: props.apiUrl !== null,
             onError: (err) => {
                 setErrorLoading(`Ошибка загрузки данных: ${err.message}`);
             },
@@ -164,7 +162,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         [props.apiUrl, 'filters'],
         getFilters(props.apiUrl ?? ""),
         {
-            enabled: props.queryClient != null && props.filters == null && !props.disableQueryFilters,
+            enabled: props.apiUrl != null && props.filters == null && !props.disableQueryFilters,
             onSuccess: (response) => {
                 setFilters(response.data);
             }
@@ -231,6 +229,12 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         filtersResetText: props.filtersResetText!,
         filtersMinPlaceHolder: props.filtersMinPlaceHolder!,
         filtersMaxPlaceHolder: props.filtersMaxPlaceHolder!,
+        filterClearText: props.filterClearText!,
+        filterCloseText: props.filterCloseText!,
+        filterOpenText: props.filterOpenText!,
+        filterNoOptionsText: props.filterNoOptionsText!,
+        filterAllText: props.filterAllText!,
+        filterSelectValuesText: props.filterSelectValuesText!,
         sorting: table.sorting,
         ctrlIsClicked: ctrlIsClicked,
         onSortingChange: props.onSortingChange!,
@@ -239,7 +243,12 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         pageSize: table.pageSize!,
         page: table.page,
         total: total,
-        dateParseRE: props.dateParseRE!
+        dateParseRE: props.dateParseRE!,
+        pageSizeOptions: props.pageSizeOptions!,
+        pageSizeOptionsText: props.pageSizeOptionsText!,
+        nextPageText: props.nextPageText!,
+        pageLabelText: props.pageLabelText!,
+        prevPageText: props.prevPageText!
     };
 
     return (
@@ -317,7 +326,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
                 </Box>
                 {
                     !props.disablePaging &&
-                    <ItnTablePagination total={total} />
+                    <ItnTablePagination />
                 }
             </TableContext.Provider>
         </Paper>
@@ -327,7 +336,6 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
 ItnTable.defaultProps = {
     items:  null,
     apiUrl: null,
-    queryClient: null,
     idField: "id",
     disableQueryFilters: false,
 
@@ -361,10 +369,22 @@ ItnTable.defaultProps = {
     filtering: [],
     onFilteringChange: null,
     filters: null,
+    filterNoOptionsText: "Ничего не найдено",
+    filterClearText: "Очистить поиск",
+    filterCloseText: "Свернуть",
+    filterOpenText: "Развернуть",
+    filterAllText: "Все",
+    filterSelectValuesText: "Выбрано значений",
 
     disablePaging: false,
     pageSize: 10,
+    pageSizeOptions: [10, 25, 50, 100],
     page: 0,
+    pageSizeOptionsText: "Строк на странице",
+    pageLabelText: ({ from, to, count }) => `${from}-${to} из ${count}`,
+    prevPageText: "Пред. страница",
+    nextPageText: "След. страница",
+
     onDownload: null,
     selectedRows: [],
     onRowSelect: null,

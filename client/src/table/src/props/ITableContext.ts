@@ -26,6 +26,12 @@ export interface ITableContext {
     filtersResetText: string;
     filtersMinPlaceHolder: string;
     filtersMaxPlaceHolder: string;
+    filterClearText: string;
+    filterCloseText: string;
+    filterOpenText: string;
+    filterNoOptionsText: string;
+    filterAllText: string;
+    filterSelectValuesText: string;
 
     sorting: Array<SortProperties>;
     onSortingChange: ((sorting: Array<SortProperties>) => void) | null;
@@ -35,8 +41,13 @@ export interface ITableContext {
     enableHideColumns: boolean;
 
     pageSize: number;
+    pageSizeOptions: number[];
+    pageSizeOptionsText: string;
     page: number;
     total: number;
+    pageLabelText: ({ from, to, count }: { from: number, to: number, count: number }) => string;
+    prevPageText: string;
+    nextPageText: string;
 
     dispatch: React.Dispatch<any>;
 

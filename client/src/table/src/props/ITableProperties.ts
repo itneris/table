@@ -72,13 +72,24 @@ export interface ITableProperties {
      * Filters for table, no will be rendered if empty
     */
     filters?: Array<FilterProperties> | null;
+    filterNoOptionsText?: string;
+    filterClearText?: string;
+    filterCloseText?: string;
+    filterOpenText?: string;
+    filterAllText?: string;
+    filterSelectValuesText?: string;
 
     /**
      * Disables paging for table
     */
     disablePaging?: boolean;
     pageSize?: number;
+    pageSizeOptions?: number[];
     page?: number;
+    pageSizeOptionsText?: string;
+    pageLabelText?: ({ from, to, count }: { from: number, to: number, count: number }) => string;
+    prevPageText?: string;
+    nextPageText?: string;
 
     /**
      * Return current table state when download button clicked if downloadUrl is not set
