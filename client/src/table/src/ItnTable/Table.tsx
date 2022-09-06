@@ -71,32 +71,6 @@ export const TableContext = React.createContext<ITableContext | null>(null);
         }
     }));*/
  
-const ItnTableWithQuery = forwardRef<ITableRef, ITableProperties>((props, ref) => {
-    const table = useRef<ITableRef | null>(null);
-
-    useImperativeHandle(ref, () => ({
-        fetch() {
-            table.current!.fetch();
-        },
-        getData() {
-            return table.current!.getData();
-        },
-        getState(): TableState {
-            return table.current!.getState();
-        }
-    }))
-
-    if (props.queryClient) { 
-        return (
-            <QueryClientProvider client={props.queryClient}>
-                <ItnTable ref={table} {...props} />
-            </QueryClientProvider>
-        );
-    } else {
-        return <ItnTable ref={table} {...props} />;
-    }
-});
-
 const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
     useImperativeHandle(ref, () => ({
         fetch() {
@@ -164,7 +138,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         {
             enabled: props.queryClient !== null,
             onError: (err) => {
-                setErrorLoading(`Ошибка загрузки данных: ${err.message || err.response.data.toString()}`);
+                setErrorLoading(`Ошибка загрузки данных: ${err.message}`);
             },
             onSuccess: (response) => {
                 setRows(response.data.rows);
@@ -265,7 +239,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         pageSize: table.pageSize!,
         page: table.page,
         total: total,
-        dateParseRE: props.dateParseRE
+        dateParseRE: props.dateParseRE!
     };
 
     return (
@@ -397,4 +371,4 @@ ItnTable.defaultProps = {
     onRowClick: null
 }
 
-export default ItnTableWithQuery;
+export default ItnTable;

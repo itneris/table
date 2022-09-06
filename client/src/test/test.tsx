@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
 import demo from "../test_data/data";
-import { QueryClientProvider, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 /*const columns = (isServer: boolean, filterType) => [
     {
@@ -245,10 +245,6 @@ export default function TestComnonent() {
     const serverColumnBuilder = useMemo(() => {
         return new ServerCocktailsColumnBuilder();
     }, []);
-
-    useQuery(["qwe"], () => Promise.resolve(5), {
-        onSuccess: () => { }
-    });
 
     return <div>
         {/*

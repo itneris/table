@@ -1,5 +1,4 @@
-﻿import { QueryClient } from "@tanstack/react-query";
-import { ReactNode } from "react";
+﻿import { ReactNode } from "react";
 import { LooseObject } from "../base/LooseObject";
 import { AbstractColumnBuilder } from "../columnBuilder/AbstractColumnBuilder";
 import { DownloadFileProperties } from "./DownloadFileProperties";
@@ -12,7 +11,6 @@ export interface ITableProperties {
     items?: Array<any> | null;
 
     apiUrl?: string | null;
-    queryClient?: QueryClient | null;
     disableQueryFilters?: boolean;
     dateParseRE?: RegExp;
 
