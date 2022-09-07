@@ -214,7 +214,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
         disableSearch: props.disableSearch!,
         title: props.title!,
         onSearchingChange: props.onSearchingChange!,
-        resetSearchTooltipText: props.restSearchTooltipText!,
+        resetSearchTooltipText: props.resetSearchTooltipText!,
         filters: filters,
         filtering: table.filtering,
         onFilteringChange: props.onFilteringChange!,
@@ -313,7 +313,7 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
                                                 colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
                                                 style={{ textAlign: "center" }}//, height: 36 }}
                                             >
-                                                {props.noDataMessage}
+                                                {isLoading ? props.loadingMessage : props.noDataMessage}
                                             </TableCell>
                                         </TableRow> :
                                         rows.map((row) => {
@@ -334,7 +334,6 @@ const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
 });
 
 ItnTable.defaultProps = {
-    items:  null,
     apiUrl: null,
     idField: "id",
     disableQueryFilters: false,
@@ -349,7 +348,7 @@ ItnTable.defaultProps = {
     noDataMessage: "Нет данных для отображения",
     loadingMessage: "Загрузка...",
     searchTooltipText: "Поиск",
-    restSearchTooltipText: "Сбросить поиск",
+    resetSearchTooltipText: "Сбросить поиск",
     filterTooltipText: "Фильтры",
     filterText: "Фильтры",
     hideColumnToolipText: "Отображение колонок",

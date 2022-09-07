@@ -6,6 +6,13 @@ declare module "./ColumnOptionsBuilder" {
 		WithName(displayName: string, bold?: boolean): ColumnOptionsBuilder<T>;
 		WithDateFormat(dateFormat: string): ColumnOptionsBuilder<T>;
 		WithBodyRenderer(renderer: (value: any, row: T) => React.ReactNode): ColumnOptionsBuilder<T>;
+		WithDefaultSort(ascending?: boolean, order?: number): ColumnOptionsBuilder<T>;
+		WithNullValue(value: string): ColumnOptionsBuilder<T>;
+		WithWidth(width: number): ColumnOptionsBuilder<T>;
+		WithDefaultFilters(filtrs: string[]): ColumnOptionsBuilder<T>;
+		WithTime(): ColumnOptionsBuilder<T>;
+		DisableSort(): ColumnOptionsBuilder<T>;
+		Hide(): ColumnOptionsBuilder<T>;
 	}
 }
 
@@ -38,92 +45,72 @@ ColumnOptionsBuilder.prototype.WithBodyRenderer = function<T extends LooseObject
 		.SetColumnProp("bodyRenderer", renderer) as ColumnOptionsBuilder<T>;
 }
 
+/**
+ * Renders DateTime column width time
+ * */
+ColumnOptionsBuilder.prototype.WithTime = function <T extends LooseObject>() {
+	return this
+		.SetColumnProp("dateWithTime", true) as ColumnOptionsBuilder<T>;
+}
 
-/*
+/**
+ * Renders DateTime column width time
+ * * */
+ColumnOptionsBuilder.prototype.WithTime = function <T extends LooseObject>() {
+	return this
+		.SetColumnProp("dateWithTime", true) as ColumnOptionsBuilder<T>;
+}
 
-	/// <summary>
-	/// Defines need time for date column
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> WithDateTime<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder)
-	{
-		return columnBuilder.SetColumnProp("DateWithTime", true);
-	}
+/**
+ * Set default sort for the column
+ * @param {boolean} ascending sort should be ascending
+ * @param {number} order order of column in multisort
+ * */
+ColumnOptionsBuilder.prototype.WithDefaultSort = function <T extends LooseObject>(ascending: boolean = true, order: number = 1) {
+	return this
+		.SetColumnProp("sortOrder", order)
+		.SetColumnProp("sortAscending", ascending) as ColumnOptionsBuilder<T>;
+}
 
-	/// <summary>
-	/// Defines initial sort for column
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> WithDefaultSort<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder, bool ascending = true, int order = 1)
-	{
-		return columnBuilder
-			.SetColumnProp("SortOrder", order)
-			.SetColumnProp("SortAscending", ascending);
-	}
+/**
+ * Disables sort for the column
+ * */
+ColumnOptionsBuilder.prototype.DisableSort = function <T extends LooseObject>() {
+	return this
+		.SetColumnProp("disableSort", true) as ColumnOptionsBuilder<T>;
+}
 
-	/// <summary>
-	/// Disables sorting for column
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> DisableSort<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder)
-	{
-		return columnBuilder.SetColumnProp("DisableSort", true);
-	}
+/**
+ * Renders DateTime column width time
+ * */
+ColumnOptionsBuilder.prototype.Hide = function <T extends LooseObject>() {
+	return this
+		.SetColumnProp("display", false) as ColumnOptionsBuilder<T>;
+}
 
-	/// <summary>
-	/// Prevent column from display
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> Hide<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder)
-	{
-		return columnBuilder.SetColumnProp("Display", false);
-	}
+/**
+ * Replaces null value for column
+ * @param {string} value string to render insted of null or empty valye
+ * */
+ColumnOptionsBuilder.prototype.WithNullValue = function <T extends LooseObject>(value: string) {
+	return this
+		.SetColumnProp("nullValue", false) as ColumnOptionsBuilder<T>;
+}
 
-	/// <summary>
-	/// Replace null value in cell
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> WithNullValue<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder, string value)
-	{
-		return columnBuilder.SetColumnProp("NullValue", value);
-	}
+/**
+ * Define percent width for column for strict table layout
+ * @param {number} width width in pecent
+ * */
+ColumnOptionsBuilder.prototype.WithWidth = function <T extends LooseObject>(width: number) {
+	return this
+		.SetColumnProp("width", width) as ColumnOptionsBuilder<T>;
+}
 
-	/// <summary>
-	/// Define percent width for column
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> WithWidth<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder, int width)
-	{
-		return columnBuilder.SetColumnProp("Width", width);
-	}
-
-	/// <summary>
-	/// Set default fitlering for column
-	/// </summary>
-	/// <typeparam name="T">Type of object being validated</typeparam>
-	/// <typeparam name="TProperty">Type of property being validated</typeparam>
-	/// <param name="columnBuilder">The column builder on which the rule should be defined</param>
-	/// <returns></returns>
-	public static IColumnBuilder<T, TProperty> WithDefaultFilters<T, TProperty>(this IColumnBuilder<T, TProperty> columnBuilder, params string?[] filters)
-	{
-		return columnBuilder.SetColumnProp("Filters", filters);
-	}
-}*/
+/**
+ * Sets the default fitlering for the column
+ * @param {string[]} filters array of values in default filtering
+ * */
+ColumnOptionsBuilder.prototype.WithDefaultFilters = function <T extends LooseObject>(filters: string[]) {
+	return this
+		.SetColumnProp("filters", filters) as ColumnOptionsBuilder<T>;
+}
