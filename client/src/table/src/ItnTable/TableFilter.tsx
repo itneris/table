@@ -50,13 +50,17 @@ function TableFilter(props: { filter: FilterProperties }) {
                     return f;
                 });
             } else {
-                (newFilter as LooseObject)[prop] = value;
+                if (prop === "values") {
+                    newFilter.values = [value as string];
+                } else {
+                    (newFilter as LooseObject)[prop] = value;
+                }
                 tableFiltering.push(newFilter);
             }
         }
 
         tableCtx.onFilteringChange && tableCtx.onFilteringChange(tableFiltering);
-        tableCtx.dispatch({ type: SET_FILTERS, filters: tableFiltering });
+        tableCtx.dispatch({ type: SET_FILTERS, filtering: tableFiltering });
     }, [tableCtx.filtering]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     let filterRender: ReactNode;

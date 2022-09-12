@@ -7,8 +7,8 @@ import {
     Tabs,
     Tab,
 } from "@mui/material";
-import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
-//import ItnTable, { AbstractColumnBuilder } from "../table/src";
+//import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
+import ItnTable, { AbstractColumnBuilder } from "../table/src";
 import demo from "../test_data/data";
 
 interface ICocktailDTO {

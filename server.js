@@ -15,6 +15,21 @@ app.post('/api/test/list', (req, res) => {
     let total =  demo.data.length;
     rows = [...rows].splice(tableState.page * tableState.pageSize, tableState.pageSize);
 
+    if (tableState.searching) {
+        rows = rows.filter(_ => _.name.toLowerCase().includes(tableState.searching.toLowerCase()));
+    }
+
+    tableState.filtering.forEach(_ => {
+        rows = rows.filter(_ => _.glassType === 1);
+    });
+
+    tableState.sorting.forEach(s => {
+        rows = rows.sort((a, b) => {
+            if (a[s.column] > b[s.column]) return s.ascending ? 1 : -1;
+            if (a[s.column] <= b[s.column]) return s.ascending ? -1 : 1;
+        });
+    });
+
     console.log(tableState.pageSize);
     //res.type('text/plain');
     //res.status(500);
@@ -48,7 +63,7 @@ app.post('/api/test/list', (req, res) => {
 
 app.get('/api/test/filters', (req, res) => {
     let filters = [
-        { column: "glassType", values: demo.dictionary.map(_ => _.label).sort() }
+        { column: "glassType", values: demo.dictionary.map(_ => _.label).sort(), type: 0 }
     ];
     res.send(filters);
 });

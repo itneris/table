@@ -34,14 +34,14 @@ const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => v
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        var searchVal = e.currentTarget.value;
+        const searchVal = e.currentTarget.value;
         setCurrentSearch(searchVal);
         if (timer.current) {
             clearTimeout(timer.current);
         }
 
         timer.current = setTimeout(() => {
-            tableCtx.dispatch({ type: SEARCH, search: searchVal });
+            tableCtx.dispatch({ type: SEARCH, searching: searchVal });
             tableCtx.onSearchingChange && tableCtx.onSearchingChange(searchVal);
         }, SEARCH_TIMEOUT);        
     }, []); // eslint-disable-line react-hooks/exhaustive-deps

@@ -59,7 +59,7 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
                 }
             });
         }
-        tableCtx.dispatch({ type: SET_FILTERS, newFiltering });
+        tableCtx.dispatch({ type: SET_FILTERS, filtering: newFiltering });
         tableCtx.onFilteringChange && tableCtx.onFilteringChange(newFiltering);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

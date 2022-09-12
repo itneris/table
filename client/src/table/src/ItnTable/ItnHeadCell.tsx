@@ -35,7 +35,7 @@ function ItnHeadCell(props: { column: ColumnDescription }) {
             sort = sort.map(s => s.column === props.column.property ? sortState : s);
         }
 
-        tableCtx.dispatch({ type: SET_SORT, sort });
+        tableCtx.dispatch({ type: SET_SORT, sorting: sort });
         tableCtx.onSortingChange && tableCtx.onSortingChange(sort);
     }, [tableCtx.sorting, tableCtx.ctrlIsClicked, sortIndex, currentSorting]); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -13,7 +13,7 @@ export class ColumnDescription implements LooseObject {
 
     sortOrder: number | null = null;
     sortAscending: boolean = true;
-    disableSort: boolean = true;
+    disableSort: boolean = false;
 
     display: boolean = true;
     systemHide: boolean = false;
