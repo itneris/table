@@ -1,7 +1,7 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
-import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
+import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, useRef } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { ITableRef } from '../base/ITableRef';
 import { LooseObject } from '../base/LooseObject';
@@ -68,8 +68,36 @@ export const TableContext = React.createContext<ITableContext | null>(null);
             return table;
         }
     }));*/
- 
-const ItnTable = forwardRef<ITableRef,ITableProperties>((props, ref) => {
+
+export const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: false,
+            refetchOnWindowFocus: false,
+        }
+    }
+});
+
+const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => {
+    const tableRef = useRef<ITableRef | null>(null);
+    useImperativeHandle(ref, () => ({
+        fetch() {
+            tableRef.current!.fetch();
+        },
+        getData() {
+            return tableRef.current!.getData();
+        },
+        getState(): TableState {
+            return tableRef.current!.getState();
+        }
+    }));
+
+    return <QueryClientProvider client={queryClient} contextSharing>
+        <ItnTable {...props} ref={tableRef}/>
+    </QueryClientProvider>;
+});
+
+const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
     useImperativeHandle(ref, () => ({
         fetch() {
             queryRows.refetch();
@@ -390,4 +418,4 @@ ItnTable.defaultProps = {
     onRowClick: null
 }
 
-export default ItnTable;
+export default ItnTableWrapper;

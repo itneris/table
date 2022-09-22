@@ -6,7 +6,7 @@ export abstract class AbstractColumnBuilder<T extends LooseObject> {
 	private _columns: Array<ColumnDescription> = [];
 
 	public ColumnFor(model: (type: T) => any): ColumnOptionsBuilder<T> {
-		const key = model.toString().split(".")[1];
+		const key = model.toString().split(".")[1].replace("}", "");
 		const column = new ColumnDescription();
 		column.order = this._columns.length;
 		column.property = key;
