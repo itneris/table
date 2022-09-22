@@ -234,7 +234,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         });
     }, [props.selectedRows, props.idField]);*/
 
-    const hasToolbar = props.title || !props.disableSearch || props.onDownload !== null || filters.some(f => f.inToolbar);
+    const hasToolbar = props.title || !props.disableSearch || props.onDownload !== null || filters.filter(f => f.inToolbar).length > 0;
 
     const contextValue: ITableContext = {
         searching: table.searching,
@@ -287,7 +287,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                     <TableToolbar />
                 }
                 {
-                    filters.some(f => f.inToolbar === true) &&
+                    filters.filter(f => f.inToolbar === true).length > 0 &&
                     <Box display="flex" flexWrap="wrap">
                         {
                             filters

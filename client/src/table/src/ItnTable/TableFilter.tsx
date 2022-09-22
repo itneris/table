@@ -29,7 +29,7 @@ function TableFilter(props: { filter: FilterProperties }) {
             newFilter.type = props.filter.type;
             newFilter.label = props.filter.label ?? null;
 
-            if (tableFiltering.some(f => f.column === currentColumn)) {
+            if (tableFiltering.filter(f => f.column === currentColumn).length > 0) {
                 tableFiltering = tableFiltering.map(f => {
                     if (f.column === currentColumn) {
                         if (newFilter.type === FilterType.Bool) {
@@ -173,11 +173,17 @@ function TableFilter(props: { filter: FilterProperties }) {
                                 props.filter.multiple ?
                                     option !== "Все" &&
                                     <Checkbox
-                                        checked={(currentFilterValue?.values!.some(v => v === option) ?? false)}
+                                        checked={
+                                            currentFilterValue === null || currentFilterValue === undefined ? false :
+                                                currentFilterValue?.values!.filter(v => v === option).length > 0
+                                        }
                                         color="secondary"
                                     /> :
                                     <Radio
-                                        checked={(currentFilterValue?.values!.some(v => v === option) ?? false)}
+                                        checked={
+                                            currentFilterValue === null || currentFilterValue === undefined ? false :
+                                                currentFilterValue?.values!.filter(v => v === option).length > 0
+                                        }
                                         color="secondary"
                                     />
                             }

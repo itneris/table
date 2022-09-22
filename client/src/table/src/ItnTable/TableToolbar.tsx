@@ -46,13 +46,13 @@ const TableToolbar = () => {
                         </IconButton>
                     </Tooltip>
                 }
-                {/*TODO DONLOAD BUTTON*/ }
+                {/*TODO DOWNLOAD BUTTON*/ }
                 {
                     tableCtx.enableHideColumns &&
                     <TableColumnsHide />
                 }
                 {
-                    tableCtx.filters.some(f => !f.inToolbar) &&
+                    tableCtx.filters.filter(f => !f.inToolbar).length > 0 &&
                     <TableFilters />
                 }
             </Box>
