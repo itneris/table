@@ -31,7 +31,7 @@ function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
         if (Array.isArray(value)) {
             return value.join(", ") as string;
         }
-        if (value === null || value.toString() === "") {
+        if (value === undefined || value === null || value.toString() === "") {
             return props.column.nullValue;
         }
         return value as unknown as string;
