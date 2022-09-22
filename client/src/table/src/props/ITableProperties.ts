@@ -1,4 +1,5 @@
-﻿import { ReactNode } from "react";
+﻿import { QueryClient } from "@tanstack/react-query";
+import { ReactNode } from "react";
 import { LooseObject } from "../base/LooseObject";
 import { AbstractColumnBuilder } from "../columnBuilder/AbstractColumnBuilder";
 import { DownloadFileProperties } from "./DownloadFileProperties";
@@ -283,4 +284,10 @@ export interface ITableProperties {
      *      row: LooseObject, clicked row data
     */
     onRowClick?: ((id: string, row: LooseObject) => void) | null;
+
+    /**
+     * Force set query client for table
+     * Default: null
+    */
+    queryClient?: QueryClient | null;
 }

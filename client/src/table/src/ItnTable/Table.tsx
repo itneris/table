@@ -92,7 +92,7 @@ const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => 
         }
     }));
 
-    return <QueryClientProvider client={queryClient} contextSharing>
+    return <QueryClientProvider client={props.queryClient ?? queryClient} contextSharing>
         <ItnTable {...props} ref={tableRef}/>
     </QueryClientProvider>;
 });
