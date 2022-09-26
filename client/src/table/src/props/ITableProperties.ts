@@ -263,10 +263,15 @@ export interface ITableProperties {
     onDownload?: ((tableState: TableState) => void) | null;
 
     /**
-     * Initially selected rows for table, array of rows or rows id
+     * Ebables row selection for table
+     * Default: false
+    */
+    enableRowsSelection?: boolean;
+    /**
+     * Initially selected rows for table, array of rows id
      * Default: null
     */
-    selectedRows?: Array<LooseObject> | Array<string>;
+    selectedRows?: Array<string>;
 
     /**
      * Return array of currently selected rows when selection triggered

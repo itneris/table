@@ -17,7 +17,7 @@ import ItnTablePagination from './ItnTablePagination';
 import ItnTableRow from './ItnTableRow';
 import TableFilter from './TableFilter';
 import TablePanelFilterValue from './TablePanelFilterValue';
-import { tableReducer } from './tableReducer';
+import { RESET_SELECTED_ROWS, SET_SELECTED_ROWS, tableReducer } from './tableReducer';
 import TableToolbar from './TableToolbar';
 
 /*const usePrevious = (value, initialValue) => {
@@ -89,6 +89,15 @@ const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => 
         },
         getState(): TableState {
             return tableRef.current!.getState();
+        },
+        getSelectedRows() {
+            return tableRef.current!.getSelectedRows();
+        },
+        resetSelection() {
+            tableRef.current!.resetSelection();
+        },
+        setSelectedRows(ids: string[]) {
+            tableRef.current!.setSelectedRows(ids);
         }
     }));
 
@@ -98,6 +107,15 @@ const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => 
 });
 
 const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
+    const [table, dispatch] = useReducer(tableReducer, {
+        filtering: props.filtering,
+        searching: props.searching,
+        sorting: props.sorting,
+        pageSize: props.pageSize,
+        page: props.page,
+        selectedRows: props.selectedRows
+    } as TableState);
+
     useImperativeHandle(ref, () => ({
         fetch() {
             queryRows.refetch();
@@ -107,6 +125,15 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         },
         getState(): TableState {
             return table;
+        },
+        getSelectedRows() {
+            return table.selectedRows;
+        },
+        resetSelection() {
+            dispatch({ type: RESET_SELECTED_ROWS });
+        },
+        setSelectedRows(ids: string[]) {
+            dispatch({ type: SET_SELECTED_ROWS, selectedRows: ids });
         }
     }))
 
@@ -119,14 +146,6 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
     const [columns, setColumns] = useState<Array<ColumnDescription>>([]);
 
     const changeColumns = useCallback((newColumns: Array<ColumnDescription>) => setColumns(newColumns), []);
-
-    const [table, dispatch] = useReducer(tableReducer, {
-        filtering: props.filtering,
-        searching: props.searching,
-        sorting: props.sorting,
-        pageSize: props.pageSize,
-        page: props.page
-    } as TableState);
 
     //INITIAL LOAD
     useEffect(() => {
@@ -276,7 +295,11 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         pageSizeOptionsText: props.pageSizeOptionsText!,
         nextPageText: props.nextPageText!,
         pageLabelText: props.pageLabelText!,
-        prevPageText: props.prevPageText!
+        prevPageText: props.prevPageText!,
+        enableRowsSelection: props.enableRowsSelection,
+        onRowSelect: props.onRowSelect,
+        selectedRows: table.selectedRows!,
+        rows: rows
     };
 
     return (
@@ -415,7 +438,8 @@ ItnTable.defaultProps = {
     onDownload: null,
     selectedRows: [],
     onRowSelect: null,
-    onRowClick: null
+    onRowClick: null,
+    enableRowsSelection: false
 }
 
 export default ItnTableWrapper;

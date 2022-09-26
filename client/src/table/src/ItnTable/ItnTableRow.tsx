@@ -1,14 +1,31 @@
-import { TableRow } from '@mui/material';
-import React, { useContext, useMemo } from 'react';
+import { Checkbox, TableCell, TableRow } from '@mui/material';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { LooseObject } from '../base/LooseObject';
 import ItnTableCell from './ItnTableCell';
 import { TableContext } from './Table';
+import { SET_SELECT } from './tableReducer';
 
 function ItnTableRow(props: { row: LooseObject }) {
     const tableCtx = useContext(TableContext)!;
 
     const displayColumns = useMemo(() => tableCtx.columns.filter(c => c.display && !c.systemHide), [tableCtx.columns]);
-    const idProp = tableCtx.idField as keyof typeof props.row;
+    const idProp = (tableCtx.idField as keyof typeof props.row) as string;
+
+
+    const isRowChecked = useMemo(() => {
+        return tableCtx.selectedRows.find(r => r === props.row[idProp]) !== undefined
+    }, [tableCtx.selectedRows, idProp, props.row]);
+
+    const handleSelectRow = useCallback((row: LooseObject) => {
+        let selection: LooseObject[] = [];
+        if (tableCtx.selectedRows.find(r => r === row[idProp]) === undefined) {
+            selection = [...tableCtx.selectedRows, row[idProp]];
+        } else {
+            selection = tableCtx.rows.filter(r => r !== row[idProp]);
+        }
+        tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
+        tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
+    }, [tableCtx.selectedRows, tableCtx.dispatch, tableCtx.rows, idProp, props.row, tableCtx.onRowSelect]);
 
     return (
         <>
@@ -35,6 +52,16 @@ function ItnTableRow(props: { row: LooseObject }) {
                     }
                 }}*/
             >
+                {
+                    tableCtx.enableRowsSelection &&
+                    <TableCell width="50px">
+                        <Checkbox
+                            sx={{ p: 0}}
+                            checked={isRowChecked}
+                            onChange={() => handleSelectRow(props.row)}
+                        />
+                    </TableCell>
+                }
                 {
                     displayColumns.map((column) => {
                         const key = `r-${props.row[idProp]}-c-${column.property}`;

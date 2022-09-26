@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
     Typography,
     Box,
@@ -10,6 +10,7 @@ import {
 //import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
 import ItnTable, { AbstractColumnBuilder } from "../table/src";
 import demo from "../test_data/data";
+import { ITableRef } from "../table/src/base/ITableRef";
 
 interface ICocktailDTO {
     id: string;
@@ -44,9 +45,11 @@ class ServerCocktailsColumnBuilder extends AbstractColumnBuilder<ICocktailDTO> {
 }
 
 export default function TestComnonent() {
+    const serverTableRef = useRef<ITableRef | null>(null);
     //const [isFilterOr, setIsFilterOr] = useState(false);
     //const [globalLoading, setGlobalLoading] = useState(false);
     const [showAction, setShowAction] = useState(false);
+    const [enableSelect, setEnableSelect] = useState(false);
     const [tab, setTab] = useState(0);
 
     //const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
@@ -83,6 +86,16 @@ export default function TestComnonent() {
                             />}
                             label="Enable action column"
                         />
+                        <FormControlLabel
+                            control={<Checkbox
+                                checked={enableSelect}
+                                onChange={() => {
+                                    setEnableSelect(!enableSelect);
+                                    serverTableRef.current!.setSelectedRows(['1', '2']);
+                                }}
+                            />}
+                            label="Enable rows selection"
+                        />
                     </Box>
                 </Box>
                 <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
@@ -90,8 +103,11 @@ export default function TestComnonent() {
                     </Typography>
                 </Box>
                 <ItnTable
+                    ref={serverTableRef}
                     apiUrl="api/test"
                     columnsBuilder={serverColumnBuilder}
+                    enableRowsSelection={enableSelect}
+                    onRowSelect={(rows) => console.log(rows)}
                 />
             </>
         }      

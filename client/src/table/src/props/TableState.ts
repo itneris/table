@@ -7,5 +7,5 @@ export class TableState {
     filtering: Array<FilterValueProperties> = [];
     page: number = 1;
     pageSize: number = 25;
-    selectedRows: Array<number> = [];
+    selectedRows: Array<string> = [];
 }

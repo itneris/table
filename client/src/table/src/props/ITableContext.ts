@@ -55,4 +55,9 @@ export interface ITableContext {
     changeColumns: (newColumns: Array<ColumnDescription>) => void;
 
     onRowClick: ((id: string, row: LooseObject) => void) | null;
+
+    selectedRows: Array<string>;
+    onRowSelect?: ((rows: Array<LooseObject>) => void) | null;
+    enableRowsSelection?: boolean;
+    rows: Array<LooseObject>;
 }

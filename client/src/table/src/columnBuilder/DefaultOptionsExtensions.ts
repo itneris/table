@@ -12,7 +12,7 @@ declare module "./ColumnOptionsBuilder" {
 		WithDefaultFilters(filtrs: string[]): ColumnOptionsBuilder<T>;
 		WithTime(): ColumnOptionsBuilder<T>;
 		DisableSort(): ColumnOptionsBuilder<T>;
-		Hide(): ColumnOptionsBuilder<T>;
+		Hide(hidden?: boolean): ColumnOptionsBuilder<T>;
 	}
 }
 
@@ -81,11 +81,12 @@ ColumnOptionsBuilder.prototype.DisableSort = function <T extends LooseObject>() 
 }
 
 /**
- * Renders DateTime column width time
+ * Hides column for display
+ * @param {boolean} hidden is column hidden, default true
  * */
-ColumnOptionsBuilder.prototype.Hide = function <T extends LooseObject>() {
+ColumnOptionsBuilder.prototype.Hide = function <T extends LooseObject>(hidden: boolean = true) {
 	return this
-		.SetColumnProp("display", false) as ColumnOptionsBuilder<T>;
+		.SetColumnProp("display", !hidden) as ColumnOptionsBuilder<T>;
 }
 
 /**
