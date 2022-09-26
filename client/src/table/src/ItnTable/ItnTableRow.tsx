@@ -16,16 +16,23 @@ function ItnTableRow(props: { row: LooseObject }) {
         return tableCtx.selectedRows.find(r => r === props.row[idProp]) !== undefined
     }, [tableCtx.selectedRows, idProp, props.row]);
 
-    const handleSelectRow = useCallback((row: LooseObject) => {
-        let selection: LooseObject[] = [];
-        if (tableCtx.selectedRows.find(r => r === row[idProp]) === undefined) {
-            selection = [...tableCtx.selectedRows, row[idProp]];
+    const handleSelectRow = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        let selection: string[] = [...tableCtx.selectedRows];
+        if (tableCtx.selectedRows.find(r => r === props.row[idProp]) === undefined) {
+            selection.push(props.row[idProp]);
         } else {
-            selection = tableCtx.rows.filter(r => r !== row[idProp]);
+            selection = selection.filter(r => r !== props.row[idProp]);
         }
         tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
     }, [tableCtx.selectedRows, tableCtx.dispatch, tableCtx.rows, idProp, props.row, tableCtx.onRowSelect]);
+
+    const handleRowClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
+        if ((e.target as any).nodeName === "INPUT") {
+            return;
+        }
+        tableCtx.onRowClick && tableCtx.onRowClick(props.row[idProp] as unknown as string, props.row);
+    }, [tableCtx.onRowClick, props.row]);
 
     return (
         <>
@@ -37,7 +44,7 @@ function ItnTableRow(props: { row: LooseObject }) {
                     //display: !n.totalId || openTotals.includes(n.totalId) ? "table-row" : "none"
                 }}
                 //onClick={() => !n.totalRow && onRowClick && onRowClick(n)}
-                onClick={() => tableCtx.onRowClick && tableCtx.onRowClick(props.row[idProp] as unknown as string, props.row)}
+                onClick={handleRowClick}
                 /*onContextMenu={e => {
                     if (context) {
                         e.preventDefault();
@@ -58,7 +65,7 @@ function ItnTableRow(props: { row: LooseObject }) {
                         <Checkbox
                             sx={{ p: 0}}
                             checked={isRowChecked}
-                            onChange={() => handleSelectRow(props.row)}
+                            onChange={handleSelectRow}
                         />
                     </TableCell>
                 }

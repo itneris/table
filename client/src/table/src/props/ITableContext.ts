@@ -57,7 +57,7 @@ export interface ITableContext {
     onRowClick: ((id: string, row: LooseObject) => void) | null;
 
     selectedRows: Array<string>;
-    onRowSelect?: ((rows: Array<LooseObject>) => void) | null;
+    onRowSelect?: ((rows: Array<string>) => void) | null;
     enableRowsSelection?: boolean;
     rows: Array<LooseObject>;
 }

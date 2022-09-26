@@ -10,14 +10,20 @@ function ItnTableHeader() {
 
     const displayColumns = useMemo(() => tableCtx.columns.filter(c => c.display && !c.systemHide), [tableCtx.columns]);
 
+    const isPageChecked = useMemo(() => {
+        return tableCtx.rows.find(row => tableCtx.selectedRows.find(select => select === row[tableCtx.idField!]) === undefined) === undefined;
+    }, [tableCtx.rows, tableCtx.selectedRows, tableCtx.idField]);
+
     const handleSelectAll = useCallback(() => {
-        let selection: LooseObject[] = [];
-        if (tableCtx.selectedRows.length !== tableCtx.pageSize) {
-            selection = tableCtx.rows.map(r => r[tableCtx.idField!]);
+        let selection: string[] = [...tableCtx.selectedRows];
+        if (isPageChecked) {
+            selection = selection.filter(sel => tableCtx.rows.find(row => row[tableCtx.idField!] === sel) === undefined);
+        } else {
+            selection = [...selection, ...tableCtx.rows.filter(row => selection.find(sel => row[tableCtx.idField!] === sel) === undefined).map(row => row[tableCtx.idField!])];
         }
         tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
-    }, [tableCtx.selectedRows, tableCtx.pageSize, tableCtx.dispatch, tableCtx.rows, tableCtx.idField, tableCtx.onRowSelect]);
+    }, [tableCtx.selectedRows, tableCtx.pageSize, tableCtx.dispatch, tableCtx.rows, tableCtx.idField, tableCtx.onRowSelect, isPageChecked]);
 
     return (
         <TableRow>
@@ -26,7 +32,7 @@ function ItnTableHeader() {
                 <TableCell width="50px">
                     <Checkbox
                         sx={{ p: 0 }}
-                        checked={tableCtx.selectedRows.length === tableCtx.pageSize}
+                        checked={isPageChecked}
                         onChange={handleSelectAll}
                     />
                 </TableCell>

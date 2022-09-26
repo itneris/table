@@ -105,6 +105,7 @@ export default function TestComnonent() {
                 <ItnTable
                     ref={serverTableRef}
                     apiUrl="api/test"
+                    onRowClick={() => console.log('row click')}
                     columnsBuilder={serverColumnBuilder}
                     enableRowsSelection={enableSelect}
                     onRowSelect={(rows) => console.log(rows)}

@@ -279,7 +279,7 @@ export interface ITableProperties {
      * Function params:
      *      rows: Array<LooseObject>, array of currently selected rows
     */
-    onRowSelect?: ((rows: Array<LooseObject>) => void) | null;
+    onRowSelect?: ((rows: Array<string>) => void) | null;
 
     /**
      * Callback when row click triggered
