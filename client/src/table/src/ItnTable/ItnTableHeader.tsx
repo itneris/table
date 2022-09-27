@@ -1,6 +1,5 @@
 import { Checkbox, TableCell, TableRow } from '@mui/material';
 import React, { useCallback, useContext, useMemo } from 'react';
-import { LooseObject } from '../base/LooseObject';
 import ItnHeadCell from './ItnHeadCell';
 import { TableContext } from './Table';
 import { SET_SELECT } from './tableReducer';
@@ -23,7 +22,7 @@ function ItnTableHeader() {
         }
         tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
-    }, [tableCtx.selectedRows, tableCtx.pageSize, tableCtx.dispatch, tableCtx.rows, tableCtx.idField, tableCtx.onRowSelect, isPageChecked]);
+    }, [tableCtx.selectedRows, tableCtx.pageSize, tableCtx.dispatch, tableCtx.rows, tableCtx.idField, tableCtx.onRowSelect, isPageChecked]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <TableRow>

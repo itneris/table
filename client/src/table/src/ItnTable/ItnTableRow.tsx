@@ -25,14 +25,14 @@ function ItnTableRow(props: { row: LooseObject }) {
         }
         tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
-    }, [tableCtx.selectedRows, tableCtx.dispatch, tableCtx.rows, idProp, props.row, tableCtx.onRowSelect]);
+    }, [tableCtx.selectedRows, tableCtx.dispatch, tableCtx.rows, idProp, props.row, tableCtx.onRowSelect]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleRowClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
         if ((e.target as any).nodeName === "INPUT") {
             return;
         }
         tableCtx.onRowClick && tableCtx.onRowClick(props.row[idProp] as unknown as string, props.row);
-    }, [tableCtx.onRowClick, props.row]);
+    }, [tableCtx.onRowClick, props.row, idProp]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>

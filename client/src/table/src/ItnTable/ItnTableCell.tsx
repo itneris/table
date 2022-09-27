@@ -16,7 +16,6 @@ function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
             return props.column.bodyRenderer(value, props.row);
         }
         if (typeof value === "string" && tableCtx.dateParseRE.test(value)) {
-            console.log(value);
             const dateFormat = props.column.dateFormat ??
                 (
                     props.column.dateWithTime ?

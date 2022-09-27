@@ -164,6 +164,8 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+    useEffect(() => setColumns(props.columnsBuilder.Build()), [props.columnsBuilder, setColumns]);
+
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
 
     const queryOptions = useMemo(() => {
