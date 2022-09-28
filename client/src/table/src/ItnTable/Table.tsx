@@ -207,6 +207,12 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         }
     }, [props.filters]);
 
+    useEffect(() => {
+        if (props.selectedRows) {
+            dispatch({ type: SET_SELECTED_ROWS, selectedRows: props.selectedRows });
+        }
+    }, [props.selectedRows]);
+
     useQuery<AxiosResponse<FilterProperties[]>, AxiosError>(
         [props.apiUrl, 'filters'],
         getFilters(props.apiUrl ?? ""),

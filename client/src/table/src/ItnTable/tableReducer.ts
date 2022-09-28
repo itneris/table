@@ -27,11 +27,6 @@ export function tableReducer(state: TableState, action: any) {
                 searching: action.searching,
                 page: 0
             } as TableState;
-        case SET_SELECT:
-            return {
-                ...state,
-                selectedRows: action.selectedRows
-            } as TableState;
         case SET_FILTERS:
             return {
                 ...state,

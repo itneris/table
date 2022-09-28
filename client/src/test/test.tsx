@@ -91,7 +91,7 @@ export default function TestComnonent() {
                                 checked={enableSelect}
                                 onChange={() => {
                                     setEnableSelect(!enableSelect);
-                                    serverTableRef.current!.setSelectedRows(['1', '2']);
+                                    //serverTableRef.current!.setSelectedRows(['1', '2']);
                                 }}
                             />}
                             label="Enable rows selection"
@@ -109,6 +109,7 @@ export default function TestComnonent() {
                     columnsBuilder={serverColumnBuilder}
                     enableRowsSelection={enableSelect}
                     onRowSelect={(rows) => console.log(rows)}
+                    selectedRows={!enableSelect ? [] : ['1', '2']}
                 />
             </>
         }      

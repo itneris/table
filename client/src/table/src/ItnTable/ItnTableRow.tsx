@@ -3,7 +3,7 @@ import React, { useCallback, useContext, useMemo } from 'react';
 import { LooseObject } from '../base/LooseObject';
 import ItnTableCell from './ItnTableCell';
 import { TableContext } from './Table';
-import { SET_SELECT } from './tableReducer';
+import { SET_SELECTED_ROWS } from './tableReducer';
 
 function ItnTableRow(props: { row: LooseObject }) {
     const tableCtx = useContext(TableContext)!;
@@ -23,7 +23,7 @@ function ItnTableRow(props: { row: LooseObject }) {
         } else {
             selection = selection.filter(r => r !== props.row[idProp]);
         }
-        tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
+        tableCtx.dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
     }, [tableCtx.selectedRows, tableCtx.dispatch, tableCtx.rows, idProp, props.row, tableCtx.onRowSelect]); // eslint-disable-line react-hooks/exhaustive-deps
 

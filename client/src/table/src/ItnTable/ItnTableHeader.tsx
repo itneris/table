@@ -2,7 +2,7 @@ import { Checkbox, TableCell, TableRow } from '@mui/material';
 import React, { useCallback, useContext, useMemo } from 'react';
 import ItnHeadCell from './ItnHeadCell';
 import { TableContext } from './Table';
-import { SET_SELECT } from './tableReducer';
+import { SET_SELECTED_ROWS } from './tableReducer';
 
 function ItnTableHeader() {
     const tableCtx = useContext(TableContext)!;
@@ -20,7 +20,7 @@ function ItnTableHeader() {
         } else {
             selection = [...selection, ...tableCtx.rows.filter(row => selection.find(sel => row[tableCtx.idField!] === sel) === undefined).map(row => row[tableCtx.idField!])];
         }
-        tableCtx.dispatch({ type: SET_SELECT, selectedRows: selection });
+        tableCtx.dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
     }, [tableCtx.selectedRows, tableCtx.pageSize, tableCtx.dispatch, tableCtx.rows, tableCtx.idField, tableCtx.onRowSelect, isPageChecked]); // eslint-disable-line react-hooks/exhaustive-deps
 
