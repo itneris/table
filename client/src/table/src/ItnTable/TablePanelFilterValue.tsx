@@ -126,7 +126,7 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
     }, [props.filter, deleteFilter]);
 
     return (
-        <Box display="flex" alignItems="center" mr={1} flexWrap="wrap">
+        <Box display="flex" alignItems="center" mr={1} flexWrap="wrap" ml={2}>
             <Typography variant="body2" color="textSecondary">
                 {column ? column.displayName : props.filter.label}:
             </Typography>

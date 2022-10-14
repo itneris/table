@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Checkbox, FormControlLabel, Radio, TextField, Typography } from '@mui/material';
-import React, { ReactNode, useCallback, useContext, useMemo } from 'react';
+import React, { ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { LooseObject } from '../base/LooseObject';
 import { FilterProperties } from "../props/FilterProperties";
 import { FilterType } from '../props/FilterType';
@@ -12,6 +12,11 @@ function TableFilter(props: { filter: FilterProperties }) {
     const currentFilterValue = useMemo(() => tableCtx.filtering.find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
     const colName = useMemo(() => tableCtx.columns.find(_ => _.property === props.filter.column)!.displayName, []); // eslint-disable-line react-hooks/exhaustive-deps
     const filterLabel = props.filter.label ?? colName;
+    const [autocompleteValue, setAutocompleteValue] = useState<string>("");
+
+    const handleAutocompleteChange = useCallback((e: React.SyntheticEvent, value: string) => {
+        setAutocompleteValue(value);
+    }, []);
 
     const changeFilter = useCallback((prop: string, value: boolean | string | number | Date) => {
         let tableFiltering = [...tableCtx.filtering];
@@ -196,7 +201,10 @@ function TableFilter(props: { filter: FilterProperties }) {
                         } else {
                             changeFilter("values", val);
                         }
+                        setAutocompleteValue("");
                     }}
+                    inputValue={autocompleteValue}
+                    onInputChange={handleAutocompleteChange}
                     noOptionsText={tableCtx.filterNoOptionsText}
                     clearText={tableCtx.filterClearText}
                     closeText={tableCtx.filterCloseText}
