@@ -45,6 +45,7 @@ function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
                 //backgroundColor: c.options && c.options.color ? c.options.color(n) : "inherit",
                 //fontWeight: n.totalRow ? "bold" : "inherit",
                 //...((c.options || {}).tdStyle || {})
+                fontWeight: props.column.bold ? "bold" : undefined
             }}
         >
             {viewValue}

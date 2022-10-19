@@ -7,8 +7,10 @@ import { ITableRef } from '../base/ITableRef';
 import { LooseObject } from '../base/LooseObject';
 import { TableRowsReponse } from '../base/TableRowsReponse';
 import { FilterProperties } from '../props/FilterProperties';
+import { FilterValueProperties } from '../props/FilterValueProperties';
 import { ITableContext } from '../props/ITableContext';
 import { ITableProperties } from '../props/ITableProperties';
+import { SortProperties } from '../props/SortProperties';
 import { TableQueryState } from '../props/TableQueryState';
 import { TableState } from '../props/TableState';
 import { getFilters, getRows } from '../queries/dataQueries';
@@ -17,7 +19,7 @@ import ItnTablePagination from './ItnTablePagination';
 import ItnTableRow from './ItnTableRow';
 import TableFilter from './TableFilter';
 import TablePanelFilterValue from './TablePanelFilterValue';
-import { RESET_SELECTED_ROWS, SET_SELECTED_ROWS, tableReducer } from './tableReducer';
+import { RESET_SELECTED_ROWS, SET_FILTERS, SET_SELECTED_ROWS, SET_SORT, tableReducer } from './tableReducer';
 import TableToolbar from './TableToolbar';
 
 /*const usePrevious = (value, initialValue) => {
@@ -164,7 +166,21 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    useEffect(() => setColumns(props.columnsBuilder.Build()), [props.columnsBuilder, setColumns]);
+    useEffect(() => {
+        const newColumns = props.columnsBuilder.Build();
+        setColumns(newColumns);
+        const defaultSorting = newColumns
+            .filter(col => col.sortOrder !== null)
+            .map(col => ({ column: col.property, ascending: col.sortAscending } as SortProperties));
+
+        dispatch({ type: SET_SORT, sorting: defaultSorting });
+
+        const defaultFiltering = newColumns
+            .filter(col => col.filters.length > 0)
+            .map(col => ({ column: col.property, values: col.filters } as FilterValueProperties));
+
+        dispatch({ type: SET_FILTERS, filtering: defaultFiltering });
+    }, [props.columnsBuilder, setColumns]);
 
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
 

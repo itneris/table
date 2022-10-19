@@ -34,7 +34,7 @@ const data = [
     { id: '32', name: "Wine", price: 5.04, ingridients: ["Wine"], createDate: null, glassType: 2 }
 ]
 
-const dictionary = [
+const cupDictionary = [
     { id: 1, label: "Cup" },
     { id: 2, label: "Highball" },
     { id: 3, label: "Rox" },
@@ -42,5 +42,23 @@ const dictionary = [
     { id: 5, label: "Shot" },
 ]
 
+const ingridientsDictionary = [
+    "Beer",
+    "Tequila",
+    "Jhin",
+    "Vodka",
+    "Rum",
+    "Cuantro",
+    "Cola",
+    "Blue Curasao",
+    "Jager",
+    "Juice",
+    "Wine",
+    "Whiskey",
+    "Liquor"
+].map(_ => ({ id: _, label: _ }))
+
+
 exports.data = data;
-exports.dictionary = dictionary;
+exports.cupDictionary = cupDictionary;
+exports.ingridientsDictionary = ingridientsDictionary;

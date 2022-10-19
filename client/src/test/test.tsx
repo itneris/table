@@ -25,7 +25,8 @@ class ServerCocktailsColumnBuilder extends AbstractColumnBuilder<ICocktailDTO> {
     constructor() {
         super();
         this.ColumnFor(_ => _.name)
-            .WithName("Наименование", true);
+            .WithName("Наименование", true)
+            .WithDefaultSort();
 
         this.ColumnFor(_ => _.price)
             .WithName("Цена");
@@ -39,7 +40,7 @@ class ServerCocktailsColumnBuilder extends AbstractColumnBuilder<ICocktailDTO> {
         this.ColumnFor(_ => _.glassType)
             .WithName("Тип стакана")
             .WithBodyRenderer((val) => {
-                return <>{demo.dictionary.find(_ => _.id === val)?.label}</>;
+                return <>{demo.cupDictionary.find(_ => _.id === val)?.label}</>;
             });
     }
 }

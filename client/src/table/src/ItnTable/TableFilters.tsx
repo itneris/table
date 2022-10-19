@@ -65,7 +65,7 @@ const TableFilters = () => {
                         {tableCtx.filtersResetText}
                     </Button>
                 </Box>
-                <Box display="flex" flexWrap="wrap" ml="-16px" px={2}>
+                <Box display="flex" flexWrap="wrap" gap={2} px={2} pb={2} minWidth={tableCtx.filters.length === 1 ? 208 : 416}>
                     {
                         tableCtx.filters.filter(f => !f.inToolbar)
                             .map((filter, i) =>

@@ -63,7 +63,8 @@ app.post('/api/test/list', (req, res) => {
 
 app.get('/api/test/filters', (req, res) => {
     let filters = [
-        { column: "glassType", values: demo.dictionary.map(_ => _.label).sort(), type: 0 }
+        { column: "glassType", values: demo.cupDictionary.map(_ => _.label).sort(), type: 0 },
+        { column: "ingridients", values: demo.ingridientsDictionary.map(_ => _.label).sort(), type: 0 },
     ];
     res.send(filters);
 });

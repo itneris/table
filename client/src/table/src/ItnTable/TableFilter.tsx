@@ -164,7 +164,7 @@ function TableFilter(props: { filter: FilterProperties }) {
         case FilterType.Select:
             filterRender =
                 <Autocomplete
-                    style={{ minWidth: 200 }}
+                    fullWidth
                     disableClearable
                     disableCloseOnSelect
                     options={["Все", ...props.filter.values!]}
@@ -232,9 +232,9 @@ function TableFilter(props: { filter: FilterProperties }) {
     }
 
     return <Box
-        width={props.filter.inToolbar ? '350px' : 'calc(50% - 16px)'}
-        mb="16px"
-        ml={props.filter.inToolbar ? "24px" : "16px"}
+        width={props.filter.inToolbar ? '350px' : undefined}
+        flex={props.filter.inToolbar ? undefined : 0.5}
+        ml={props.filter.inToolbar ? "24px" : undefined}
     >
         {filterRender}
     </Box>
