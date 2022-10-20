@@ -45,6 +45,8 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
             } else {
                 newFiltering = newFiltering.filter(fd => fd.column !== filter.column);
             }
+        } else if (filter.type === FilterType.Bool) {
+            newFiltering = newFiltering.filter(fd => fd.column !== filter.column);
         } else if (newFiltering.find(fd => fd.column === filter.column)?.values?.length === 1) {
             newFiltering = newFiltering.filter(fd => fd.column !== filter.column);
         } else {
