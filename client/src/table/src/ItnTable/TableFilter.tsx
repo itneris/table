@@ -10,7 +10,7 @@ import { SET_FILTERS } from './tableReducer';
 function TableFilter(props: { filter: FilterProperties }) {
     const tableCtx = useContext(TableContext)!;
     const currentFilterValue = useMemo(() => tableCtx.filtering.find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
-    const colName = useMemo(() => tableCtx.columns.find(_ => _.property === props.filter.column)!.displayName, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const colName = useMemo(() => tableCtx.columns.find(_ => _.property === props.filter.column)?.displayName, []); // eslint-disable-line react-hooks/exhaustive-deps
     const filterLabel = props.filter.label ?? colName;
     const [autocompleteValue, setAutocompleteValue] = useState<string>("");
 
