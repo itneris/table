@@ -232,8 +232,8 @@ function TableFilter(props: { filter: FilterProperties }) {
     }
 
     return <Box
-        width={props.filter.inToolbar ? '350px' : undefined}
-        flex={props.filter.inToolbar ? undefined : tableCtx.filters.filter(_ => !_.inToolbar).length === 1 ? 1 : 0.5}
+        width={props.filter.inToolbar ? '350px' : tableCtx.filters.filter(_ => !_.inToolbar).length > 1 ? "calc(50% - 8px)" : undefined}
+        flex={props.filter.inToolbar ? undefined : tableCtx.filters.filter(_ => !_.inToolbar).length === 1 ? 1 : undefined}
         ml={props.filter.inToolbar ? "24px" : undefined}
     >
         {filterRender}

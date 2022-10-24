@@ -1,6 +1,6 @@
 {
   "name": "@itneris/table",
-  "version": "2.1.1",
+  "version": "2.1.3",
   "description": "Custom ItNeris organization table based on MaterialUI",
   "proxy": "http://localhost:5000/",
   "dependencies": {
