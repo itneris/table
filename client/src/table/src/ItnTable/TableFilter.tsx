@@ -172,8 +172,15 @@ function TableFilter(props: { filter: FilterProperties }) {
                     value=""
                     getOptionLabel={(option) => option ? option.toString() : ""}
                     isOptionEqualToValue={() => false}
+                    componentsProps={{
+                        popper: {
+                            style: {
+                                width: 416
+                            }
+                        }
+                    }}
                     renderOption={(renderProps, option, val) => (
-                        <li style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }} {...renderProps}>
+                        <li style={{ display: "flex", alignItems: "center" }} {...renderProps}>
                             {
                                 props.filter.multiple ?
                                     option !== "Все" &&
