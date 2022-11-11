@@ -157,7 +157,6 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         window.addEventListener("keydown", EventCtlrClicked);
         window.addEventListener("keyup", EventCtlrUnclicked);
 
-        setColumns(props.columnsBuilder.Build());
         setIsLoading(props.apiUrl !== null);
 
         return () => {
@@ -179,7 +178,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
             .filter(col => col.filters.length > 0)
             .map(col => ({ column: col.property, values: col.filters } as FilterValueProperties));
 
-        dispatch({ type: SET_FILTERS, filtering: defaultFiltering });
+        dispatch({ type: SET_FILTERS, filtering: [...(props.filtering ?? []), ...defaultFiltering] });
     }, [props.columnsBuilder, setColumns]);
 
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
@@ -199,11 +198,12 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         [props.apiUrl, 'list', queryOptions],
         getRows(props.apiUrl ?? "", queryOptions),
         {
-            enabled: props.apiUrl !== null,
+            enabled: props.apiUrl !== null && columns.length > 0,
             onError: (err) => {
                 setErrorLoading(`Ошибка загрузки данных: ${err.message}`);
             },
             onSuccess: (response) => {
+                setErrorLoading(null);
                 setRows(response.data.rows);
                 setTotal(response.data.total);
             },
@@ -242,11 +242,12 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
 
     //useEffectDebugger(() => {
     useEffect(() => {
-        if (props.apiUrl) {
+        if (props.apiUrl && columns.length > 0) {
             queryRows.refetch();
             return;
         }
     }, [ // eslint-disable-line react-hooks/exhaustive-deps
+        columns,
         props.apiUrl,
         props.disablePaging,
         table.filtering,

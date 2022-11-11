@@ -86,8 +86,8 @@ function TableFilter(props: { filter: FilterProperties }) {
             let min: number | null = null,
                 max: number | null = null;
             if (currentFilterValue != null) {
-                min = currentFilterValue.min;
-                max = currentFilterValue.max;
+                min = currentFilterValue.min ?? null;
+                max = currentFilterValue.max ?? null;
             }
             filterRender = <>
                 <Typography
