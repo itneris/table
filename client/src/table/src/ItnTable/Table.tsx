@@ -175,8 +175,12 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         dispatch({ type: SET_SORT, sorting: defaultSorting });
 
         const defaultFiltering = newColumns
-            .filter(col => col.filters.length > 0)
-            .map(col => ({ column: col.property, values: col.filters } as FilterValueProperties));
+            .filter(col => col.filtering !== null)
+            .map(col => ({
+                column: col.property,
+                label: col.displayName,
+                ...col.filtering
+            } as FilterValueProperties));
 
         dispatch({ type: SET_FILTERS, filtering: [...(props.filtering ?? []), ...defaultFiltering] });
     }, [props.columnsBuilder, setColumns]);

@@ -28,7 +28,7 @@ function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
             return value ? "Да" : "Нет";
         }
         if (Array.isArray(value)) {
-            return value.join(", ") as string;
+            return value.length === 0 ? props.column.nullValue : value.join(", ") as string;
         }
         if (value === undefined || value === null || value.toString() === "") {
             return props.column.nullValue;

@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { ColumnFilteringProperties } from "../props/ColumnFilteringProperties";
 import { LooseObject } from "./LooseObject";
 
 export class ColumnDescription implements LooseObject {
@@ -21,7 +22,7 @@ export class ColumnDescription implements LooseObject {
     nullValue: string | null = "-";
     width: number | null = null;
 
-    filters: Array<string | null> = [];
+    filtering: ColumnFilteringProperties | null = null;
 
     bodyRenderer: ((value: any, row: LooseObject) => ReactNode) | null = null;
 }
