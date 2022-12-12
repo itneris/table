@@ -110,7 +110,7 @@ export default function TestComnonent() {
                     columnsBuilder={serverColumnBuilder}
                     enableRowsSelection={enableSelect ? (row => row.name !== "Beer") : false}
                     onRowSelect={(rows) => console.log(rows)}
-                    selectedRows={!enableSelect ? [] : ['1', '2']}
+                    selectedRows={!enableSelect ? [] : ['1', '2']}                    
                 />
             </>
         }      

@@ -69,7 +69,10 @@ function ItnTableRow(props: { row: LooseObject }) {
             >
                 {
                     tableCtx.enableRowsSelection !== false &&
-                    <TableCell width="50px">
+                    <TableCell
+                        width="50px"
+                        onClick={e => e.stopPropagation()}
+                    >
                         <Checkbox
                             sx={{ p: 0 }}
                             disabled={!canRowBeSelected}
