@@ -266,7 +266,7 @@ export interface ITableProperties {
      * Ebables row selection for table
      * Default: false
     */
-    enableRowsSelection?: boolean;
+    enableRowsSelection?: boolean | ((row: any) => boolean);
     /**
      * Initially selected rows for table, array of rows id
      * Default: null

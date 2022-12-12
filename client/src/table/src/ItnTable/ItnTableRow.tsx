@@ -34,6 +34,14 @@ function ItnTableRow(props: { row: LooseObject }) {
         tableCtx.onRowClick && tableCtx.onRowClick(props.row[idProp] as unknown as string, props.row);
     }, [tableCtx.onRowClick, props.row, idProp]); // eslint-disable-line react-hooks/exhaustive-deps
 
+    const canRowBeSelected = useMemo(() => {
+        if (typeof (tableCtx.enableRowsSelection) !== "function") {
+            return tableCtx.enableRowsSelection;
+        }
+
+        return tableCtx.enableRowsSelection(props.row);
+    }, [tableCtx.enableRowsSelection, props.row])
+
     return (
         <>
             <TableRow
@@ -60,10 +68,11 @@ function ItnTableRow(props: { row: LooseObject }) {
                 }}*/
             >
                 {
-                    tableCtx.enableRowsSelection &&
+                    tableCtx.enableRowsSelection !== false &&
                     <TableCell width="50px">
                         <Checkbox
-                            sx={{ p: 0}}
+                            sx={{ p: 0 }}
+                            disabled={!canRowBeSelected}
                             checked={isRowChecked}
                             onChange={handleSelectRow}
                         />

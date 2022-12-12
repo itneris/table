@@ -9,25 +9,49 @@ function ItnTableHeader() {
 
     const displayColumns = useMemo(() => tableCtx.columns.filter(c => c.display && !c.systemHide), [tableCtx.columns]);
 
+
+    const canRowBeSelected = useCallback((row: any) => {
+        if (typeof (tableCtx.enableRowsSelection) !== "function") {
+            return tableCtx.enableRowsSelection;
+        }
+
+        return tableCtx.enableRowsSelection(row);
+    }, [tableCtx.enableRowsSelection])
+
     const isPageChecked = useMemo(() => {
-        return tableCtx.rows.find(row => tableCtx.selectedRows.find(select => select === row[tableCtx.idField!]) === undefined) === undefined;
-    }, [tableCtx.rows, tableCtx.selectedRows, tableCtx.idField]);
+        return tableCtx.rows
+            .find(row => tableCtx.selectedRows.find(select => select === row[tableCtx.idField!]) === undefined && canRowBeSelected(row)) === undefined;
+    }, [tableCtx.rows, tableCtx.selectedRows, tableCtx.idField, canRowBeSelected]);
 
     const handleSelectAll = useCallback(() => {
         let selection: string[] = [...tableCtx.selectedRows];
         if (isPageChecked) {
-            selection = selection.filter(sel => tableCtx.rows.find(row => row[tableCtx.idField!] === sel) === undefined);
+            selection = selection.filter(sel => tableCtx.rows.find(row => row[tableCtx.idField!] === sel && canRowBeSelected(row)) === undefined);
         } else {
-            selection = [...selection, ...tableCtx.rows.filter(row => selection.find(sel => row[tableCtx.idField!] === sel) === undefined).map(row => row[tableCtx.idField!])];
+            selection = [
+                ...selection,
+                ...tableCtx.rows
+                    .filter(row => selection.find(sel => row[tableCtx.idField!] === sel) === undefined && canRowBeSelected(row))
+                    .map(row => row[tableCtx.idField!])
+            ];
         }
         tableCtx.dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
         tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
-    }, [tableCtx.selectedRows, tableCtx.pageSize, tableCtx.dispatch, tableCtx.rows, tableCtx.idField, tableCtx.onRowSelect, isPageChecked]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [
+        tableCtx.selectedRows,
+        tableCtx.pageSize,
+        tableCtx.dispatch,
+        tableCtx.rows,
+        tableCtx.idField,
+        tableCtx.onRowSelect,
+        isPageChecked,
+        canRowBeSelected
+    ]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <TableRow>
             {
-                tableCtx.enableRowsSelection &&
+                tableCtx.enableRowsSelection !== false &&
                 <TableCell width="50px">
                     <Checkbox
                         sx={{ p: 0 }}

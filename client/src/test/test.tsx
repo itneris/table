@@ -108,7 +108,7 @@ export default function TestComnonent() {
                     apiUrl="api/test"
                     onRowClick={() => console.log('row click')}
                     columnsBuilder={serverColumnBuilder}
-                    enableRowsSelection={enableSelect}
+                    enableRowsSelection={enableSelect ? (row => row.name !== "Beer") : false}
                     onRowSelect={(rows) => console.log(rows)}
                     selectedRows={!enableSelect ? [] : ['1', '2']}
                 />
