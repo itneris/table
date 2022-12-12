@@ -20,7 +20,7 @@ function ItnTableHeader() {
 
     const isPageChecked = useMemo(() => {
         return tableCtx.rows
-            .find(row => tableCtx.selectedRows.find(select => select === row[tableCtx.idField!] && canRowBeSelected(row)) === undefined) === undefined &&
+            .find(row => tableCtx.selectedRows.find(select => select === row[tableCtx.idField!]) === undefined && canRowBeSelected(row)) === undefined &&
             tableCtx.selectedRows.length > 0;
     }, [tableCtx.rows, tableCtx.selectedRows, tableCtx.idField, canRowBeSelected]);
 
