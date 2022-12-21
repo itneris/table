@@ -63,7 +63,7 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
         }
         tableCtx.dispatch({ type: SET_FILTERS, filtering: newFiltering });
         tableCtx.onFilteringChange && tableCtx.onFilteringChange(newFiltering);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [tableCtx.filtering, tableCtx.onFilteringChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const filterRenderer = useMemo(() => {
         const chipStyle = { marginLeft: 8 };
