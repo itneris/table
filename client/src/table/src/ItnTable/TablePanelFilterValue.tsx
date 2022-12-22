@@ -66,13 +66,11 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
     }, [tableCtx.filtering, tableCtx.onFilteringChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const filterRenderer = useMemo(() => {
-        const chipStyle = { marginLeft: 8 };
         const filter = props.filter;
 
         switch (filter.type) {
             case FilterType.Bool:
                 return <Chip
-                    style={chipStyle}
                     label={filter.checked ? 'Да' : 'Нет'}
                     onDelete={() => deleteFilter('true')}
                 />;            
@@ -81,7 +79,6 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
                     {
                         filter.min &&
                         <Chip
-                            style={chipStyle}
                             label={"Больше " + filter.min}
                             onDelete={() => deleteFilter('min')}
                         />
@@ -89,7 +86,6 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
                     {
                         filter.max &&
                         <Chip
-                            style={chipStyle}
                             label={"Меньше " + filter.max}
                             onDelete={() => deleteFilter('max')}
                         />
@@ -100,7 +96,6 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
                     {
                         filter.startDate &&
                         <Chip
-                            style={chipStyle}
                             label={"Позже " + format(new Date(filter.startDate), 'dd.MM.yyyy')}
                             onDelete={() => deleteFilter('start')}
                         />
@@ -108,7 +103,6 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
                     {
                         filter.endDate &&
                         <Chip
-                            style={chipStyle}
                             label={"Раньше " + format(new Date(filter.endDate), 'dd.MM.yyyy')}
                             onDelete={() => deleteFilter('end')}
                         />
@@ -118,7 +112,6 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
                 return filter.values!.map((fv, fvInd) =>
                     <Chip
                         key={"col-" + filter.column + "-chip-" + fvInd}
-                        style={chipStyle}
                         label={fv}
                         onDelete={() => deleteFilter(fv)}
                     />
@@ -128,7 +121,7 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
     }, [props.filter, deleteFilter]);
 
     return (
-        <Box display="flex" alignItems="center" mr={1} flexWrap="wrap" ml={2}>
+        <Box display="flex" alignItems="center" flexWrap="wrap" gap={1}>
             <Typography variant="body2" color="textSecondary">
                 {column ? column.displayName : props.filter.label}:
             </Typography>

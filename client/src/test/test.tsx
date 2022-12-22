@@ -11,6 +11,7 @@ import {
 import ItnTable, { AbstractColumnBuilder } from "../table/src";
 import demo from "../test_data/data";
 import { ITableRef } from "../table/src/base/ITableRef";
+import { FilterType } from "../table/src/props/FilterType";
 
 interface ICocktailDTO {
     id: string;
@@ -110,7 +111,11 @@ export default function TestComnonent() {
                     columnsBuilder={serverColumnBuilder}
                     enableRowsSelection={enableSelect ? (row => row.name !== "Beer" && false) : false}
                     onRowSelect={(rows) => console.log(rows)}
-                    selectedRows={!enableSelect ? [] : ['1', '2']}                    
+                    selectedRows={!enableSelect ? [] : ['1', '2']}
+                    filtering={[
+                        { column: "name", type: FilterType.Select, values: ["Очень длинное название", "Очень очень длинное название", "Просто длинное название"] },
+                        { column: "price", type: FilterType.Select, values: ["Очень длинное ценник", "Очень очень длинное ценник", "Просто длинное ценник"] },
+                    ]}
                 />
             </>
         }      

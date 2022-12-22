@@ -355,7 +355,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                 }
                 {
                     ((props.title != null || !props.disableSearch) && table.filtering.length > 0) &&
-                    <Box display="flex" flexWrap="wrap">
+                    <Box display="flex" ml={2} flexWrap="wrap" gap={2}>
                         {
                             table.filtering.map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
                         }
