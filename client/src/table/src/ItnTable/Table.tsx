@@ -251,14 +251,14 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
             return;
         }
     }, [ // eslint-disable-line react-hooks/exhaustive-deps
-        columns,
-        props.apiUrl,
-        props.disablePaging,
-        table.filtering,
-        table.pageSize,
-        table.searching,
-        table.sorting,
-        table.page,
+        //columns,
+        //props.apiUrl,
+        //props.disablePaging,
+        //table.filtering,
+        //table.pageSize,
+        //table.searching,
+        //table.sorting,
+        //table.page,
     ]);
 
     /*useEffect(() => {
