@@ -31,7 +31,7 @@ export function tableReducer(state: TableState, action: any) {
             return {
                 ...state,
                 filtering: action.filtering,
-                page: 0
+                page: 0//action.isInit ? state.page : 0
             } as TableState;
         case RESET_FILTERS:
             return {

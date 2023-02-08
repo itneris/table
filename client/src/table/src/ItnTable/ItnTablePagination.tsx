@@ -1,6 +1,6 @@
 import { TablePagination } from '@mui/material';
 import React, { useCallback, useContext } from 'react';
-import { TableContext } from './Table';
+import { saveState, TableContext } from './Table';
 import { SET_PAGE, SET_ROWS_PER_PAGE } from './tableReducer';
 
 function ItnTablePagination() {
@@ -8,11 +8,19 @@ function ItnTablePagination() {
 
     const hanlePageChange = useCallback((page: number) => {
         tableCtx.dispatch({ type: SET_PAGE, page });
+        saveState(tableCtx.saveState, (state) => {
+            state.page = page;
+            return state;
+        });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const hanlePageSizeChange = useCallback((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const pageSize = parseInt(event.target.value, 10);
         tableCtx.dispatch({ type: SET_ROWS_PER_PAGE, pageSize });
+        saveState(tableCtx.saveState, (state) => {
+            state.pageSize = pageSize;
+            return state;
+        });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (

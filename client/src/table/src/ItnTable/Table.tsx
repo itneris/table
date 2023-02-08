@@ -108,15 +108,61 @@ const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => 
     </QueryClientProvider>;
 });
 
-const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
-    const [table, dispatch] = useReducer(tableReducer, {
+const getTableInitState = (props: ITableProperties) => {
+    let propsState = {
         filtering: props.filtering,
         searching: props.searching,
         sorting: props.sorting,
         pageSize: props.pageSize,
         page: props.page,
         selectedRows: props.selectedRows
-    } as TableState);
+    } as TableState;
+
+    if (!props.saveState) {
+        return propsState;
+    } else {
+        let tableState: any;
+        if (props.saveState.type === "storage" && localStorage.getItem(props.saveState.name)) {
+            tableState = JSON.parse(localStorage.getItem(props.saveState.name)!);
+        } else if (props.saveState.type === "session" && sessionStorage.getItem(props.saveState.name)) {
+            tableState = JSON.parse(sessionStorage.getItem(props.saveState.name)!);
+        }
+
+        if (tableState) {
+            return {
+                filtering: tableState.filtering ?? props.filtering,
+                searching: tableState.searching ?? props.searching,
+                sorting: tableState.sorting ?? props.sorting,
+                pageSize: tableState.pageSize ?? props.pageSize,
+                page: tableState.page ?? props.page,
+                selectedRows: props.selectedRows
+            } as TableState;
+        } else {
+            return propsState;
+        }
+    }
+}
+
+export const saveState = (saveState: { type: "storage" | "session", name: string } | null, propChangeCallback: ((storageState: any) => any)) => {
+    if (!saveState) {
+        return;
+    }
+
+    let tableStateJson = localStorage.getItem(saveState.name) ??
+        sessionStorage.getItem(saveState.name);
+
+    let tableState = tableStateJson ? JSON.parse(tableStateJson) : {};
+    tableState = propChangeCallback(tableState);
+
+    if (saveState.type === "storage") {
+        localStorage.setItem(saveState.name, JSON.stringify(tableState));
+    } else {
+        sessionStorage.setItem(saveState.name, JSON.stringify(tableState));
+    }
+};
+
+const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
+    const [table, dispatch] = useReducer(tableReducer, getTableInitState(props));
 
     useImperativeHandle(ref, () => ({
         fetch() {
@@ -167,12 +213,14 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
 
     useEffect(() => {
         const newColumns = props.columnsBuilder.Build();
+        const initTableState = getTableInitState(props);
+
         setColumns(newColumns);
         const defaultSorting = newColumns
             .filter(col => col.sortOrder !== null)
             .map(col => ({ column: col.property, ascending: col.sortAscending } as SortProperties));
 
-        dispatch({ type: SET_SORT, sorting: defaultSorting });
+        dispatch({ type: SET_SORT, sorting: initTableState.sorting || defaultSorting });
 
         const defaultFiltering = newColumns
             .filter(col => col.filtering !== null)
@@ -182,8 +230,8 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                 ...col.filtering
             } as FilterValueProperties));
 
-        dispatch({ type: SET_FILTERS, filtering: [...(props.filtering ?? []), ...defaultFiltering] });
-    }, [props.columnsBuilder, setColumns]);
+        dispatch({ type: SET_FILTERS, filtering: [...(initTableState.filtering ?? []), ...defaultFiltering], isInit: true });
+    }, [props.columnsBuilder, setColumns]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
 
@@ -251,9 +299,9 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
             return;
         }
     }, [ // eslint-disable-line react-hooks/exhaustive-deps
-        //columns,
-        //props.apiUrl,
-        //props.disablePaging,
+        columns,
+        props.apiUrl,
+        props.disablePaging,
         //table.filtering,
         //table.pageSize,
         //table.searching,
@@ -328,7 +376,8 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         enableRowsSelection: props.enableRowsSelection,
         onRowSelect: props.onRowSelect,
         selectedRows: table.selectedRows!,
-        rows: rows
+        rows: rows,
+        saveState: props.saveState ?? null
     };
 
     return (
@@ -354,7 +403,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                     </Box>
                 }
                 {
-                    ((props.title != null || !props.disableSearch) && table.filtering.length > 0) &&
+                    ((props.title != null || !props.disableSearch) && (table.filtering ?? []).length > 0) &&
                     <Box display="flex" ml={2} flexWrap="wrap" gap={2}>
                         {
                             table.filtering.map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
@@ -405,7 +454,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                     </Table>
                 </Box>
                 {
-                    !props.disablePaging &&
+                    (!props.disablePaging && queryRows.isFetched) &&
                     <ItnTablePagination />
                 }
             </TableContext.Provider>
@@ -443,9 +492,7 @@ ItnTable.defaultProps = {
     disableSearch: false,
     searching: "",
     onSearchingChange: null,
-    sorting: [],
     onSortingChange: null,
-    filtering: [],
     onFilteringChange: null,
     filters: null,
     filterNoOptionsText: "Ничего не найдено",
@@ -468,7 +515,9 @@ ItnTable.defaultProps = {
     selectedRows: [],
     onRowSelect: null,
     onRowClick: null,
-    enableRowsSelection: false
+    enableRowsSelection: false,
+
+    saveState: null
 }
 
 export default ItnTableWrapper;

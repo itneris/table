@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useMemo } from 'react';
 import { Box, Chip, Typography } from '@mui/material';
-import { TableContext } from './Table';
+import { saveState, TableContext } from './Table';
 import { FilterValueProperties } from '../props/FilterValueProperties';
 import { SET_FILTERS } from './tableReducer';
 import { format } from 'date-fns/esm';
@@ -12,7 +12,7 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
 
     const deleteFilter = useCallback((value: string) => {
         const filter = props.filter;
-        let newFiltering = [...tableCtx.filtering];
+        let newFiltering = [...(tableCtx.filtering ?? [])];
         if (filter.type === FilterType.Date) {
             if (filter.startDate != null && filter.endDate != null) {
                 newFiltering = newFiltering.map(fd => {
@@ -63,6 +63,10 @@ const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
         }
         tableCtx.dispatch({ type: SET_FILTERS, filtering: newFiltering });
         tableCtx.onFilteringChange && tableCtx.onFilteringChange(newFiltering);
+        saveState(tableCtx.saveState, (state) => {
+            state.filtering = newFiltering;
+            return state;
+        });
     }, [tableCtx.filtering, tableCtx.onFilteringChange]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const filterRenderer = useMemo(() => {

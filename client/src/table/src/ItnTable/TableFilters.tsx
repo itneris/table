@@ -1,7 +1,7 @@
 import { FilterList } from '@mui/icons-material';
 import { Box, Button, IconButton, Popover, Tooltip, Typography } from '@mui/material';
 import React, { useCallback, useContext, useRef, useState } from 'react';
-import { TableContext } from './Table';
+import { saveState, TableContext } from './Table';
 import TableFilter from './TableFilter';
 import { RESET_FILTERS } from './tableReducer';
 
@@ -22,6 +22,10 @@ const TableFilters = () => {
     const handleResetFilters = useCallback(() => {
         tableCtx.dispatch({ type: RESET_FILTERS });
         tableCtx.onFilteringChange && tableCtx.onFilteringChange([]);
+        saveState(tableCtx.saveState, (state) => {
+            state.filtering = [];
+            return state;
+        });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (

@@ -29,10 +29,10 @@ const TableToolbar = () => {
             }
             {
                 //Show panel with current filtering
-                (!tableCtx.title && tableCtx.disableSearch && tableCtx.filtering.length) &&
+                (!tableCtx.title && tableCtx.disableSearch && (tableCtx.filtering ?? []).length > 0) &&
                     <Box display="flex" flexWrap="wrap">
                         {
-                            tableCtx.filtering.map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
+                            (tableCtx.filtering ?? []).map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
                         }
                     </Box>
             }

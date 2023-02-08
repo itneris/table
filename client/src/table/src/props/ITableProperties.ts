@@ -295,4 +295,10 @@ export interface ITableProperties {
      * Default: null
     */
     queryClient?: QueryClient | null;
+
+    /**
+     * Save table state in browser local or session storage with defined name
+     * Default: null
+    */
+    saveState?: { type: "session" | "storage", name: string } | null;
 }

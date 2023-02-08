@@ -20,7 +20,7 @@ export interface ITableContext {
     onSearchingChange: ((search: string) => void) | null;
 
     filters: Array<FilterProperties>;
-    filtering: Array<FilterValueProperties>;
+    filtering?: Array<FilterValueProperties>;
     onFilteringChange: ((sorting: Array<FilterValueProperties>) => void) | null;
     filterTooltipText: string;
     filtersResetText: string;
@@ -33,7 +33,7 @@ export interface ITableContext {
     filterAllText: string;
     filterSelectValuesText: string;
 
-    sorting: Array<SortProperties>;
+    sorting?: Array<SortProperties>;
     onSortingChange: ((sorting: Array<SortProperties>) => void) | null;
 
     hideColumnToolipText: string;
@@ -60,4 +60,6 @@ export interface ITableContext {
     onRowSelect?: ((rows: Array<string>) => void) | null;
     enableRowsSelection?: boolean | ((row: any) => boolean);
     rows: Array<LooseObject>;
+
+    saveState: { type: "session" | "storage", name: string } | null;
 }

@@ -4,12 +4,12 @@ import { LooseObject } from '../base/LooseObject';
 import { FilterProperties } from "../props/FilterProperties";
 import { FilterType } from '../props/FilterType';
 import { FilterValueProperties } from '../props/FilterValueProperties';
-import { TableContext } from './Table';
+import { saveState, TableContext } from './Table';
 import { SET_FILTERS } from './tableReducer';
 
 function TableFilter(props: { filter: FilterProperties }) {
     const tableCtx = useContext(TableContext)!;
-    const currentFilterValue = useMemo(() => tableCtx.filtering.find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
+    const currentFilterValue = useMemo(() => (tableCtx.filtering ?? []).find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
     const colName = useMemo(() => tableCtx.columns.find(_ => _.property === props.filter.column)?.displayName, []); // eslint-disable-line react-hooks/exhaustive-deps
     const filterLabel = props.filter.label ?? colName;
     const [autocompleteValue, setAutocompleteValue] = useState<string>("");
@@ -19,7 +19,7 @@ function TableFilter(props: { filter: FilterProperties }) {
     }, []);
 
     const changeFilter = useCallback((prop: string, value: boolean | string | number | Date) => {
-        let tableFiltering = [...tableCtx.filtering];
+        let tableFiltering = [...(tableCtx.filtering ?? [])];
         const currentColumn = props.filter.column;
         if (
             value === "all" ||
@@ -66,6 +66,10 @@ function TableFilter(props: { filter: FilterProperties }) {
 
         tableCtx.onFilteringChange && tableCtx.onFilteringChange(tableFiltering);
         tableCtx.dispatch({ type: SET_FILTERS, filtering: tableFiltering });
+        saveState(tableCtx.saveState, (state) => {
+            state.filtering = tableFiltering;
+            return state;
+        });
     }, [tableCtx.filtering]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     let filterRender: ReactNode;

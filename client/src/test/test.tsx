@@ -105,6 +105,7 @@ export default function TestComnonent() {
                     </Typography>
                 </Box>
                 <ItnTable
+                    saveState={{ type: "storage", name: "test_table" }}
                     ref={serverTableRef}
                     apiUrl="api/test"
                     onRowClick={() => console.log('row click')}
@@ -112,10 +113,6 @@ export default function TestComnonent() {
                     enableRowsSelection={enableSelect ? (row => row.name !== "Beer" && false) : false}
                     onRowSelect={(rows) => console.log(rows)}
                     selectedRows={!enableSelect ? [] : ['1', '2']}
-                    filtering={[
-                        { column: "name", type: FilterType.Select, values: ["Очень длинное название", "Очень очень длинное название", "Просто длинное название"] },
-                        { column: "price", type: FilterType.Select, values: ["Очень длинное ценник", "Очень очень длинное ценник", "Просто длинное ценник"] },
-                    ]}
                 />
             </>
         }      

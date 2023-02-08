@@ -2,18 +2,18 @@ import { Badge, TableCell, TableSortLabel } from '@mui/material';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { SortProperties } from '../props/SortProperties';
-import { TableContext } from './Table';
+import { saveState, TableContext } from './Table';
 import { SET_SORT } from './tableReducer';
 
 function ItnHeadCell(props: { column: ColumnDescription }) {
     const tableCtx = useContext(TableContext)!;
 
     const sortIndex = useMemo(() => {
-        return tableCtx.sorting.map(_ => _.column).indexOf(props.column.property);
+        return (tableCtx.sorting ?? []).map(_ => _.column).indexOf(props.column.property);
     }, [tableCtx.sorting]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const currentSorting = useMemo(() => {
-        return tableCtx.sorting.find(_ => _.column === props.column.property) ?? null;
+        return (tableCtx.sorting ?? []).find(_ => _.column === props.column.property) ?? null;
     }, [tableCtx.sorting]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const columnRender = useMemo(() => {
@@ -21,7 +21,7 @@ function ItnHeadCell(props: { column: ColumnDescription }) {
     }, [props.column]);
 
     const sortByColumn = useCallback(() => {
-        let sort = [...tableCtx.sorting];
+        let sort = [...(tableCtx.sorting ?? [])];
         let sortState = {
             column: props.column.property,
             ascending: sortIndex === -1 || currentSorting?.ascending === false
@@ -37,6 +37,10 @@ function ItnHeadCell(props: { column: ColumnDescription }) {
 
         tableCtx.dispatch({ type: SET_SORT, sorting: sort });
         tableCtx.onSortingChange && tableCtx.onSortingChange(sort);
+        saveState(tableCtx.saveState, (state) => {
+            state.sorting = sort;
+            return state;
+        });
     }, [tableCtx.sorting, tableCtx.ctrlIsClicked, sortIndex, currentSorting]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
@@ -55,7 +59,7 @@ function ItnHeadCell(props: { column: ColumnDescription }) {
                 !props.column.disableSort ?
                     <Badge
                         badgeContent={sortIndex + 1}
-                        invisible={tableCtx.sorting.length < 2 || sortIndex === -1}
+                        invisible={(tableCtx.sorting ?? []).length < 2 || sortIndex === -1}
                     >
                         <TableSortLabel
                             active={currentSorting != null}

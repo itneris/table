@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useContext, useImperativeHandle, useRef, useState } from 'react';
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
-import { TableContext } from './Table';
+import { saveState, TableContext } from './Table';
 import { RESET_SEARCH, SEARCH } from './tableReducer';
 import { Clear, Search } from '@mui/icons-material';
 import { IFocusable } from '../base/IFocusable';
@@ -25,6 +25,10 @@ const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => v
         props.setShowSearch(tableCtx.title === null);
         tableCtx.dispatch({ type: RESET_SEARCH });
         tableCtx.onSearchingChange !== null && tableCtx.onSearchingChange("");
+        saveState(tableCtx.saveState, (state) => {
+            state.searching = "";
+            return state;
+        });
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleSearchKeyUp = useCallback((e: React.KeyboardEvent) => {
@@ -43,6 +47,10 @@ const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => v
         timer.current = setTimeout(() => {
             tableCtx.dispatch({ type: SEARCH, searching: searchVal });
             tableCtx.onSearchingChange && tableCtx.onSearchingChange(searchVal);
+            saveState(tableCtx.saveState, (state) => {
+                state.searching = searchVal;
+                return state;
+            });
         }, SEARCH_TIMEOUT);        
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
