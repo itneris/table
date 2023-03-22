@@ -16,7 +16,11 @@ export interface ITableRef {
     /*
      * Gets tablestate: filtering, searching, sorting, paging
      * */
-    getState: () => TableState
+    getState: () => TableState;
+    /*
+     * Sets tablestate: filtering, searching, sorting, paging
+     * */
+    setState: (state: TableState) => void;
     /*
      * Gets currently selected rows ids
      * */

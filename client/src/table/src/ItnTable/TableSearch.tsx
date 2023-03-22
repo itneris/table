@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useContext, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import { saveState, TableContext } from './Table';
 import { RESET_SEARCH, SEARCH } from './tableReducer';
@@ -19,7 +19,11 @@ const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => v
 
     const tableCtx = useContext(TableContext)!;
 
-    const [currentSearch, setCurrentSearch] = useState<string>(tableCtx.searching);
+    const [currentSearch, setCurrentSearch] = useState<string>("");
+
+    useEffect(() => {
+        setCurrentSearch(tableCtx.searching);
+    }, [tableCtx.searching])
 
     const resetSearch = useCallback(() => {
         props.setShowSearch(tableCtx.title === null);

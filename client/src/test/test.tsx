@@ -6,6 +6,7 @@ import {
     FormControlLabel,
     Tabs,
     Tab,
+    Button,
 } from "@mui/material";
 //import ItnTable, { AbstractColumnBuilder } from "@itneris/table";
 import ItnTable, { AbstractColumnBuilder } from "../table/src";
@@ -98,6 +99,18 @@ export default function TestComnonent() {
                             />}
                             label="Enable rows selection"
                         />
+                        <Button onClick={() => {
+                            const state = { ...serverTableRef.current!.getState() };
+                            serverTableRef.current!.setState({
+                                ...state,
+                                searching: "qwerty",
+                                filtering: [{
+                                    column: "glassType",
+                                    values: ["Cup"],
+                                    type: FilterType.Select
+                                }]
+                            })
+                        }}>Set state</Button>
                     </Box>
                 </Box>
                 <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">

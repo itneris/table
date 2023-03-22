@@ -12,6 +12,7 @@ export const SET_SELECTED_ROWS = 'SET_SELECTED_ROWS_ACTION';
 export const RESET_SELECTED_ROWS = 'RESET_SELECTED_ROWS_ACTION';
 export const SET_ROWS_PER_PAGE = 'SET_ROWS_PER_PAGE_ACTION';
 export const SET_PAGE = 'SET_PAGE_ACTION';
+export const SET_STATE = 'SET_STATE';
 
 export function tableReducer(state: TableState, action: any) {
     switch (action.type) {
@@ -70,6 +71,8 @@ export function tableReducer(state: TableState, action: any) {
                 ...state,
                 page: action.page
             } as TableState;
+        case SET_STATE:
+            return action.state as TableState;
         default:
             throw new Error();
     }

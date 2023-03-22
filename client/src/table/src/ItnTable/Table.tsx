@@ -19,7 +19,7 @@ import ItnTablePagination from './ItnTablePagination';
 import ItnTableRow from './ItnTableRow';
 import TableFilter from './TableFilter';
 import TablePanelFilterValue from './TablePanelFilterValue';
-import { RESET_SELECTED_ROWS, SET_FILTERS, SET_SELECTED_ROWS, SET_SORT, tableReducer } from './tableReducer';
+import { RESET_SELECTED_ROWS, SET_FILTERS, SET_SELECTED_ROWS, SET_SORT, SET_STATE, tableReducer } from './tableReducer';
 import TableToolbar from './TableToolbar';
 
 /*const usePrevious = (value, initialValue) => {
@@ -91,6 +91,9 @@ const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => 
         },
         getState(): TableState {
             return tableRef.current!.getState();
+        },
+        setState(state: TableState) {
+            return tableRef.current!.setState(state);
         },
         getSelectedRows() {
             return tableRef.current!.getSelectedRows();
@@ -173,6 +176,9 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         },
         getState(): TableState {
             return table;
+        },
+        setState(state: TableState) {
+            dispatch({ type: SET_STATE, state });
         },
         getSelectedRows() {
             return table.selectedRows;
