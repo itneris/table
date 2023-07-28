@@ -179,6 +179,9 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         },
         setState(state: TableState) {
             dispatch({ type: SET_STATE, state });
+            saveState(props.saveState, () => {
+                return state;
+            });
         },
         getSelectedRows() {
             return table.selectedRows;
