@@ -14,6 +14,10 @@ export interface ITableRef {
      * */
     getData: () => LooseObject[];
     /*
+     * Set currently displayed rows in table
+     * */
+    setData: React.Dispatch<React.SetStateAction<LooseObject[]>>;
+    /*
      * Gets tablestate: filtering, searching, sorting, paging
      * */
     getState: () => TableState;

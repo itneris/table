@@ -308,4 +308,10 @@ export interface ITableProperties {
      * Default: null
     */
     saveState?: { type: "session" | "storage", name: string } | null;
+
+    /**
+     * Change row after server response
+     * Default: null
+    */
+    mutateRows?: (row: LooseObject) => LooseObject;
 }

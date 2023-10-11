@@ -1,7 +1,7 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
-import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, useRef } from 'react';
+import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { ITableRef } from '../base/ITableRef';
 import { LooseObject } from '../base/LooseObject';
@@ -81,33 +81,8 @@ export const queryClient = new QueryClient({
 });
 
 const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => {
-    const tableRef = useRef<ITableRef | null>(null);
-    useImperativeHandle(ref, () => ({
-        fetch() {
-            tableRef.current!.fetch();
-        },
-        getData() {
-            return tableRef.current!.getData();
-        },
-        getState(): TableState {
-            return tableRef.current!.getState();
-        },
-        setState(state: TableState) {
-            return tableRef.current!.setState(state);
-        },
-        getSelectedRows() {
-            return tableRef.current!.getSelectedRows();
-        },
-        resetSelection() {
-            tableRef.current!.resetSelection();
-        },
-        setSelectedRows(ids: string[]) {
-            tableRef.current!.setSelectedRows(ids);
-        }
-    }));
-
     return <QueryClientProvider client={props.queryClient ?? queryClient} contextSharing>
-        <ItnTable {...props} ref={tableRef}/>
+        <ItnTable {...props} ref={ref}/>
     </QueryClientProvider>;
 });
 
@@ -173,6 +148,9 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         },
         getData() {
             return rows;
+        },
+        setData(rows) {
+            setRows(rows);
         },
         getState(): TableState {
             return table;
@@ -265,7 +243,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
             },
             onSuccess: (response) => {
                 setErrorLoading(null);
-                setRows(response.data.rows);
+                setRows(props.mutateRows ? response.data.rows.map(props.mutateRows) : response.data.rows);
                 setTotal(response.data.total);
             },
             onSettled: () => {
