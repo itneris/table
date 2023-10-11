@@ -1,9 +1,11 @@
 ﻿import React, { ReactNode } from "react";
 import { ColumnDescription } from "../base/ColumnDescription";
 import { LooseObject } from "../base/LooseObject";
+import { DownloadFileProperties } from "./DownloadFileProperties";
 import { FilterProperties } from "./FilterProperties";
 import { FilterValueProperties } from "./FilterValueProperties";
 import { SortProperties } from "./SortProperties";
+import { TableState } from "./TableState";
 
 export interface ITableContext {
     idField: string | null;
@@ -32,6 +34,7 @@ export interface ITableContext {
     filterNoOptionsText: string;
     filterAllText: string;
     filterSelectValuesText: string;
+    downloadTooltipText: string;
 
     sorting?: Array<SortProperties>;
     onSortingChange: ((sorting: Array<SortProperties>) => void) | null;
@@ -62,4 +65,6 @@ export interface ITableContext {
     rows: Array<LooseObject>;
 
     saveState: { type: "session" | "storage", name: string } | null;
+
+    onDownload: (() => void) | null;
 }

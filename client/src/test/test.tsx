@@ -13,6 +13,7 @@ import ItnTable, { AbstractColumnBuilder } from "../table/src";
 import demo from "../test_data/data";
 import { ITableRef } from "../table/src/base/ITableRef";
 import { FilterType } from "../table/src/props/FilterType";
+import { DownloadFileProperties } from "../table/src/props/DownloadFileProperties";
 
 interface ICocktailDTO {
     id: string;
@@ -126,6 +127,7 @@ export default function TestComnonent() {
                     enableRowsSelection={enableSelect ? (row => row.name !== "Beer" && false) : false}
                     onRowSelect={(rows) => console.log(rows)}
                     selectedRows={!enableSelect ? [] : ['1', '2']}
+                    downloadProperties={{ useState: false }}
                 />
             </>
         }      

@@ -1,26 +1,18 @@
-export class DownloadFileProperties {
+export interface DownloadFileProperties {
     /**
-     * Url to api that returns base64 file string
+     * Url to api that returns base64 file string or File, default {api}/Download
     */
-    url: string;
+    url?: string | null;
     /**
      * Name of downloaded file
     */
-    name: string;
+    name?: string;
     /**
-     * Mime-type of downloaded file
+     * Mime-type of downloaded file in case of binary string, default application/csv
     */
-    mimeType: string;
-
+    mimeType?: string;
     /**
-     * Initialize file download behavior
-     * @param {string} url Url to api that returns base64 file string
-     * @param {string} name Name of downloaded file
-     * @param {string} mimeType Mime-type of downloaded file, default "application/csv"
-     */
-    constructor(url: string, name: string, mimeType: string = "application/csv") {
-        this.url = url;
-        this.name = name;
-        this.mimeType = mimeType;
-    }
+     * Will be it get response or post with current table state
+    */
+    useState: boolean;
 }

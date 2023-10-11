@@ -7,6 +7,7 @@ import TablePanelFilterValue from './TablePanelFilterValue';
 import { IFocusable } from '../base/IFocusable';
 import TableColumnsHide from './TableColumnsHide';
 import TableFilters from './TableFilters';
+import DownloadButton from './DownloadButton';
 
 const TableToolbar = () => {
     const searchInputRef = useRef<IFocusable|null>(null);
@@ -46,7 +47,10 @@ const TableToolbar = () => {
                         </IconButton>
                     </Tooltip>
                 }
-                {/*TODO DOWNLOAD BUTTON*/ }
+                {
+                    tableCtx.onDownload  &&
+                    <DownloadButton />
+                }
                 {
                     tableCtx.enableHideColumns &&
                     <TableColumnsHide />

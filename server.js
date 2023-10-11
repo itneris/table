@@ -1,6 +1,7 @@
 ﻿const express = require('express');
 const bodyParser = require('body-parser');
 const demo = require('./client/src/test_data/data');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -69,6 +70,15 @@ app.get('/api/test/filters', (req, res) => {
     res.send(filters);
 });
 
+app.get('/api/test/download', (req, res) => {
+    /*var str = "77u/MTsyOzMNCnRlc3Q7dGVzdDt0ZXN0DQo=";
+    fs.writeFile('export.csv', str, { encoding: 'base64' }, function (err, file) {
+        res.setHeader('Content-Type', 'application/csv');
+        res.setHeader('Content-Disposition', 'inline; filename="export.csv"');
+
+        res.send(file);
+    });*/
+});
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
 

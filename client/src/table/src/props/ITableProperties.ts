@@ -48,6 +48,14 @@ export interface ITableProperties {
     toolbarAdornment?: ReactNode | null;
 
     /**
+     * Return current table state when download button clicked if download file options is not set
+     * Default: null
+     * Function params:
+     *      tableState: TableState, table state with paging, searching, filtering and sorting
+    */
+    onDownload?: ((tableState: TableState) => void) | null;
+
+    /**
      * Properties that describes behavior when "Download" btn clicked, button will not be rendered if null
      * Default: null
     */
@@ -63,6 +71,13 @@ export interface ITableProperties {
      * Default: "Загрузка..."
     */
     loadingMessage?: string;
+
+    /**
+     * Tooltip for "Download" button
+     * Default: "Скачать"
+    */
+    downloadTooltipText?: string;
+
     /**
      * Tooltip for "Search" button
      * Default: "Поиск"
@@ -253,14 +268,6 @@ export interface ITableProperties {
      * Default: "След. страница"
     */
     nextPageText?: string;
-
-    /**
-     * Return current table state when download button clicked if download file options is not set
-     * Default: null
-     * Function params:
-     *      tableState: TableState, table state with paging, searching, filtering and sorting
-    */
-    onDownload?: ((tableState: TableState) => void) | null;
 
     /**
      * Ebables row selection for table

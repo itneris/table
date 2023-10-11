@@ -1,5 +1,5 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
 import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, useRef } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
@@ -13,7 +13,7 @@ import { ITableProperties } from '../props/ITableProperties';
 import { SortProperties } from '../props/SortProperties';
 import { TableQueryState } from '../props/TableQueryState';
 import { TableState } from '../props/TableState';
-import { getFilters, getRows } from '../queries/dataQueries';
+import { getFileFromServer, getFilters, getRows } from '../queries/dataQueries';
 import ItnTableHeader from './ItnTableHeader';
 import ItnTablePagination from './ItnTablePagination';
 import ItnTableRow from './ItnTableRow';
@@ -179,7 +179,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         },
         setState(state: TableState) {
             dispatch({ type: SET_STATE, state });
-            saveState(props.saveState, () => {
+            saveState(props.saveState ?? null, () => {
                 return state;
             });
         },
@@ -301,6 +301,20 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         }
     );
 
+    const downloadMutation = useMutation(getFileFromServer, {
+        onMutate: () => setIsLoading(true),
+        onSettled: () => setIsLoading(false),
+        onSuccess: (file) => {
+            const url = URL.createObjectURL(file);
+            let downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = file.name;
+
+            downloadLink.click();
+            downloadLink.remove();
+        }
+    });
+
     //useEffectDebugger(() => {
     useEffect(() => {
         if (props.apiUrl && columns.length > 0) {
@@ -318,6 +332,18 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         //table.page,
     ]);
 
+    const handleDownload = useCallback(() => {
+        if (props.onDownload) {
+            props.onDownload(table);
+            return;
+        }
+
+        downloadMutation.mutate({
+            downloadProperties: props.downloadProperties!,
+            state: table,
+            url: props.apiUrl!
+        });
+    }, [props, table, downloadMutation]);
     /*useEffect(() => {
         dispatch({ type: SET_SORT, sorting: props.sorting });
     }, [props.sorting]);
@@ -339,7 +365,11 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         });
     }, [props.selectedRows, props.idField]);*/
 
-    const hasToolbar = props.title || !props.disableSearch || props.onDownload !== null || filters.filter(f => f.inToolbar).length > 0;
+    const hasToolbar = props.title ||
+        !props.disableSearch ||
+        props.onDownload !== null ||
+        filters.filter(f => f.inToolbar).length > 0 ||
+        props.downloadProperties !== null;
 
     const contextValue: ITableContext = {
         searching: table.searching,
@@ -368,6 +398,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         filterNoOptionsText: props.filterNoOptionsText!,
         filterAllText: props.filterAllText!,
         filterSelectValuesText: props.filterSelectValuesText!,
+        downloadTooltipText: props.downloadTooltipText!,
         sorting: table.sorting,
         ctrlIsClicked: ctrlIsClicked,
         onSortingChange: props.onSortingChange!,
@@ -386,7 +417,8 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         onRowSelect: props.onRowSelect,
         selectedRows: table.selectedRows!,
         rows: rows,
-        saveState: props.saveState ?? null
+        saveState: props.saveState ?? null,
+        onDownload: props.onDownload || props.downloadProperties ? handleDownload : null
     };
 
     return (
@@ -510,6 +542,7 @@ ItnTable.defaultProps = {
     filterOpenText: "Развернуть",
     filterAllText: "Все",
     filterSelectValuesText: "Выбрано значений",
+    downloadTooltipText: "Скачать",
 
     disablePaging: false,
     pageSize: 10,
