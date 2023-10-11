@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
     Typography,
     Box,
@@ -13,7 +13,6 @@ import ItnTable, { AbstractColumnBuilder } from "../table/src";
 import demo from "../test_data/data";
 import { ITableRef } from "../table/src/base/ITableRef";
 import { FilterType } from "../table/src/props/FilterType";
-import { DownloadFileProperties } from "../table/src/props/DownloadFileProperties";
 
 interface ICocktailDTO {
     id: string;
@@ -32,10 +31,12 @@ class ServerCocktailsColumnBuilder extends AbstractColumnBuilder<ICocktailDTO> {
             .WithDefaultSort();
 
         this.ColumnFor(_ => _.price)
-            .WithName("Цена");
+            .WithName("Цена")
+            .WithTooltip("Цена указана в долларах США");
 
         this.ColumnFor(_ => _.ingridients)
-            .WithName("Ингридиенты");
+            .WithName("Ингридиенты")
+            .DisableSort();
 
         this.ColumnFor(_ => _.createDate)
             .WithName("Дата создания");

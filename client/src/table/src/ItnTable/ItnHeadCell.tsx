@@ -1,4 +1,5 @@
-import { Badge, TableCell, TableSortLabel } from '@mui/material';
+import { HelpOutline } from '@mui/icons-material';
+import { Badge, TableCell, TableSortLabel, Tooltip } from '@mui/material';
 import React, { useCallback, useContext, useMemo } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { SortProperties } from '../props/SortProperties';
@@ -55,22 +56,37 @@ function ItnHeadCell(props: { column: ColumnDescription }) {
             //rowSpan={options.rowSpan}
             //colSpan={options.colSpan}
         >
-            {
-                !props.column.disableSort ?
-                    <Badge
-                        badgeContent={sortIndex + 1}
-                        invisible={(tableCtx.sorting ?? []).length < 2 || sortIndex === -1}
-                    >
-                        <TableSortLabel
-                            active={currentSorting != null}
-                            direction={currentSorting?.ascending ? "asc" : "desc"}
-                            onClick={sortByColumn}
+            <Badge
+                badgeContent={sortIndex + 1}
+                invisible={(tableCtx.sorting ?? []).length < 2 || sortIndex === -1 || props.column.disableSort}
+            >
+                <TableSortLabel
+                    active={currentSorting != null}
+                    direction={currentSorting?.ascending ? "asc" : "desc"}
+                    onClick={sortByColumn}
+                    hidden={props.column.disableSort}
+                    disabled={props.column.disableSort}
+                >
+                    {columnRender}
+                    {
+                        props.column.tooltip &&
+                        <Tooltip
+                            title={props.column.tooltip}
                         >
-                            {columnRender}
-                        </TableSortLabel>
-                    </Badge> :
-                    columnRender
-            }
+                            <HelpOutline
+                                sx={theme => ({
+                                    pl: 1,
+                                    cursor: "pointer",
+                                    color: "gray",
+                                    ":hover": {
+                                        color: theme.palette.secondary.main
+                                    }
+                                })}
+                            />
+                        </Tooltip>
+                    }
+                </TableSortLabel>
+            </Badge>
         </TableCell>
     );
 }

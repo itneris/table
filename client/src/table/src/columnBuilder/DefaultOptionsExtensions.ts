@@ -1,6 +1,5 @@
 import { LooseObject } from "../base/LooseObject";
 import { ColumnFilteringProperties } from "../props/ColumnFilteringProperties";
-import { FilterValueProperties } from "../props/FilterValueProperties";
 import { ColumnOptionsBuilder } from "./ColumnOptionsBuilder";
 
 declare module "./ColumnOptionsBuilder" {
@@ -55,7 +54,17 @@ declare module "./ColumnOptionsBuilder" {
 		 * @param {boolean} hidden is column hidden, default true
 		 * */
 		Hide(hidden?: boolean): ColumnOptionsBuilder<T>;
+		/**
+		 * With tooltip
+		 * @param {string} text tooltip label
+		 * */
+		WithTooltip(text: string): ColumnOptionsBuilder<T>;
 	}
+}
+
+ColumnOptionsBuilder.prototype.WithTooltip = function <T extends LooseObject>(text: string) {
+	return this
+		.SetColumnProp("tooltip", text) as ColumnOptionsBuilder<T>;
 }
 
 ColumnOptionsBuilder.prototype.WithName = function<T extends LooseObject>(displayName: string, bold: boolean = false) {
