@@ -1,39 +1,36 @@
 {
-  "name": "@itneris/table",
-  "version": "2.0.1",
-  "description": "Custom ItNeris organization table based on MaterialUI",
+  "name": "table",
+  "version": "0.1.0",
+  "private": true,
   "proxy": "http://localhost:5000/",
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@itneris/table": "^2.0.5",
     "@mui/icons-material": "^5.10.3",
     "@mui/material": "^5.10.3",
-    "@tanstack/react-query": "^4.2.3",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.3.0",
+    "@tanstack/react-query": "5.8.4",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.11.56",
-    "@types/react": "^18.0.18",
-    "@types/react-dom": "^18.0.6",
-    "axios": "^0.27.2",
+    "@types/node": "^16.18.68",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "axios": "1.6.2",
     "date-fns": "^2.29.2",
-    "react-scripts": "5.0.1",
-    "typescript": "^4.8.2",
-    "web-vitals": "^2.1.4"
-  },
-  "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "5.2.2",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build-ts": "tsc",
-    "publish:npm": "(if exist dist rmdir /s /q dist) && mkdir dist && babel ./src/components -d dist --copy-files"
+    "lint": "eslint -c .eslintrc --max-warnings 0 --ext .js,.jsx,.ts,.tsx ./src",
+    "lint:fix": "npm run lint -- --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -52,21 +49,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "main": "dist/ItnTable.js",
-  "module": "dist/ItnTable.js",
-  "files": [
-    "dist",
-    "README.md"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/itneris/table.git"
-  },
-  "author": "itneris",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/itneris/table/issues"
-  },
-  "homepage": ".https://github.com/itneris/table#readme"
+  }
 }

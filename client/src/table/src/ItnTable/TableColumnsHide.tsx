@@ -1,10 +1,10 @@
 import { ViewColumn } from '@mui/icons-material';
 import { Box, Checkbox, IconButton, Popover, Tooltip, Typography } from '@mui/material';
-import React, { useCallback, useContext, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
-import { TableContext } from './Table';
+import { useTableContext } from '../context/TableContext';
 
-function sortColumns(a: ColumnDescription, b: ColumnDescription) {
+function sortColumns<T>(a: ColumnDescription<T>, b: ColumnDescription<T>) {
     const nameA = a.displayName.toUpperCase();
     const nameB = b.displayName.toUpperCase();
     if (nameA < nameB) {
@@ -16,8 +16,8 @@ function sortColumns(a: ColumnDescription, b: ColumnDescription) {
     return 0;
 }
 
-function TableColumnsHide() {
-    const tableCtx = useContext(TableContext)!;
+function TableColumnsHide<T>() {
+    const tableCtx = useTableContext<T>();
     const btn = useRef<HTMLButtonElement | null>(null);
 
     const [columnsOpen, setColumnsOpen] = useState<boolean>(false);
@@ -30,7 +30,7 @@ function TableColumnsHide() {
         setColumnsOpen(false);
     }, []);
 
-    const handleColumnVisibilityChange = useCallback((column: ColumnDescription) => {
+    const handleColumnVisibilityChange = useCallback((column: ColumnDescription<T>) => {
         const newColumns = tableCtx.columns.map(c => {
             if (c.property === column.property) {
                 return {

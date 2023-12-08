@@ -1,13 +1,14 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box, Chip, Typography } from '@mui/material';
-import { saveState, TableContext } from './Table';
 import { FilterValueProperties } from '../props/FilterValueProperties';
 import { SET_FILTERS } from './tableReducer';
 import { format } from 'date-fns/esm';
 import { FilterType } from '../props/FilterType';
+import { useTableContext } from '../context/TableContext';
+import saveState from '../utils/saveState';
 
-const TablePanelFilterValue = (props: { filter: FilterValueProperties }) => {
-    const tableCtx = useContext(TableContext)!;
+const TablePanelFilterValue = <T,>(props: { filter: FilterValueProperties }) => {
+    const tableCtx = useTableContext<T>();
     const column = useMemo(() => tableCtx.columns.find(tc => tc.property === props.filter.column), [props.filter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const deleteFilter = useCallback((value: string) => {

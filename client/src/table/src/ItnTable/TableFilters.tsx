@@ -1,12 +1,13 @@
 import { FilterList } from '@mui/icons-material';
 import { Box, Button, IconButton, Popover, Tooltip, Typography } from '@mui/material';
-import React, { useCallback, useContext, useRef, useState } from 'react';
-import { saveState, TableContext } from './Table';
+import React, { useCallback, useRef, useState } from 'react';
 import TableFilter from './TableFilter';
 import { RESET_FILTERS } from './tableReducer';
+import { useTableContext } from '../context/TableContext';
+import saveState from '../utils/saveState';
 
-const TableFilters = () => {
-    const tableCtx = useContext(TableContext)!;
+const TableFilters = <T,>() => {
+    const tableCtx = useTableContext<T>();
     const btn = useRef<HTMLButtonElement | null>(null);
 
     const [filtersOpen, setFiltersOpen] = useState<boolean>(false);

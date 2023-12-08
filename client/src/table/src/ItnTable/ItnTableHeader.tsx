@@ -1,58 +1,60 @@
 import { Checkbox, TableCell, TableRow } from '@mui/material';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import ItnHeadCell from './ItnHeadCell';
-import { TableContext } from './Table';
+import { useTableContext } from '../context/TableContext';
 import { SET_SELECTED_ROWS } from './tableReducer';
 
-function ItnTableHeader() {
-    const tableCtx = useContext(TableContext)!;
+function ItnTableHeader<T>() {
+    const { enableRowsSelection, idField, columns, rows, selectedRows, dispatch, onRowSelect } = useTableContext<T>();
 
-    const displayColumns = useMemo(() => tableCtx.columns.filter(c => c.display && !c.systemHide), [tableCtx.columns]);
+    const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
 
 
-    const canRowBeSelected = useCallback((row: any) => {
-        if (typeof (tableCtx.enableRowsSelection) !== "function") {
-            return tableCtx.enableRowsSelection;
+    const canRowBeSelected = useCallback((row: T) => {
+        if (typeof (enableRowsSelection) !== "function") {
+            return enableRowsSelection;
         }
 
-        return tableCtx.enableRowsSelection(row);
-    }, [tableCtx.enableRowsSelection])
+        return enableRowsSelection(row);
+    }, [enableRowsSelection])
 
     const isPageChecked = useMemo(() => {
-        return tableCtx.rows
-            .find(row => tableCtx.selectedRows.find(select => select === row[tableCtx.idField!]) === undefined && canRowBeSelected(row)) === undefined &&
-            tableCtx.selectedRows.length > 0;
-    }, [tableCtx.rows, tableCtx.selectedRows, tableCtx.idField, canRowBeSelected]);
+        const allAbailableRowsSelected = !rows
+            .some(row =>
+                selectedRows.find(select => select === row[idField!]) === undefined &&
+                canRowBeSelected(row)
+            );
+        return allAbailableRowsSelected && selectedRows.length > 0;
+    }, [rows, selectedRows, idField, canRowBeSelected]);
 
     const handleSelectAll = useCallback(() => {
-        let selection: string[] = [...tableCtx.selectedRows];
+        let selection: string[] = [...selectedRows];
         if (isPageChecked) {
-            selection = selection.filter(sel => tableCtx.rows.find(row => row[tableCtx.idField!] === sel && canRowBeSelected(row)) === undefined);
+            selection = selection.filter(sel => rows.find(row => row[idField!] === sel && canRowBeSelected(row)) === undefined);
         } else {
             selection = [
                 ...selection,
-                ...tableCtx.rows
-                    .filter(row => selection.find(sel => row[tableCtx.idField!] === sel) === undefined && canRowBeSelected(row))
-                    .map(row => row[tableCtx.idField!])
+                ...rows
+                    .filter(row => selection.find(sel => row[idField!] === sel) === undefined && canRowBeSelected(row))
+                    .map(row => row[idField!] as string)
             ];
         }
-        tableCtx.dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
+        dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
+        onRowSelect && onRowSelect(selection);
     }, [
-        tableCtx.selectedRows,
-        tableCtx.pageSize,
-        tableCtx.dispatch,
-        tableCtx.rows,
-        tableCtx.idField,
-        tableCtx.onRowSelect,
+        selectedRows,
+        dispatch,
+        rows,
+        idField,
+        onRowSelect,
         isPageChecked,
         canRowBeSelected
-    ]); // eslint-disable-line react-hooks/exhaustive-deps
+    ]);
 
     return (
         <TableRow>
             {
-                tableCtx.enableRowsSelection !== false &&
+                enableRowsSelection !== false &&
                 <TableCell width="50px">
                     <Checkbox
                         sx={{ p: 0 }}

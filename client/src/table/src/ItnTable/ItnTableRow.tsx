@@ -1,53 +1,52 @@
 import { Checkbox, TableCell, TableRow } from '@mui/material';
-import React, { useCallback, useContext, useMemo } from 'react';
-import { LooseObject } from '../base/LooseObject';
+import React, { useCallback, useMemo } from 'react';
 import ItnTableCell from './ItnTableCell';
-import { TableContext } from './Table';
+import { useTableContext } from '../context/TableContext';
 import { SET_SELECTED_ROWS } from './tableReducer';
 
-function ItnTableRow(props: { row: LooseObject }) {
-    const tableCtx = useContext(TableContext)!;
+function ItnTableRow<T>(props: { row: T }) {
+    const { columns, idField, selectedRows, onRowSelect, rows, dispatch, onRowClick, enableRowsSelection } = useTableContext<T>();
 
-    const displayColumns = useMemo(() => tableCtx.columns.filter(c => c.display && !c.systemHide), [tableCtx.columns]);
-    const idProp = (tableCtx.idField as keyof typeof props.row) as string;
+    const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
+    const idProp = idField!;
 
 
     const isRowChecked = useMemo(() => {
-        return tableCtx.selectedRows.find(r => r === props.row[idProp]) !== undefined
-    }, [tableCtx.selectedRows, idProp, props.row]);
+        return selectedRows.find(r => r === props.row[idProp]) !== undefined
+    }, [selectedRows, idProp, props.row]);
 
     const handleSelectRow = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        let selection: string[] = [...tableCtx.selectedRows];
-        if (tableCtx.selectedRows.find(r => r === props.row[idProp]) === undefined) {
-            selection.push(props.row[idProp]);
+        let selection: string[] = [...selectedRows];
+        if (selectedRows.find(r => r === props.row[idProp]) === undefined) {
+            selection.push(props.row[idProp] as string);
         } else {
             selection = selection.filter(r => r !== props.row[idProp]);
         }
-        tableCtx.dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        tableCtx.onRowSelect && tableCtx.onRowSelect(selection);
-    }, [tableCtx.selectedRows, tableCtx.dispatch, tableCtx.rows, idProp, props.row, tableCtx.onRowSelect]); // eslint-disable-line react-hooks/exhaustive-deps
+        dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
+        onRowSelect && onRowSelect(selection);
+    }, [selectedRows, dispatch, rows, idProp, props.row, onRowSelect]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleRowClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
         if ((e.target as any).nodeName === "INPUT") {
             return;
         }
-        tableCtx.onRowClick && tableCtx.onRowClick(props.row[idProp] as unknown as string, props.row);
-    }, [tableCtx.onRowClick, props.row, idProp]); // eslint-disable-line react-hooks/exhaustive-deps
+        onRowClick && onRowClick(props.row[idProp] as unknown as string, props.row);
+    }, [onRowClick, props.row, idProp]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const canRowBeSelected = useMemo(() => {
-        if (typeof (tableCtx.enableRowsSelection) !== "function") {
-            return tableCtx.enableRowsSelection;
+        if (typeof (enableRowsSelection) !== "function") {
+            return enableRowsSelection;
         }
 
-        return tableCtx.enableRowsSelection(props.row);
-    }, [tableCtx.enableRowsSelection, props.row])
+        return enableRowsSelection(props.row);
+    }, [enableRowsSelection, props.row])
 
     return (
         <>
             <TableRow
-                hover={tableCtx.onRowClick != null}
+                hover={onRowClick != null}
                 style={{
-                    cursor: tableCtx.onRowClick ? "pointer" : "default",
+                    cursor: onRowClick ? "pointer" : "default",
                     //backgroundColor: stripedRows && rowI % 2 ? '#fafafa' : color ? color(n) : undefined,
                     //display: !n.totalId || openTotals.includes(n.totalId) ? "table-row" : "none"
                 }}
@@ -68,7 +67,7 @@ function ItnTableRow(props: { row: LooseObject }) {
                 }}*/
             >
                 {
-                    tableCtx.enableRowsSelection !== false &&
+                    enableRowsSelection !== false &&
                     <TableCell
                         width="50px"
                         onClick={e => e.stopPropagation()}

@@ -1,6 +1,4 @@
-﻿import { QueryClient } from "@tanstack/react-query";
 import { ReactNode } from "react";
-import { LooseObject } from "../base/LooseObject";
 import { AbstractColumnBuilder } from "../columnBuilder/AbstractColumnBuilder";
 import { DownloadFileProperties } from "./DownloadFileProperties";
 import { FilterProperties } from "./FilterProperties";
@@ -8,7 +6,7 @@ import { FilterValueProperties } from "./FilterValueProperties";
 import { SortProperties } from "./SortProperties";
 import { TableState } from "./TableState";
 
-export interface ITableProperties {
+export interface ITableProperties<T> {
     /**
      * Url of api that contains POST {api}/list and GET {api}/filters methods
     */
@@ -28,7 +26,7 @@ export interface ITableProperties {
      * Column with unique identifier for rows
      * Default: "id"
     */
-    idField?: string;
+    idField?: keyof T;
 
     /**
      * Table title, not be rendered if null
@@ -139,7 +137,7 @@ export interface ITableProperties {
     /**
      * Class with columns description for table
      * */
-    columnsBuilder: AbstractColumnBuilder<LooseObject>;
+    columnsBuilder: AbstractColumnBuilder<T>;
 
     /**
      * Initial searching for table, updates on onSearchingChange
@@ -284,7 +282,7 @@ export interface ITableProperties {
      * Return array of currently selected rows when selection triggered
      * Default: null
      * Function params:
-     *      rows: Array<LooseObject>, array of currently selected rows
+     *      rows: Array<T>, array of currently selected rows
     */
     onRowSelect?: ((rows: Array<string>) => void) | null;
 
@@ -293,16 +291,9 @@ export interface ITableProperties {
      * Default: null
      * Function params:
      *      id: string, clicked row id
-     *      row: LooseObject, clicked row data
+     *      row: T, clicked row data
     */
-    onRowClick?: ((id: string, row: LooseObject) => void) | null;
-
-    /**
-     * Force set query client for table
-     * Default: null
-    */
-    queryClient?: QueryClient | null;
-
+    onRowClick?: ((id: string, row: T) => void) | null;
     /**
      * Save table state in browser local or session storage with defined name
      * Default: null
@@ -313,5 +304,5 @@ export interface ITableProperties {
      * Change row after server response
      * Default: null
     */
-    mutateRows?: (row: LooseObject) => LooseObject;
+    mutateRows?: (row: T) => T;
 }

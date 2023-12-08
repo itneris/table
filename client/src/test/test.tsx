@@ -50,12 +50,13 @@ class ServerCocktailsColumnBuilder extends AbstractColumnBuilder<ICocktailDTO> {
 }
 
 export default function TestComnonent() {
-    const serverTableRef = useRef<ITableRef | null>(null);
+    const serverTableRef = useRef<ITableRef<ICocktailDTO> | null>(null);
     //const [isFilterOr, setIsFilterOr] = useState(false);
     //const [globalLoading, setGlobalLoading] = useState(false);
     const [showAction, setShowAction] = useState(false);
     const [enableSelect, setEnableSelect] = useState(false);
     const [tab, setTab] = useState(0);
+    const [api, setApi] = useState("api/test");
 
     //const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
     //const changeSearch = search => localStorage.setItem("search", search);
@@ -113,6 +114,9 @@ export default function TestComnonent() {
                                 }]
                             })
                         }}>Set state</Button>
+                        <Button onClick={() => {
+                            setApi("api/test1")
+                        }}>Set Api</Button>
                     </Box>
                 </Box>
                 <Box alignItems="center" display="flex" mb="20px" justifyContent="space-between">
@@ -122,7 +126,7 @@ export default function TestComnonent() {
                 <ItnTable
                     saveState={{ type: "storage", name: "test_table" }}
                     ref={serverTableRef}
-                    apiUrl="api/test"
+                    apiUrl={api}
                     onRowClick={() => console.log('row click')}
                     columnsBuilder={serverColumnBuilder}
                     enableRowsSelection={enableSelect ? (row => row.name !== "Beer" && false) : false}

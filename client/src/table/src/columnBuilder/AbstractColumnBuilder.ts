@@ -1,9 +1,8 @@
 import { ColumnDescription } from "../base/ColumnDescription";
-import { LooseObject } from "../base/LooseObject";
 import { ColumnOptionsBuilder } from "./ColumnOptionsBuilder";
 
-export abstract class AbstractColumnBuilder<T extends LooseObject> {
-	private _columns: Array<ColumnDescription> = [];
+export abstract class AbstractColumnBuilder<T> {
+	private _columns: Array<ColumnDescription<T>> = [];
 
 	public ColumnFor(model: string | ((type: T) => any)): ColumnOptionsBuilder<T> {
 		const key = typeof model === "string" ?
@@ -21,7 +20,7 @@ export abstract class AbstractColumnBuilder<T extends LooseObject> {
 		return new ColumnOptionsBuilder<T>(column);
 	}  
 
-	public Build(): Array<ColumnDescription> 
+	public Build(): Array<ColumnDescription<T>> 
 	{
 		return this._columns;
 	}

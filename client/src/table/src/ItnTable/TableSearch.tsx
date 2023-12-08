@@ -1,23 +1,22 @@
-import React, { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
-import { saveState, TableContext } from './Table';
 import { RESET_SEARCH, SEARCH } from './tableReducer';
 import { Clear, Search } from '@mui/icons-material';
-import { IFocusable } from '../base/IFocusable';
+import { useTableContext } from '../context/TableContext';
+import saveState from '../utils/saveState';
 
 const SEARCH_TIMEOUT = 400;
 
-const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => void }>((props, ref) => {
-    let searchElement = useRef<HTMLDivElement | null>(null);
+declare module "react" {
+    function forwardRef<T,P = {}>(
+        render: (props: P, ref: React.Ref<T>) => React.ReactNode | null
+    ): (props: P & React.RefAttributes<T>) => React.ReactNode | null;
+}
+
+function TableSearchInner<T>(props: { setShowSearch: (show: boolean) => void }, ref: React.Ref<HTMLDivElement>) {
     let timer = useRef<NodeJS.Timeout | null>(null);
 
-    useImperativeHandle(ref, () => ({
-        focus() {
-            searchElement.current?.focus();
-        }
-    }));
-
-    const tableCtx = useContext(TableContext)!;
+    const tableCtx = useTableContext<T>();
 
     const [currentSearch, setCurrentSearch] = useState<string>("");
 
@@ -62,7 +61,7 @@ const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => v
         <Box display="flex" alignItems='center'>
             <TextField
                 variant="standard"
-                ref={searchElement}
+                ref={ref}
                 value={currentSearch}
                 onKeyUp={handleSearchKeyUp}
                 onChange={handleSearchChange}
@@ -83,6 +82,7 @@ const TableSearch = forwardRef<IFocusable, { setShowSearch: (show: boolean) => v
             }
         </Box>
     );
-});
+};
 
+const TableSearch = React.forwardRef(TableSearchInner);
 export default TableSearch;

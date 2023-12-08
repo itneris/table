@@ -1,14 +1,11 @@
-﻿import React, { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { ColumnDescription } from "../base/ColumnDescription";
-import { LooseObject } from "../base/LooseObject";
-import { DownloadFileProperties } from "./DownloadFileProperties";
-import { FilterProperties } from "./FilterProperties";
-import { FilterValueProperties } from "./FilterValueProperties";
-import { SortProperties } from "./SortProperties";
-import { TableState } from "./TableState";
+import { FilterProperties } from "../props/FilterProperties";
+import { FilterValueProperties } from "../props/FilterValueProperties";
+import { SortProperties } from "../props/SortProperties";
 
-export interface ITableContext {
-    idField: string | null;
+export interface ITableContext<T> {
+    idField: keyof T | null;
     dateParseRE: RegExp;
 
     title: string | null;
@@ -54,15 +51,15 @@ export interface ITableContext {
 
     dispatch: React.Dispatch<any>;
 
-    columns: Array<ColumnDescription>;
-    changeColumns: (newColumns: Array<ColumnDescription>) => void;
+    columns: Array<ColumnDescription<T>>;
+    changeColumns: (newColumns: Array<ColumnDescription<T>>) => void;
 
-    onRowClick: ((id: string, row: LooseObject) => void) | null;
+    onRowClick: ((id: string, row: T) => void) | null;
 
     selectedRows: Array<string>;
     onRowSelect?: ((rows: Array<string>) => void) | null;
     enableRowsSelection?: boolean | ((row: any) => boolean);
-    rows: Array<LooseObject>;
+    rows: Array<T>;
 
     saveState: { type: "session" | "storage", name: string } | null;
 

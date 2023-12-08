@@ -1,14 +1,14 @@
 import { Autocomplete, Box, Checkbox, FormControlLabel, Radio, TextField, Typography } from '@mui/material';
-import React, { ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-import { LooseObject } from '../base/LooseObject';
+import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 import { FilterProperties } from "../props/FilterProperties";
 import { FilterType } from '../props/FilterType';
 import { FilterValueProperties } from '../props/FilterValueProperties';
-import { saveState, TableContext } from './Table';
 import { SET_FILTERS } from './tableReducer';
+import { useTableContext } from '../context/TableContext';
+import saveState from '../utils/saveState';
 
-function TableFilter(props: { filter: FilterProperties }) {
-    const tableCtx = useContext(TableContext)!;
+function TableFilter<T>(props: { filter: FilterProperties }) {
+    const tableCtx = useTableContext<T>();
     const currentFilterValue = useMemo(() => (tableCtx.filtering ?? []).find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
     const colName = useMemo(() => tableCtx.columns.find(_ => _.property === props.filter.column)?.displayName, []); // eslint-disable-line react-hooks/exhaustive-deps
     const filterLabel = props.filter.label ?? colName;
@@ -18,7 +18,7 @@ function TableFilter(props: { filter: FilterProperties }) {
         setAutocompleteValue(value);
     }, []);
 
-    const changeFilter = useCallback((prop: string, value: boolean | string | number | Date) => {
+    const changeFilter = useCallback((prop: keyof FilterValueProperties, value: boolean | string | number | Date) => {
         let tableFiltering = [...(tableCtx.filtering ?? [])];
         const currentColumn = props.filter.column;
         if (
@@ -40,9 +40,9 @@ function TableFilter(props: { filter: FilterProperties }) {
                         if (newFilter.type === FilterType.Bool) {
                             newFilter.checked = value as boolean;
                         } else if (newFilter.type === FilterType.Number) {
-                            (newFilter as LooseObject)[prop] = value as number;
+                            (newFilter as any)[prop] = value as number;
                         } else if (newFilter.type === FilterType.Date) {
-                            (newFilter as LooseObject)[prop] = value as Date;
+                            (newFilter as any)[prop] = value as Date;
                         } else if (newFilter.type === FilterType.Select) {
                             if (f.values!.includes(value as string)) {
                                 newFilter.values = f.values!.filter(val => val !== value);
@@ -58,7 +58,7 @@ function TableFilter(props: { filter: FilterProperties }) {
                 if (prop === "values") {
                     newFilter.values = [value as string];
                 } else {
-                    (newFilter as LooseObject)[prop] = value;
+                    (newFilter as any)[prop] = value;
                 }
                 tableFiltering.push(newFilter);
             }

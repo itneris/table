@@ -1,10 +1,9 @@
 import { TableState } from "../props/TableState";
-import { LooseObject } from "./LooseObject";
 
 /*
  * Interfacle for ItnTable userRef
  * */
-export interface ITableRef {
+export interface ITableRef<T> {
     /*
      * Initialize refetch data when rows changed externally
      * */
@@ -12,11 +11,11 @@ export interface ITableRef {
     /*
      * Get currently displayed rows in table
      * */
-    getData: () => LooseObject[];
+    getData: () => T[];
     /*
      * Set currently displayed rows in table
      * */
-    setData: React.Dispatch<React.SetStateAction<LooseObject[]>>;
+    setData: (rows: T[]) => void;
     /*
      * Gets tablestate: filtering, searching, sorting, paging
      * */

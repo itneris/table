@@ -1,8 +1,7 @@
 import { ReactNode } from "react";
 import { ColumnFilteringProperties } from "../props/ColumnFilteringProperties";
-import { LooseObject } from "./LooseObject";
 
-export class ColumnDescription implements LooseObject {
+export class ColumnDescription<T> {
     order: number = 0;
     property: string = "";
     displayName: string = "";
@@ -24,5 +23,5 @@ export class ColumnDescription implements LooseObject {
 
     filtering: ColumnFilteringProperties | null = null;
 
-    bodyRenderer: ((value: any, row: LooseObject) => ReactNode) | null = null;
+    bodyRenderer: ((value: any, row: T) => ReactNode) | null = null;
 }

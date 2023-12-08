@@ -1,12 +1,11 @@
 import { TableCell } from '@mui/material';
 import { format } from 'date-fns';
-import React, { ReactNode, useContext, useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
-import { LooseObject } from '../base/LooseObject';
-import { TableContext } from './Table';
+import { useTableContext } from '../context/TableContext';
 
-function ItnTableCell(props: { row: LooseObject, column: ColumnDescription }) {
-    const tableCtx = useContext(TableContext)!;
+function ItnTableCell<T>(props: { row: T, column: ColumnDescription<T> }) {
+    const tableCtx = useTableContext<T>();
 
     const valProp = props.column.property as keyof typeof props.row;
     const value = props.row[valProp];

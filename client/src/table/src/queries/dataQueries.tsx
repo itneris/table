@@ -1,15 +1,26 @@
-﻿import axios, {  AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { TableRowsReponse } from "../base/TableRowsReponse";
 import { DownloadFileProperties } from "../props/DownloadFileProperties";
 import { FilterProperties } from "../props/FilterProperties";
 import { TableQueryState } from "../props/TableQueryState";
 
-export const getRows = (apiUrl: string, options: TableQueryState) => async (): Promise<AxiosResponse<TableRowsReponse>> => {
-    return await axios.post(`${apiUrl}/List`, options);
+export function getRows<T>(apiUrl: string, options: TableQueryState, changeRows?: (row: T) => T) {
+    async function fetchRows() {
+        const response = await axios.post(`${apiUrl}/list`, options);
+        const data = response.data as TableRowsReponse<T>;
+        if (changeRows) {
+            data.rows = data.rows.map(changeRows);
+        }
+
+        return data;
+    };
+
+    return fetchRows;
 }
 
-export const getFilters = (apiUrl: string) => async (): Promise<AxiosResponse<Array<FilterProperties>>> => {
-    return await axios.get(`${apiUrl}/Filters`);
+export const getFilters = (apiUrl: string) => async () => {
+    const response = await axios.get(`${apiUrl}/filters`);
+    return response.data as Array<FilterProperties>;
 }
 
 export interface DownloadParams {

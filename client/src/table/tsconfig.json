@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
+    "target": "es2016",
     "jsx": "react",
     "declaration": true,
     "outDir": "dist",
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "moduleResolution": "node",
     "rootDir": "./src",
     "baseUrl": "./src"
@@ -12,3 +14,36 @@
     "src/**/*"
   ]
 }
+
+//{
+//  "compilerOptions": {
+//    "target": "es2016",
+//    "module": "commonjs",
+//    "declaration": true,
+//    "outDir": "dist",
+//    "esModuleInterop": true,
+//    "forceConsistentCasingInFileNames": true,
+//    "strict": true,
+//    "skipLibCheck": true,
+//    "jsx": "react" /*,
+//    "moduleResolution": "node",
+//    "rootDir": "./src",
+//    "baseUrl": "./src"*/
+//  },
+//  "include": [ "src" ]
+//}
+
+//{
+//  "compilerOptions": {
+//    "jsx": "react",
+//    "declaration": true,
+//    "outDir": "dist",
+//    "esModuleInterop": true,
+//    "moduleResolution": "node",
+//    "rootDir": "./src",
+//    "baseUrl": "./src"
+//  },
+//  "include": [
+//    "src/**/*"
+//  ]
+//}

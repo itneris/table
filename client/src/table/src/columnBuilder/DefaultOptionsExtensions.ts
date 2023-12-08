@@ -1,9 +1,8 @@
-import { LooseObject } from "../base/LooseObject";
 import { ColumnFilteringProperties } from "../props/ColumnFilteringProperties";
 import { ColumnOptionsBuilder } from "./ColumnOptionsBuilder";
 
 declare module "./ColumnOptionsBuilder" {
-	interface ColumnOptionsBuilder<T extends LooseObject> {
+	interface ColumnOptionsBuilder<T> {
 		/**
 		 * Defines a display name for current column and bold higlight.
 		 * @param {string} displayName
@@ -62,62 +61,62 @@ declare module "./ColumnOptionsBuilder" {
 	}
 }
 
-ColumnOptionsBuilder.prototype.WithTooltip = function <T extends LooseObject>(text: string) {
+ColumnOptionsBuilder.prototype.WithTooltip = function <T>(text: string) {
 	return this
 		.SetColumnProp("tooltip", text) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithName = function<T extends LooseObject>(displayName: string, bold: boolean = false) {
+ColumnOptionsBuilder.prototype.WithName = function<T>(displayName: string, bold: boolean = false) {
 	return this
 		.SetColumnProp("displayName", displayName)
 		.SetColumnProp("bold", bold) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithDateFormat = function<T extends LooseObject>(dateFormat: string) {
+ColumnOptionsBuilder.prototype.WithDateFormat = function<T>(dateFormat: string) {
 	return this
 		.SetColumnProp("dateFormat", dateFormat) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithBodyRenderer = function<T extends LooseObject>(renderer: (value: any, row: T) => React.ReactNode) {
+ColumnOptionsBuilder.prototype.WithBodyRenderer = function<T>(renderer: (value: any, row: T) => React.ReactNode) {
 	return this
 		.SetColumnProp("bodyRenderer", renderer) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithTime = function <T extends LooseObject>() {
+ColumnOptionsBuilder.prototype.WithTime = function <T>() {
 	return this
 		.SetColumnProp("dateWithTime", true) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithDefaultSort = function <T extends LooseObject>(ascending: boolean = true, order: number = 1) {
+ColumnOptionsBuilder.prototype.WithDefaultSort = function <T>(ascending: boolean = true, order: number = 1) {
 	return this
 		.SetColumnProp("sortOrder", order)
 		.SetColumnProp("sortAscending", ascending) as ColumnOptionsBuilder<T>;
 }
 
 
-ColumnOptionsBuilder.prototype.DisableSort = function <T extends LooseObject>() {
+ColumnOptionsBuilder.prototype.DisableSort = function <T>() {
 	return this
 		.SetColumnProp("disableSort", true) as ColumnOptionsBuilder<T>;
 }
 
 
-ColumnOptionsBuilder.prototype.Hide = function <T extends LooseObject>(hidden: boolean = true) {
+ColumnOptionsBuilder.prototype.Hide = function <T>(hidden: boolean = true) {
 	return this
 		.SetColumnProp("display", !hidden) as ColumnOptionsBuilder<T>;
 }
 
 
-ColumnOptionsBuilder.prototype.WithNullValue = function <T extends LooseObject>(value: string) {
+ColumnOptionsBuilder.prototype.WithNullValue = function <T>(value: string) {
 	return this
 		.SetColumnProp("nullValue", false) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithWidth = function <T extends LooseObject>(width: number) {
+ColumnOptionsBuilder.prototype.WithWidth = function <T>(width: number) {
 	return this
 		.SetColumnProp("width", width) as ColumnOptionsBuilder<T>;
 }
 
-ColumnOptionsBuilder.prototype.WithDefaultFilters = function <T extends LooseObject>(filtering: ColumnFilteringProperties) {
+ColumnOptionsBuilder.prototype.WithDefaultFilters = function <T>(filtering: ColumnFilteringProperties) {
 	return this
 		.SetColumnProp("filtering", filtering) as ColumnOptionsBuilder<T>;
 }

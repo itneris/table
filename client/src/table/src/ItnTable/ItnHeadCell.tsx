@@ -1,13 +1,14 @@
 import { HelpOutline } from '@mui/icons-material';
 import { Badge, TableCell, TableSortLabel, Tooltip } from '@mui/material';
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { SortProperties } from '../props/SortProperties';
-import { saveState, TableContext } from './Table';
 import { SET_SORT } from './tableReducer';
+import { useTableContext } from '../context/TableContext';
+import saveState from '../utils/saveState';
 
-function ItnHeadCell(props: { column: ColumnDescription }) {
-    const tableCtx = useContext(TableContext)!;
+function ItnHeadCell<T>(props: { column: ColumnDescription<T> }) {
+    const tableCtx = useTableContext<T>();
 
     const sortIndex = useMemo(() => {
         return (tableCtx.sorting ?? []).map(_ => _.column).indexOf(props.column.property);

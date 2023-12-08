@@ -1,10 +1,11 @@
 import { TablePagination } from '@mui/material';
-import React, { useCallback, useContext } from 'react';
-import { saveState, TableContext } from './Table';
+import React, { useCallback } from 'react';
 import { SET_PAGE, SET_ROWS_PER_PAGE } from './tableReducer';
+import { useTableContext } from '../context/TableContext';
+import saveState from '../utils/saveState';
 
-function ItnTablePagination() {
-    const tableCtx = useContext(TableContext)!;
+function ItnTablePagination<T>() {
+    const tableCtx = useTableContext<T>();
 
     const hanlePageChange = useCallback((page: number) => {
         tableCtx.dispatch({ type: SET_PAGE, page });
@@ -32,8 +33,12 @@ function ItnTablePagination() {
             labelRowsPerPage={tableCtx.pageSizeOptionsText}
             labelDisplayedRows={tableCtx.pageLabelText}
             page={tableCtx.page}
-            backIconButtonProps={{ 'aria-label': tableCtx.prevPageText }}
-            nextIconButtonProps={{ 'aria-label': tableCtx.nextPageText }}
+            slotProps={{
+                actions: {
+                    nextButton: { 'aria-label': tableCtx.nextPageText },
+                    previousButton: { 'aria-label': tableCtx.prevPageText }
+                }
+            }}
             onPageChange={(event, page) => hanlePageChange(page)}
             onRowsPerPageChange={hanlePageSizeChange}
         />

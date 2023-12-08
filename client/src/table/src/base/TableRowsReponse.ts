@@ -1,6 +1,4 @@
-import { LooseObject } from "./LooseObject";
-
-export interface TableRowsReponse {
-    rows: Array<LooseObject>;
+export interface TableRowsReponse<T> {
+    rows: Array<T>;
     total: number;
 }

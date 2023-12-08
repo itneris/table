@@ -1,14 +1,9 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query';
-import { AxiosError, AxiosResponse } from 'axios';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { ITableRef } from '../base/ITableRef';
-import { LooseObject } from '../base/LooseObject';
-import { TableRowsReponse } from '../base/TableRowsReponse';
-import { FilterProperties } from '../props/FilterProperties';
 import { FilterValueProperties } from '../props/FilterValueProperties';
-import { ITableContext } from '../props/ITableContext';
 import { ITableProperties } from '../props/ITableProperties';
 import { SortProperties } from '../props/SortProperties';
 import { TableQueryState } from '../props/TableQueryState';
@@ -21,6 +16,10 @@ import TableFilter from './TableFilter';
 import TablePanelFilterValue from './TablePanelFilterValue';
 import { RESET_SELECTED_ROWS, SET_FILTERS, SET_SELECTED_ROWS, SET_SORT, SET_STATE, tableReducer } from './tableReducer';
 import TableToolbar from './TableToolbar';
+import getTableInitState from '../utils/getTableInitState';
+import saveState from '../utils/saveState';
+import { TableRowsReponse } from '../base/TableRowsReponse';
+import { createTableContext } from '../context/TableContext';
 
 /*const usePrevious = (value, initialValue) => {
     const ref = useRef(initialValue);
@@ -55,109 +54,99 @@ const useEffectDebugger = (effectHook, dependencies, dependencyNames = []) => {
     useEffect(effectHook, dependencies);
 };*/
 
-
-export const TableContext = React.createContext<ITableContext | null>(null);
-
-/*const ItnTable = forwardRef(<T,>(props: TableProperties<T>, ref: React.ForwardedRef<any>) => {
-    useImperativeHandle(ref, () => ({
-        fetch() {
-            queryRows.refetch();
-        },
-        getData() {
-            return rows;
-        },
-        getState(): TableState {
-            return table;
-        }
-    }));*/
-
-export const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            retry: false,
-            refetchOnWindowFocus: false,
-        }
-    }
-});
-
-const ItnTableWrapper = forwardRef<ITableRef, ITableProperties>((props, ref) => {
-    return <QueryClientProvider client={props.queryClient ?? queryClient} contextSharing>
-        <ItnTable {...props} ref={ref}/>
-    </QueryClientProvider>;
-});
-
-const getTableInitState = (props: ITableProperties) => {
-    let propsState = {
-        filtering: props.filtering,
-        searching: props.searching,
-        sorting: props.sorting,
-        pageSize: props.pageSize,
-        page: props.page,
-        selectedRows: props.selectedRows
-    } as TableState;
-
-    if (!props.saveState) {
-        return propsState;
-    } else {
-        let tableState: any;
-        if (props.saveState.type === "storage" && localStorage.getItem(props.saveState.name)) {
-            tableState = JSON.parse(localStorage.getItem(props.saveState.name)!);
-        } else if (props.saveState.type === "session" && sessionStorage.getItem(props.saveState.name)) {
-            tableState = JSON.parse(sessionStorage.getItem(props.saveState.name)!);
-        }
-
-        if (tableState) {
-            return {
-                filtering: tableState.filtering ?? props.filtering,
-                searching: tableState.searching ?? props.searching,
-                sorting: tableState.sorting ?? props.sorting,
-                pageSize: tableState.pageSize ?? props.pageSize,
-                page: tableState.page ?? props.page,
-                selectedRows: props.selectedRows
-            } as TableState;
-        } else {
-            return propsState;
-        }
-    }
+declare module "react" {
+    function forwardRef<T, P = {}>(
+        render: (props: P, ref: React.Ref<T>) => React.ReactNode | null
+    ): (props: P & React.RefAttributes<T>) => React.ReactNode | null;
 }
 
-export const saveState = (saveState: { type: "storage" | "session", name: string } | null, propChangeCallback: ((storageState: any) => any)) => {
-    if (!saveState) {
-        return;
-    }
 
-    let tableStateJson = localStorage.getItem(saveState.name) ??
-        sessionStorage.getItem(saveState.name);
+function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<ITableRef<T>>) {
+    const {
+        apiUrl = null,
+        idField = ("id" as keyof T),
+        disableQueryFilters = false,
 
-    let tableState = tableStateJson ? JSON.parse(tableStateJson) : {};
-    tableState = propChangeCallback(tableState);
+        title = null,
+        dense = false,
 
-    if (saveState.type === "storage") {
-        localStorage.setItem(saveState.name, JSON.stringify(tableState));
-    } else {
-        sessionStorage.setItem(saveState.name, JSON.stringify(tableState));
-    }
-};
+        toolbarAdornment = null,
 
-const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
+        downloadProperties = null,
+
+        noDataMessage = "Нет данных для отображения",
+        loadingMessage = "Загрузка...",
+        searchTooltipText = "Поиск",
+        resetSearchTooltipText = "Сбросить поиск",
+        filterTooltipText = "Фильтры",
+        //filterText = "Фильтры",
+        hideColumnToolipText = "Отображение колонок",
+        columnsText = "Колонки",
+        filtersResetText = "Сбросить",
+        filtersMinPlaceHolder = "минимум",
+        filtersMaxPlaceHolder = "максимум",
+        dateParseRE = /^\d{4}-\d{2}-\d{2}T\d{2} =\d{2} =\d{2}.*$/,
+
+        enableHideColumns = false,
+
+        disableSearch = false,
+        onSearchingChange = null,
+        onSortingChange = null,
+        onFilteringChange = null,
+        filters: propFilters = null,
+        filterNoOptionsText = "Ничего не найдено",
+        filterClearText = "Очистить поиск",
+        filterCloseText = "Свернуть",
+        filterOpenText = "Развернуть",
+        filterAllText = "Все",
+        filterSelectValuesText = "Выбрано значений",
+        downloadTooltipText = "Скачать",
+
+        disablePaging = false,
+        pageSizeOptions = [10, 25, 50, 100],
+        pageSizeOptionsText = "Строк на странице",
+        pageLabelText = ({ from, to, count }) => `${from}-${to} из ${count}`,
+        prevPageText = "Пред. страница",
+        nextPageText = "След. страница",
+
+        onDownload = null,
+        selectedRows = [],
+        onRowSelect = null,
+        onRowClick = null,
+        enableRowsSelection = false,
+
+        saveState: propSaveState = null,
+        columnsBuilder,
+        mutateRows
+    } = props;
+
     const [table, dispatch] = useReducer(tableReducer, getTableInitState(props));
+    const queryClient = useQueryClient();
 
     useImperativeHandle(ref, () => ({
         fetch() {
-            queryRows.refetch();
+            tableDataQuery.refetch();
         },
         getData() {
-            return rows;
+            return tableData.rows;
         },
-        setData(rows) {
-            setRows(rows);
+        setData(rows: T[]) {
+            queryClient.setQueryData([apiUrl, 'list', queryOptions], (oldData: TableRowsReponse<T> | undefined) => {
+                if (!oldData) {
+                    return oldData;
+                }
+                return {
+                    ...oldData,
+                    rows
+                }
+            });
         },
         getState(): TableState {
             return table;
         },
         setState(state: TableState) {
             dispatch({ type: SET_STATE, state });
-            saveState(props.saveState ?? null, () => {
+            saveState(propSaveState, () => {
                 return state;
             });
         },
@@ -170,17 +159,12 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         setSelectedRows(ids: string[]) {
             dispatch({ type: SET_SELECTED_ROWS, selectedRows: ids });
         }
-    }))
+    }));
 
     const [ctrlIsClicked, setCtrlIsClicked] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [errorLoading, setErrorLoading] = useState<string | null>(null); 
-    const [rows, setRows] = useState<Array<LooseObject>>([]);
-    const [filters, setFilters] = useState<Array<FilterProperties>>([]);
-    const [total, setTotal] = useState<number>(0);
-    const [columns, setColumns] = useState<Array<ColumnDescription>>([]);
+    const [columns, setColumns] = useState<Array<ColumnDescription<T>>>([]);
 
-    const changeColumns = useCallback((newColumns: Array<ColumnDescription>) => setColumns(newColumns), []);
+    const changeColumns = useCallback((newColumns: Array<ColumnDescription<T>>) => setColumns(newColumns), []);
 
     //INITIAL LOAD
     useEffect(() => {
@@ -190,8 +174,6 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         window.addEventListener("keydown", EventCtlrClicked);
         window.addEventListener("keyup", EventCtlrUnclicked);
 
-        setIsLoading(props.apiUrl !== null);
-
         return () => {
             window.removeEventListener("keydown", EventCtlrClicked);
             window.removeEventListener("keyup", EventCtlrUnclicked);
@@ -199,7 +181,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
-        const newColumns = props.columnsBuilder.Build();
+        const newColumns = columnsBuilder.Build();
         const initTableState = getTableInitState(props);
 
         setColumns(newColumns);
@@ -218,7 +200,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
             } as FilterValueProperties));
 
         dispatch({ type: SET_FILTERS, filtering: [...(initTableState.filtering ?? []), ...defaultFiltering], isInit: true });
-    }, [props.columnsBuilder, setColumns]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [columnsBuilder, setColumns]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
 
@@ -232,56 +214,37 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
         } as TableQueryState
     }, [table]);
 
+    const queryFn = useMemo(() => {
+        return getRows(apiUrl ?? "", queryOptions, mutateRows);
+    }, [apiUrl, queryOptions, mutateRows]);
 
-    const queryRows = useQuery<AxiosResponse<TableRowsReponse>, AxiosError>(
-        [props.apiUrl, 'list', queryOptions],
-        getRows(props.apiUrl ?? "", queryOptions),
-        {
-            enabled: props.apiUrl !== null && columns.length > 0,
-            onError: (err) => {
-                setErrorLoading(`Ошибка загрузки данных: ${err.message}`);
-            },
-            onSuccess: (response) => {
-                setErrorLoading(null);
-                setRows(props.mutateRows ? response.data.rows.map(props.mutateRows) : response.data.rows);
-                setTotal(response.data.total);
-            },
-            onSettled: () => {
-                setIsLoading(false);
-            }
-        }
-    );
 
-    useEffect(() => {
-        setIsLoading(queryRows.isFetching);
-    }, [queryRows.isFetching]);
+    const { data: tableData, ...tableDataQuery } = useQuery({
+        queryKey: [apiUrl, 'list', queryOptions],
+        queryFn: queryFn,
+        initialData: { rows: [], total: 0 },
+        enabled: apiUrl !== null && columns.length > 0
+    });
 
-    useEffect(() => {
-        if (props.filters) {
-            setFilters(props.filters);
-        }
-    }, [props.filters]);
+    const queryFiltersFn = useMemo(() => {
+        return getFilters(apiUrl ?? "");
+    }, [apiUrl]);
+
+    const { data: filters } = useQuery({
+        queryKey: [apiUrl, 'filters'],
+        queryFn: queryFiltersFn,
+        initialData: propFilters ?? [],
+        enabled: apiUrl != null && propFilters == null && !disableQueryFilters,
+    });
 
     useEffect(() => {
-        if (props.selectedRows) {
-            dispatch({ type: SET_SELECTED_ROWS, selectedRows: props.selectedRows });
+        if (selectedRows) {
+            dispatch({ type: SET_SELECTED_ROWS, selectedRows });
         }
-    }, [props.selectedRows]);
+    }, [selectedRows]);
 
-    useQuery<AxiosResponse<FilterProperties[]>, AxiosError>(
-        [props.apiUrl, 'filters'],
-        getFilters(props.apiUrl ?? ""),
-        {
-            enabled: props.apiUrl != null && props.filters == null && !props.disableQueryFilters,
-            onSuccess: (response) => {
-                setFilters(response.data);
-            }
-        }
-    );
-
-    const downloadMutation = useMutation(getFileFromServer, {
-        onMutate: () => setIsLoading(true),
-        onSettled: () => setIsLoading(false),
+    const { mutate: downloadMutate, ...downloadMutation } = useMutation({
+        mutationFn: getFileFromServer,
         onSuccess: (file) => {
             const url = URL.createObjectURL(file);
             let downloadLink = document.createElement("a");
@@ -294,110 +257,140 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
     });
 
     //useEffectDebugger(() => {
-    useEffect(() => {
-        if (props.apiUrl && columns.length > 0) {
-            queryRows.refetch();
+    /*useEffect(() => {
+        if (apiUrl && columns.length > 0) {
+            tableDataQuery.refetch();
             return;
         }
     }, [ // eslint-disable-line react-hooks/exhaustive-deps
         columns,
-        props.apiUrl,
-        props.disablePaging,
+        apiUrl,
+        disablePaging,
         //table.filtering,
         //table.pageSize,
         //table.searching,
         //table.sorting,
         //table.page,
-    ]);
+    ]);*/
 
     const handleDownload = useCallback(() => {
-        if (props.onDownload) {
-            props.onDownload(table);
+        if (onDownload) {
+            onDownload(table);
             return;
         }
 
-        downloadMutation.mutate({
-            downloadProperties: props.downloadProperties!,
+        downloadMutate({
+            downloadProperties: downloadProperties!,
             state: table,
-            url: props.apiUrl!
+            url: apiUrl!
         });
-    }, [props, table, downloadMutation]);
-    /*useEffect(() => {
-        dispatch({ type: SET_SORT, sorting: props.sorting });
-    }, [props.sorting]);
+    }, [apiUrl, downloadProperties, table, downloadMutate, onDownload]);
 
-    useEffect(() => {
-        dispatch({ type: SET_FILTERS, filtering: props.filtering ?? [] });
-    }, [props.filtering]);*/
+    const hasToolbar = useMemo(() => {
+        return title ||
+            !disableSearch ||
+            onDownload !== null ||
+            filters.filter(f => f.inToolbar).length > 0 ||
+            downloadProperties !== null
+    }, [title, onDownload, disableSearch, filters, downloadProperties]);
 
-    /*useEffect(() => {
-        dispatch({
-            type: SET_SELECT,
-            selectedRows: props.selectedRows!.map(row => {
-                if (typeof (row) === "string") {
-                    return row;
-                } else {
-                    return row[props.idField!];
-                }
-            })
-        });
-    }, [props.selectedRows, props.idField]);*/
+    const contextValue = useMemo(() => {
+        return {
+            searching: table.searching,
+            dispatch: dispatch,
+            disableSearch: disableSearch,
+            title: title,
+            onSearchingChange: onSearchingChange,
+            resetSearchTooltipText: resetSearchTooltipText,
+            filters: filters,
+            filtering: table.filtering,
+            onFilteringChange: onFilteringChange,
+            columns: columns,
+            toolbarAdornment: toolbarAdornment,
+            searchTooltipText: searchTooltipText,
+            enableHideColumns: enableHideColumns,
+            hideColumnToolipText: hideColumnToolipText,
+            columnsText: columnsText,
+            changeColumns,
+            filterTooltipText: filterTooltipText,
+            filtersResetText: filtersResetText,
+            filtersMinPlaceHolder: filtersMinPlaceHolder,
+            filtersMaxPlaceHolder: filtersMaxPlaceHolder,
+            filterClearText: filterClearText,
+            filterCloseText: filterCloseText,
+            filterOpenText: filterOpenText,
+            filterNoOptionsText: filterNoOptionsText,
+            filterAllText: filterAllText,
+            filterSelectValuesText: filterSelectValuesText,
+            downloadTooltipText: downloadTooltipText,
+            sorting: table.sorting,
+            ctrlIsClicked: ctrlIsClicked,
+            onSortingChange: onSortingChange,
+            onRowClick: onRowClick,
+            idField: idField,
+            pageSize: table.pageSize,
+            page: table.page,
+            total: tableData.total,
+            dateParseRE: dateParseRE,
+            pageSizeOptions: pageSizeOptions,
+            pageSizeOptionsText: pageSizeOptionsText,
+            nextPageText: nextPageText,
+            pageLabelText: pageLabelText,
+            prevPageText: prevPageText,
+            enableRowsSelection: enableRowsSelection,
+            onRowSelect: onRowSelect,
+            selectedRows: table.selectedRows,
+            rows: tableData.rows,
+            saveState: propSaveState,
+            onDownload: onDownload || downloadProperties ? handleDownload : null
+        }
+    }, [
+        tableData,
+        table,
+        changeColumns,
+        columns,
+        ctrlIsClicked,
+        filters,
+        handleDownload,
+        columnsText,
+        dateParseRE,
+        disableSearch,
+        downloadProperties,
+        downloadTooltipText,
+        enableHideColumns,
+        enableRowsSelection, 
+        filterAllText,
+        filterClearText,
+        filterCloseText,
+        filterNoOptionsText,
+        filterOpenText,
+        filterSelectValuesText,
+        filterTooltipText,
+        filtersMaxPlaceHolder,
+        filtersMinPlaceHolder,
+        filtersResetText,
+        hideColumnToolipText,
+        idField,
+        nextPageText,
+        onDownload,
+        onFilteringChange,
+        onRowClick,
+        onRowSelect,
+        onSearchingChange,
+        onSortingChange,
+        pageLabelText,
+        pageSizeOptions,
+        pageSizeOptionsText,
+        prevPageText,
+        propSaveState,
+        resetSearchTooltipText,
+        searchTooltipText,
+        title,
+        toolbarAdornment
+    ]);
 
-    const hasToolbar = props.title ||
-        !props.disableSearch ||
-        props.onDownload !== null ||
-        filters.filter(f => f.inToolbar).length > 0 ||
-        props.downloadProperties !== null;
 
-    const contextValue: ITableContext = {
-        searching: table.searching,
-        dispatch: dispatch,
-        disableSearch: props.disableSearch!,
-        title: props.title!,
-        onSearchingChange: props.onSearchingChange!,
-        resetSearchTooltipText: props.resetSearchTooltipText!,
-        filters: filters,
-        filtering: table.filtering,
-        onFilteringChange: props.onFilteringChange!,
-        columns: columns,
-        toolbarAdornment: props.toolbarAdornment,
-        searchTooltipText: props.searchTooltipText!,
-        enableHideColumns: props.enableHideColumns!,
-        hideColumnToolipText: props.hideColumnToolipText!,
-        columnsText: props.columnsText!,
-        changeColumns: changeColumns,
-        filterTooltipText: props.filterTooltipText!,
-        filtersResetText: props.filtersResetText!,
-        filtersMinPlaceHolder: props.filtersMinPlaceHolder!,
-        filtersMaxPlaceHolder: props.filtersMaxPlaceHolder!,
-        filterClearText: props.filterClearText!,
-        filterCloseText: props.filterCloseText!,
-        filterOpenText: props.filterOpenText!,
-        filterNoOptionsText: props.filterNoOptionsText!,
-        filterAllText: props.filterAllText!,
-        filterSelectValuesText: props.filterSelectValuesText!,
-        downloadTooltipText: props.downloadTooltipText!,
-        sorting: table.sorting,
-        ctrlIsClicked: ctrlIsClicked,
-        onSortingChange: props.onSortingChange!,
-        onRowClick: props.onRowClick!,
-        idField: props.idField!,
-        pageSize: table.pageSize!,
-        page: table.page,
-        total: total,
-        dateParseRE: props.dateParseRE!,
-        pageSizeOptions: props.pageSizeOptions!,
-        pageSizeOptionsText: props.pageSizeOptionsText!,
-        nextPageText: props.nextPageText!,
-        pageLabelText: props.pageLabelText!,
-        prevPageText: props.prevPageText!,
-        enableRowsSelection: props.enableRowsSelection,
-        onRowSelect: props.onRowSelect,
-        selectedRows: table.selectedRows!,
-        rows: rows,
-        saveState: props.saveState ?? null,
-        onDownload: props.onDownload || props.downloadProperties ? handleDownload : null
-    };
+    const TableContext = useMemo(() => createTableContext<T>(), []);
 
     return (
         <Paper>
@@ -422,7 +415,7 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                     </Box>
                 }
                 {
-                    ((props.title != null || !props.disableSearch) && (table.filtering ?? []).length > 0) &&
+                    ((title != null || !disableSearch) && (table.filtering ?? []).length > 0) &&
                     <Box display="flex" ml={2} flexWrap="wrap" gap={2}>
                         {
                             table.filtering.map(f => <TablePanelFilterValue key={"col-" + f.column} filter={f} />)
@@ -431,10 +424,10 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                 }
                 <Box /*style={{ maxHeight: `calc(100vh - ${maxHeight}px)` }}*/ overflow="auto">
                     <Box sx={{ width: "100%", height: 4 }}>
-                        {isLoading && <LinearProgress color="secondary" />}
+                        {(tableDataQuery.isFetching || downloadMutation.isPending) && <LinearProgress color="secondary" />}
                     </Box>
                     <Table
-                        size={props.dense ? "small" : "medium"}
+                        size={dense ? "small" : "medium"}
                     /*style={{
                         minWidth: minWidth,
                         overflowX: overflow ? "auto" : undefined,
@@ -447,25 +440,25 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                         </TableHead>
                         <TableBody>
                             {
-                                errorLoading !== null ? <TableRow>
+                                tableDataQuery.isError ? <TableRow>
                                         <TableCell
                                             colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
                                             style={{ textAlign: "center" }}//, height: 36 }}
                                         >
-                                            {errorLoading}
+                                            Ошибка загрузки данных: {tableDataQuery.error.message}
                                         </TableCell>
                                     </TableRow> :
-                                    rows.length === 0 ?
+                                    tableData.rows.length === 0 ?
                                         <TableRow>
                                             <TableCell
                                                 colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
                                                 style={{ textAlign: "center" }}//, height: 36 }}
                                             >
-                                                {isLoading ? props.loadingMessage : props.noDataMessage}
+                                                {tableDataQuery.isLoading ? loadingMessage : noDataMessage}
                                             </TableCell>
                                         </TableRow> :
-                                        rows.map((row) => {
-                                            const idProp = props.idField as keyof typeof row;
+                                        tableData.rows.map((row) => {
+                                            const idProp = idField as keyof typeof row;
                                             return <ItnTableRow row={row} key={`row-${row[idProp]}`} />;
                                         })
                             }
@@ -473,71 +466,13 @@ const ItnTable = forwardRef<ITableRef, ITableProperties>((props, ref) => {
                     </Table>
                 </Box>
                 {
-                    (!props.disablePaging && queryRows.isFetched) &&
+                    (!disablePaging && tableDataQuery.isFetched) &&
                     <ItnTablePagination />
                 }
             </TableContext.Provider>
         </Paper>
     );
-});
+};
 
-ItnTable.defaultProps = {
-    apiUrl: null,
-    idField: "id",
-    disableQueryFilters: false,
-
-    title: null,
-    dense: false,
-
-    toolbarAdornment: null,
-
-    downloadProperties: null,
-
-    noDataMessage: "Нет данных для отображения",
-    loadingMessage: "Загрузка...",
-    searchTooltipText: "Поиск",
-    resetSearchTooltipText: "Сбросить поиск",
-    filterTooltipText: "Фильтры",
-    filterText: "Фильтры",
-    hideColumnToolipText: "Отображение колонок",
-    columnsText: "Колонки",
-    filtersResetText: "Сбросить",
-    filtersMinPlaceHolder: "минимум",
-    filtersMaxPlaceHolder: "максимум",
-    dateParseRE: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*$/,
-
-    enableHideColumns: false,
-
-    disableSearch: false,
-    searching: "",
-    onSearchingChange: null,
-    onSortingChange: null,
-    onFilteringChange: null,
-    filters: null,
-    filterNoOptionsText: "Ничего не найдено",
-    filterClearText: "Очистить поиск",
-    filterCloseText: "Свернуть",
-    filterOpenText: "Развернуть",
-    filterAllText: "Все",
-    filterSelectValuesText: "Выбрано значений",
-    downloadTooltipText: "Скачать",
-
-    disablePaging: false,
-    pageSize: 10,
-    pageSizeOptions: [10, 25, 50, 100],
-    page: 0,
-    pageSizeOptionsText: "Строк на странице",
-    pageLabelText: ({ from, to, count }) => `${from}-${to} из ${count}`,
-    prevPageText: "Пред. страница",
-    nextPageText: "След. страница",
-
-    onDownload: null,
-    selectedRows: [],
-    onRowSelect: null,
-    onRowClick: null,
-    enableRowsSelection: false,
-
-    saveState: null
-}
-
-export default ItnTableWrapper;
+const ItnTable = forwardRef(ItnTableInner);
+export default ItnTable;
