@@ -244,7 +244,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
     }, [selectedRows]);
 
     const { mutate: downloadMutate, ...downloadMutation } = useMutation({
-        mutationFn: getFileFromServer,
+        mutationFn: getFileFromServer,        
         onSuccess: (file) => {
             const url = URL.createObjectURL(file);
             let downloadLink = document.createElement("a");

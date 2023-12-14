@@ -66,9 +66,11 @@ function TableSearchInner<T>(props: { setShowSearch: (show: boolean) => void }, 
                 onKeyUp={handleSearchKeyUp}
                 onChange={handleSearchChange}
                 InputProps={{
-                    startAdornment: <Search sx={{ color: "rgba(0, 0, 0, 0.54)", marginRight: "8px" }} />
+                    startAdornment: <Search sx={{ opacity: 0.54, mr: 2 }} />
                 }}
                 size="small"
+                autoComplete="off"
+                name="t-search"
                 //TODO ADD SEARCH INPUT PROPS
                 //{...props.searchProps}
             />
