@@ -5,6 +5,7 @@ import { FilterProperties } from "./FilterProperties";
 import { FilterValueProperties } from "./FilterValueProperties";
 import { SortProperties } from "./SortProperties";
 import { TableState } from "./TableState";
+import { QueryClient } from "@tanstack/react-query";
 
 export interface ITableProperties<T> {
     /**
