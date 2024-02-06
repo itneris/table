@@ -58,6 +58,8 @@ export default function TestComnonent() {
     const [tab, setTab] = useState(0);
     const [api, setApi] = useState("api/test");
 
+    const [selectedRows, setSelectedRows] = useState<string[]>(["1", "2"]);
+
     //const changeFilters = filters => localStorage.setItem("filters", JSON.stringify(filters));
     //const changeSearch = search => localStorage.setItem("search", search);
     //const changeSorting = sorting => localStorage.setItem("sorting", JSON.stringify(sorting));
@@ -129,9 +131,9 @@ export default function TestComnonent() {
                     apiUrl={api}
                     onRowClick={() => console.log('row click')}
                     columnsBuilder={serverColumnBuilder}
-                    enableRowsSelection={enableSelect ? (row => row.name !== "Beer" && false) : false}
-                    onRowSelect={(rows) => console.log(rows)}
-                    selectedRows={!enableSelect ? [] : ['1', '2']}
+                    enableRowsSelection={enableSelect ? (row => row.name !== "Beer") : false}
+                    //onRowSelect={(rows) => { console.log(rows); setSelectedRows(rows); }}
+                    //selectedRows={!enableSelect ? [] : selectedRows}
                     downloadProperties={{ useState: false }}
                 />
             </>

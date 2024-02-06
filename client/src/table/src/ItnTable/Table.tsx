@@ -110,7 +110,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         nextPageText = "След. страница",
 
         onDownload = null,
-        selectedRows = [],
+        selectedRows = null,
         onRowSelect = null,
         onRowClick = null,
         enableRowsSelection = false,
