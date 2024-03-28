@@ -85,7 +85,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         filtersResetText = "Сбросить",
         filtersMinPlaceHolder = "минимум",
         filtersMaxPlaceHolder = "максимум",
-        dateParseRE = /^\d{4}-\d{2}-\d{2}T\d{2} =\d{2} =\d{2}.*$/,
+        dateParseRE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*$/,
 
         enableHideColumns = false,
 
