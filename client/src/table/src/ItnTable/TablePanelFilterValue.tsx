@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Box, Chip, Typography } from '@mui/material';
 import { FilterValueProperties } from '../props/FilterValueProperties';
 import { SET_FILTERS } from './tableReducer';
-import { format } from 'date-fns/esm';
+import { format } from 'date-fns';
 import { FilterType } from '../props/FilterType';
 import { useTableContext } from '../context/TableContext';
 import saveState from '../utils/saveState';
