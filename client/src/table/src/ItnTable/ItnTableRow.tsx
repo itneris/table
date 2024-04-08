@@ -5,7 +5,7 @@ import { useTableContext } from '../context/TableContext';
 import { SET_SELECTED_ROWS } from './tableReducer';
 
 function ItnTableRow<T>(props: { row: T }) {
-    const { columns, idField, selectedRows, onRowSelect, rows, dispatch, onRowClick, enableRowsSelection } = useTableContext<T>();
+    const { columns, idField, selectedRows, onRowSelect, dispatch, onRowClick, enableRowsSelection } = useTableContext<T>();
 
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
     const idProp = idField!;
@@ -15,16 +15,18 @@ function ItnTableRow<T>(props: { row: T }) {
         return selectedRows.find(r => r === props.row[idProp]) !== undefined
     }, [selectedRows, idProp, props.row]);
 
-    const handleSelectRow = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSelectRow = (e: React.ChangeEvent<HTMLInputElement>) => {
         let selection: string[] = [...selectedRows];
+
         if (selectedRows.find(r => r === props.row[idProp]) === undefined) {
             selection.push(props.row[idProp] as string);
         } else {
             selection = selection.filter(r => r !== props.row[idProp]);
         }
+
         dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        onRowSelect && onRowSelect(selection);
-    }, [selectedRows, dispatch, rows, idProp, props.row, onRowSelect]); // eslint-disable-line react-hooks/exhaustive-deps
+        onRowSelect && onRowSelect([props.row]);
+    };
 
     const handleRowClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {
         if ((e.target as any).nodeName === "INPUT") {

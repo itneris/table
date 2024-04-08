@@ -27,7 +27,7 @@ function ItnTableHeader<T>() {
         return allAbailableRowsSelected && selectedRows.length > 0;
     }, [rows, selectedRows, idField, canRowBeSelected]);
 
-    const handleSelectAll = useCallback(() => {
+    const handleSelectAll = () => {
         let selection: string[] = [...selectedRows];
         if (isPageChecked) {
             selection = selection.filter(sel => rows.find(row => row[idField!] === sel && canRowBeSelected(row)) === undefined);
@@ -40,16 +40,8 @@ function ItnTableHeader<T>() {
             ];
         }
         dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        onRowSelect && onRowSelect(selection);
-    }, [
-        selectedRows,
-        dispatch,
-        rows,
-        idField,
-        onRowSelect,
-        isPageChecked,
-        canRowBeSelected
-    ]);
+        onRowSelect && onRowSelect(rows);
+    };
 
     return (
         <TableRow>

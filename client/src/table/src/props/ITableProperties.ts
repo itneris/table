@@ -285,7 +285,7 @@ export interface ITableProperties<T> {
      * Function params:
      *      rows: Array<T>, array of currently selected rows
     */
-    onRowSelect?: ((rows: Array<string>) => void) | null;
+    onRowSelect?: ((rows: Array<T>) => void) | null;
 
     /**
      * Callback when row click triggered
