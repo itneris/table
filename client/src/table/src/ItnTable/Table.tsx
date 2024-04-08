@@ -441,8 +441,8 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
                         <TableBody>
                             {
                                 tableDataQuery.isError ? <TableRow>
-                                        <TableCell
-                                            colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
+                                    <TableCell
+                                            colSpan={displayColumns.length + (enableRowsSelection ? 1 : 0)}// + (showRowNums ? 1 : 0) + (detailRow ? 1 : 0)}
                                             style={{ textAlign: "center" }}//, height: 36 }}
                                         >
                                             Ошибка загрузки данных: {tableDataQuery.error.message}
@@ -451,7 +451,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
                                     tableData.rows.length === 0 ?
                                         <TableRow>
                                             <TableCell
-                                                colSpan={displayColumns.length}// + (showRowNums ? 1 : 0) + (onRowSelect ? 1 : 0) + (detailRow ? 1 : 0)}
+                                                colSpan={displayColumns.length + (enableRowsSelection ? 1 : 0)}// + (showRowNums ? 1 : 0) + (detailRow ? 1 : 0)}
                                                 style={{ textAlign: "center" }}//, height: 36 }}
                                             >
                                                 {tableDataQuery.isLoading ? loadingMessage : noDataMessage}

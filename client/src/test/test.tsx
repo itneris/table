@@ -132,7 +132,7 @@ export default function TestComnonent() {
                     onRowClick={() => console.log('row click')}
                     columnsBuilder={serverColumnBuilder}
                     enableRowsSelection={enableSelect ? (row => row.name !== "Beer") : false}
-                    //onRowSelect={(rows) => { console.log(rows); setSelectedRows(rows); }}
+                    onRowSelect={(rows, sel) => { console.log(rows, sel); setSelectedRows(rows.map(r => r.id)); }}
                     //selectedRows={!enableSelect ? [] : selectedRows}
                     downloadProperties={{ useState: false }}
                 />

@@ -17,15 +17,18 @@ function ItnTableRow<T>(props: { row: T }) {
 
     const handleSelectRow = (e: React.ChangeEvent<HTMLInputElement>) => {
         let selection: string[] = [...selectedRows];
+        let isSelected: boolean;
 
         if (selectedRows.find(r => r === props.row[idProp]) === undefined) {
             selection.push(props.row[idProp] as string);
+            isSelected = true;
         } else {
             selection = selection.filter(r => r !== props.row[idProp]);
+            isSelected = false;
         }
 
         dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        onRowSelect && onRowSelect([props.row]);
+        onRowSelect && onRowSelect([props.row], isSelected);
     };
 
     const handleRowClick = useCallback((e: React.MouseEvent<HTMLTableRowElement>) => {

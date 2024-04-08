@@ -40,7 +40,7 @@ function ItnTableHeader<T>() {
             ];
         }
         dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        onRowSelect && onRowSelect(rows);
+        onRowSelect && onRowSelect(rows, isPageChecked);
     };
 
     return (
