@@ -1,6 +1,6 @@
 {
   "name": "@itneris/table",
-  "version": "3.0.6",
+  "version": "3.0.7",
   "description": "Custom ItNeris organization table based on MaterialUI",
   "main": "dist/index.js",
   "files": [
