@@ -60,6 +60,7 @@ declare module "react" {
     ): (props: P & React.RefAttributes<T>) => React.ReactNode | null;
 }
 
+const INITIAL_PAGE_OPTIONS = [10, 25, 50, 100];
 
 function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<ITableRef<T>>) {
     const {
@@ -103,7 +104,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         downloadTooltipText = "Скачать",
 
         disablePaging = false,
-        pageSizeOptions = [10, 25, 50, 100],
+        pageSizeOptions = INITIAL_PAGE_OPTIONS,
         pageSizeOptionsText = "Строк на странице",
         pageLabelText = ({ from, to, count }) => `${from}-${to} из ${count}`,
         prevPageText = "Пред. страница",

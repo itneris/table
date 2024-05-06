@@ -1,6 +1,8 @@
 import { ITableProperties } from "../props/ITableProperties";
 import { TableState } from "../props/TableState";
 
+const EMPTY_STRING_ARRAY = [] as string[];
+
 function getTableInitState<T>(props: ITableProperties<T>) {
     let propsState = {
         filtering: props.filtering,
@@ -8,7 +10,7 @@ function getTableInitState<T>(props: ITableProperties<T>) {
         sorting: props.sorting,
         pageSize: props.pageSize ?? 10,
         page: props.page ?? 0,
-        selectedRows: props.selectedRows ?? []
+        selectedRows: props.selectedRows ?? EMPTY_STRING_ARRAY
     } as TableState;
 
     if (!props.saveState) {
@@ -28,7 +30,7 @@ function getTableInitState<T>(props: ITableProperties<T>) {
                 sorting: tableState.sorting ?? props.sorting,
                 pageSize: tableState.pageSize ?? props.pageSize ?? 10,
                 page: tableState.page ?? props.page ?? 0,
-                selectedRows: props.selectedRows ?? []
+                selectedRows: props.selectedRows ?? EMPTY_STRING_ARRAY
             } as TableState;
         } else {
             return propsState;

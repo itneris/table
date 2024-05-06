@@ -126,6 +126,7 @@ export default function TestComnonent() {
                     </Typography>
                 </Box>
                 <ItnTable
+                    disableSearch
                     saveState={{ type: "storage", name: "test_table" }}
                     ref={serverTableRef}
                     apiUrl={api}
