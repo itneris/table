@@ -19,28 +19,34 @@ function ItnTableHeader<T>() {
     }, [enableRowsSelection])
 
     const isPageChecked = useMemo(() => {
-        const allAbailableRowsSelected = !rows
+        const allAvailableRowsSelected = !rows
             .some(row =>
                 selectedRows.find(select => select === row[idField!]) === undefined &&
                 canRowBeSelected(row)
             );
-        return allAbailableRowsSelected && selectedRows.length > 0;
+        return allAvailableRowsSelected && selectedRows.length > 0;
     }, [rows, selectedRows, idField, canRowBeSelected]);
 
     const handleSelectAll = () => {
         let selection: string[] = [...selectedRows];
         if (isPageChecked) {
-            selection = selection.filter(sel => rows.find(row => row[idField!] === sel && canRowBeSelected(row)) === undefined);
+            const unselectedRows = rows
+                .filter(row => canRowBeSelected(row));
+
+            selection = selection.filter(sel => !unselectedRows.some(row => row[idField!] === sel));
+
+            onRowSelect && onRowSelect(unselectedRows, false);
         } else {
+            const selectedRows = rows
+                .filter(row => !selection.some(sel => row[idField!] === sel) && canRowBeSelected(row));
+
             selection = [
                 ...selection,
-                ...rows
-                    .filter(row => selection.find(sel => row[idField!] === sel) === undefined && canRowBeSelected(row))
-                    .map(row => row[idField!] as string)
+                ...selectedRows.map(row => row[idField!]) as string[]
             ];
+            onRowSelect && onRowSelect(selectedRows, true);
         }
         dispatch({ type: SET_SELECTED_ROWS, selectedRows: selection });
-        onRowSelect && onRowSelect(rows, isPageChecked);
     };
 
     return (
