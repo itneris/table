@@ -63,7 +63,7 @@ const TableFilters = <T,>() => {
                 }}
             >
                 <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
-                    <Typography variant="body2">ФИЛЬТРЫ</Typography>
+                    <Typography variant="body2">{locale.filtering.filterText}</Typography>
                     <Button
                         variant="text"
                         color="secondary"
