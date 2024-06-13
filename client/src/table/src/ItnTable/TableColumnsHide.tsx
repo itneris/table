@@ -1,8 +1,9 @@
 import { ViewColumn } from '@mui/icons-material';
 import { Box, Checkbox, IconButton, Popover, Tooltip, Typography } from '@mui/material';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { useTableContext } from '../context/TableContext';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 function sortColumns<T>(a: ColumnDescription<T>, b: ColumnDescription<T>) {
     const nameA = a.displayName.toUpperCase();
@@ -18,6 +19,8 @@ function sortColumns<T>(a: ColumnDescription<T>, b: ColumnDescription<T>) {
 
 function TableColumnsHide<T>() {
     const tableCtx = useTableContext<T>();
+    const { locale } = useContext(ItnTableGlobalContext);
+
     const btn = useRef<HTMLButtonElement | null>(null);
 
     const [columnsOpen, setColumnsOpen] = useState<boolean>(false);
@@ -46,7 +49,7 @@ function TableColumnsHide<T>() {
 
     return (
         <>
-            <Tooltip title={tableCtx.hideColumnToolipText}>
+            <Tooltip title={locale.visibility.visibilityText}>
                 <IconButton ref={btn} onClick={handleBtnClick}>
                     <ViewColumn />
                 </IconButton>
@@ -63,7 +66,7 @@ function TableColumnsHide<T>() {
             >
                 <Box p={2} maxHeight={400} maxWidth={800} minWidth={200}>
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="body2">{tableCtx.columnsText}</Typography>
+                        <Typography variant="body2">{locale.visibility.columnsText}</Typography>
                     </Box>
                     {
                         tableCtx.columns

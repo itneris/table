@@ -10,7 +10,6 @@ function ItnTableRow<T>(props: { row: T }) {
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
     const idProp = idField!;
 
-
     const isRowChecked = useMemo(() => {
         return selectedRows.find(r => r === props.row[idProp]) !== undefined
     }, [selectedRows, idProp, props.row]);

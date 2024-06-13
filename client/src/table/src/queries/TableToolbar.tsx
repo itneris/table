@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { TableRowsReponse } from "../base/TableRowsReponse";
+import { TableRowsResponse } from "../base/TableRowsResponse";
 import { DownloadFileProperties } from "../props/DownloadFileProperties";
 import { FilterProperties } from "../props/FilterProperties";
 import { TableQueryState } from "../props/TableQueryState";
@@ -7,7 +7,7 @@ import { TableQueryState } from "../props/TableQueryState";
 export function getRows<T>(apiUrl: string, options: TableQueryState, changeRows?: (row: T) => T) {
     async function fetchRows() {
         const response = await axios.post(`${apiUrl}/List`, options);
-        const data = response.data as TableRowsReponse<T>;
+        const data = response.data as TableRowsResponse<T>;
         if (changeRows) {
             data.rows = data.rows.map(changeRows);
         }

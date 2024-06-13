@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Box, IconButton, TextField, Tooltip } from "@mui/material";
 import { RESET_SEARCH, SEARCH } from './tableReducer';
 import { Clear, Search } from '@mui/icons-material';
 import { useTableContext } from '../context/TableContext';
 import saveState from '../utils/saveState';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 const SEARCH_TIMEOUT = 400;
 
@@ -17,6 +18,7 @@ function TableSearchInner<T>(props: { setShowSearch: (show: boolean) => void }, 
     let timer = useRef<NodeJS.Timeout | null>(null);
 
     const tableCtx = useTableContext<T>();
+    const { locale } = useContext(ItnTableGlobalContext);
 
     const [currentSearch, setCurrentSearch] = useState<string>("");
 
@@ -76,7 +78,7 @@ function TableSearchInner<T>(props: { setShowSearch: (show: boolean) => void }, 
             />
             {
                 tableCtx.title &&
-                <Tooltip title={tableCtx.resetSearchTooltipText}>
+                <Tooltip title={locale.search.resetText}>
                     <IconButton onClick={() => resetSearch()}>
                         <Clear />
                     </IconButton>

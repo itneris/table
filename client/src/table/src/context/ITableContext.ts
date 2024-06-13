@@ -14,40 +14,21 @@ export interface ITableContext<T> {
 
     searching: string;
     disableSearch: boolean;
-    resetSearchTooltipText: string;
-    searchTooltipText: string;
     onSearchingChange: ((search: string) => void) | null;
 
     filters: Array<FilterProperties>;
     filtering?: Array<FilterValueProperties>;
     onFilteringChange: ((sorting: Array<FilterValueProperties>) => void) | null;
-    filterTooltipText: string;
-    filtersResetText: string;
-    filtersMinPlaceHolder: string;
-    filtersMaxPlaceHolder: string;
-    filterClearText: string;
-    filterCloseText: string;
-    filterOpenText: string;
-    filterNoOptionsText: string;
-    filterAllText: string;
-    filterSelectValuesText: string;
-    downloadTooltipText: string;
 
     sorting?: Array<SortProperties>;
     onSortingChange: ((sorting: Array<SortProperties>) => void) | null;
 
-    hideColumnToolipText: string;
-    columnsText: string;
     enableHideColumns: boolean;
 
     pageSize: number;
     pageSizeOptions: number[];
-    pageSizeOptionsText: string;
     page: number;
     total: number;
-    pageLabelText: ({ from, to, count }: { from: number, to: number, count: number }) => string;
-    prevPageText: string;
-    nextPageText: string;
 
     dispatch: React.Dispatch<any>;
 

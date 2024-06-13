@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { Box, Chip, Typography } from '@mui/material';
 import { FilterValueProperties } from '../props/FilterValueProperties';
 import { SET_FILTERS } from './tableReducer';
@@ -6,9 +6,12 @@ import { format } from 'date-fns';
 import { FilterType } from '../props/FilterType';
 import { useTableContext } from '../context/TableContext';
 import saveState from '../utils/saveState';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 const TablePanelFilterValue = <T,>(props: { filter: FilterValueProperties }) => {
     const tableCtx = useTableContext<T>();
+    const { locale } = useContext(ItnTableGlobalContext);
+
     const column = useMemo(() => tableCtx.columns.find(tc => tc.property === props.filter.column), [props.filter]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const deleteFilter = useCallback((value: string) => {
@@ -76,7 +79,7 @@ const TablePanelFilterValue = <T,>(props: { filter: FilterValueProperties }) => 
         switch (filter.type) {
             case FilterType.Bool:
                 return <Chip
-                    label={filter.checked ? 'Да' : 'Нет'}
+                    label={locale.formatters.bool(filter.checked)}
                     onDelete={() => deleteFilter('true')}
                 />;            
             case FilterType.Number:
@@ -84,14 +87,14 @@ const TablePanelFilterValue = <T,>(props: { filter: FilterValueProperties }) => 
                     {
                         filter.min &&
                         <Chip
-                            label={"Больше " + filter.min}
+                            label={locale.filtering.greaterThanText + " " + filter.min}
                             onDelete={() => deleteFilter('min')}
                         />
                     }
                     {
                         filter.max &&
                         <Chip
-                            label={"Меньше " + filter.max}
+                            label={locale.filtering.lessThanText + " " + filter.max}
                             onDelete={() => deleteFilter('max')}
                         />
                     }
@@ -101,14 +104,14 @@ const TablePanelFilterValue = <T,>(props: { filter: FilterValueProperties }) => 
                     {
                         filter.startDate &&
                         <Chip
-                            label={"Позже " + format(new Date(filter.startDate), 'dd.MM.yyyy')}
+                            label={locale.filtering.laterThanText + " " + locale.formatters.date(new Date(filter.startDate), false)}
                             onDelete={() => deleteFilter('start')}
                         />
                     }
                     {
                         filter.endDate &&
                         <Chip
-                            label={"Раньше " + format(new Date(filter.endDate), 'dd.MM.yyyy')}
+                        label={locale.filtering.earlierThanText + " " + locale.formatters.date(new Date(filter.endDate), false)}
                             onDelete={() => deleteFilter('end')}
                         />
                     }

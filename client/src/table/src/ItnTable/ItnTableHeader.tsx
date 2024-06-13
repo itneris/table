@@ -9,7 +9,6 @@ function ItnTableHeader<T>() {
 
     const displayColumns = useMemo(() => columns.filter(c => c.display && !c.systemHide), [columns]);
 
-
     const canRowBeSelected = useCallback((row: T) => {
         if (typeof (enableRowsSelection) !== "function") {
             return enableRowsSelection;

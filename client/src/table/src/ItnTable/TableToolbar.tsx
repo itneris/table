@@ -1,4 +1,4 @@
-import React, {  useRef, useState } from 'react';
+import React, {  useContext, useRef, useState } from 'react';
 import { Box, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { useTableContext } from '../context/TableContext';
 import { Search } from '@mui/icons-material';
@@ -7,10 +7,14 @@ import TablePanelFilterValue from './TablePanelFilterValue';
 import TableColumnsHide from './TableColumnsHide';
 import TableFilters from './TableFilters';
 import DownloadButton from './DownloadButton';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 const TableToolbar = <T,>() => {
     const searchInputRef = useRef<HTMLDivElement>(null);
+
     const tableCtx = useTableContext<T>();
+    const { locale } = useContext(ItnTableGlobalContext);
+
     const [showSearch, setShowSearch] = useState<boolean>(tableCtx.title != null ? tableCtx.searching !== "" : true);
 
     return (
@@ -43,7 +47,7 @@ const TableToolbar = <T,>() => {
                 {tableCtx.toolbarAdornment}
                 {
                     (!tableCtx.disableSearch && tableCtx.title) &&
-                    <Tooltip title={tableCtx.searchTooltipText}>
+                    <Tooltip title={locale.search.searchText}>
                         <IconButton onClick={() => { setShowSearch(true); searchInputRef.current?.focus() }}>
                             <Search color={showSearch ? "primary" : undefined} />
                         </IconButton>

@@ -1,6 +1,6 @@
 import { Box, LinearProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
+import React, { useReducer, useState, useMemo, useEffect, useCallback, useImperativeHandle, forwardRef, useContext } from 'react';
 import { ColumnDescription } from '../base/ColumnDescription';
 import { ITableRef } from '../base/ITableRef';
 import { FilterValueProperties } from '../props/FilterValueProperties';
@@ -18,8 +18,9 @@ import { RESET_SELECTED_ROWS, SET_FILTERS, SET_SELECTED_ROWS, SET_SORT, SET_STAT
 import TableToolbar from './TableToolbar';
 import getTableInitState from '../utils/getTableInitState';
 import saveState from '../utils/saveState';
-import { TableRowsReponse } from '../base/TableRowsReponse';
+import { TableRowsResponse } from '../base/TableRowsResponse';
 import { createTableContext } from '../context/TableContext';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 /*const usePrevious = (value, initialValue) => {
     const ref = useRef(initialValue);
@@ -32,11 +33,11 @@ import { createTableContext } from '../context/TableContext';
 const useEffectDebugger = (effectHook, dependencies, dependencyNames = []) => {
     const previousDeps = usePrevious(dependencies, []);
 
-    const changedDeps = dependencies.reduce((accum, dependency, index) => {
+    const changedDeps = dependencies.reduce((acc, dependency, index) => {
         if (dependency !== previousDeps[index]) {
             const keyName = dependencyNames[index] || index;
             return {
-                ...accum,
+                ...acc,
                 [keyName]: {
                     before: previousDeps[index],
                     after: dependency
@@ -44,7 +45,7 @@ const useEffectDebugger = (effectHook, dependencies, dependencyNames = []) => {
             };
         }
 
-        return accum;
+        return acc;
     }, {});
 
     if (Object.keys(changedDeps).length) {
@@ -72,20 +73,8 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         dense = false,
 
         toolbarAdornment = null,
-
         downloadProperties = null,
 
-        noDataMessage = "Нет данных для отображения",
-        loadingMessage = "Загрузка...",
-        searchTooltipText = "Поиск",
-        resetSearchTooltipText = "Сбросить поиск",
-        filterTooltipText = "Фильтры",
-        //filterText = "Фильтры",
-        hideColumnToolipText = "Отображение колонок",
-        columnsText = "Колонки",
-        filtersResetText = "Сбросить",
-        filtersMinPlaceHolder = "минимум",
-        filtersMaxPlaceHolder = "максимум",
         dateParseRE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*$/,
 
         enableHideColumns = false,
@@ -95,20 +84,9 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         onSortingChange = null,
         onFilteringChange = null,
         filters: propFilters = null,
-        filterNoOptionsText = "Ничего не найдено",
-        filterClearText = "Очистить поиск",
-        filterCloseText = "Свернуть",
-        filterOpenText = "Развернуть",
-        filterAllText = "Все",
-        filterSelectValuesText = "Выбрано значений",
-        downloadTooltipText = "Скачать",
 
         disablePaging = false,
         pageSizeOptions = INITIAL_PAGE_OPTIONS,
-        pageSizeOptionsText = "Строк на странице",
-        pageLabelText = ({ from, to, count }) => `${from}-${to} из ${count}`,
-        prevPageText = "Пред. страница",
-        nextPageText = "След. страница",
 
         onDownload = null,
         selectedRows = null,
@@ -121,6 +99,8 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         mutateRows
     } = props;
 
+    const { locale } = useContext(ItnTableGlobalContext);
+
     const [table, dispatch] = useReducer(tableReducer, getTableInitState(props));
     const queryClient = useQueryClient();
 
@@ -132,7 +112,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
             return tableData.rows;
         },
         setData(rows: T[]) {
-            queryClient.setQueryData([apiUrl, 'list', queryOptions], (oldData: TableRowsReponse<T> | undefined) => {
+            queryClient.setQueryData([apiUrl, 'list', queryOptions], (oldData: TableRowsResponse<T> | undefined) => {
                 if (!oldData) {
                     return oldData;
                 }
@@ -169,17 +149,17 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
 
     //INITIAL LOAD
     useEffect(() => {
-        function EventCtlrClicked(e: KeyboardEvent) { e.code === "ControlLeft" && setCtrlIsClicked(true) };
-        function EventCtlrUnclicked(e: KeyboardEvent) { e.code === "ControlLeft" && setCtrlIsClicked(false) };
+        function EventCtrlClicked(e: KeyboardEvent) { e.code === "ControlLeft" && setCtrlIsClicked(true) };
+        function EventCtrlBlurred(e: KeyboardEvent) { e.code === "ControlLeft" && setCtrlIsClicked(false) };
 
-        window.addEventListener("keydown", EventCtlrClicked);
-        window.addEventListener("keyup", EventCtlrUnclicked);
+        window.addEventListener("keydown", EventCtrlClicked);
+        window.addEventListener("keyup", EventCtrlBlurred);
 
         return () => {
-            window.removeEventListener("keydown", EventCtlrClicked);
-            window.removeEventListener("keyup", EventCtlrUnclicked);
+            window.removeEventListener("keydown", EventCtrlClicked);
+            window.removeEventListener("keyup", EventCtrlBlurred);
         };
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         const newColumns = columnsBuilder.Build();
@@ -302,28 +282,13 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
             disableSearch: disableSearch,
             title: title,
             onSearchingChange: onSearchingChange,
-            resetSearchTooltipText: resetSearchTooltipText,
             filters: filters,
             filtering: table.filtering,
             onFilteringChange: onFilteringChange,
             columns: columns,
             toolbarAdornment: toolbarAdornment,
-            searchTooltipText: searchTooltipText,
             enableHideColumns: enableHideColumns,
-            hideColumnToolipText: hideColumnToolipText,
-            columnsText: columnsText,
             changeColumns,
-            filterTooltipText: filterTooltipText,
-            filtersResetText: filtersResetText,
-            filtersMinPlaceHolder: filtersMinPlaceHolder,
-            filtersMaxPlaceHolder: filtersMaxPlaceHolder,
-            filterClearText: filterClearText,
-            filterCloseText: filterCloseText,
-            filterOpenText: filterOpenText,
-            filterNoOptionsText: filterNoOptionsText,
-            filterAllText: filterAllText,
-            filterSelectValuesText: filterSelectValuesText,
-            downloadTooltipText: downloadTooltipText,
             sorting: table.sorting,
             ctrlIsClicked: ctrlIsClicked,
             onSortingChange: onSortingChange,
@@ -334,10 +299,6 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
             total: tableData.total,
             dateParseRE: dateParseRE,
             pageSizeOptions: pageSizeOptions,
-            pageSizeOptionsText: pageSizeOptionsText,
-            nextPageText: nextPageText,
-            pageLabelText: pageLabelText,
-            prevPageText: prevPageText,
             enableRowsSelection: enableRowsSelection,
             onRowSelect: onRowSelect,
             selectedRows: table.selectedRows,
@@ -353,39 +314,20 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
         ctrlIsClicked,
         filters,
         handleDownload,
-        columnsText,
         dateParseRE,
         disableSearch,
         downloadProperties,
-        downloadTooltipText,
         enableHideColumns,
         enableRowsSelection, 
-        filterAllText,
-        filterClearText,
-        filterCloseText,
-        filterNoOptionsText,
-        filterOpenText,
-        filterSelectValuesText,
-        filterTooltipText,
-        filtersMaxPlaceHolder,
-        filtersMinPlaceHolder,
-        filtersResetText,
-        hideColumnToolipText,
         idField,
-        nextPageText,
         onDownload,
         onFilteringChange,
         onRowClick,
         onRowSelect,
         onSearchingChange,
         onSortingChange,
-        pageLabelText,
         pageSizeOptions,
-        pageSizeOptionsText,
-        prevPageText,
         propSaveState,
-        resetSearchTooltipText,
-        searchTooltipText,
         title,
         toolbarAdornment
     ]);
@@ -408,7 +350,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
                                 .filter(f => f.inToolbar)
                                 .map((filter, i) =>
                                     <TableFilter
-                                        key={"tab-filt-" + i}
+                                        key={"tab-filter-" + i}
                                         filter={filter}
                                     />
                                 )
@@ -443,7 +385,7 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
                             {
                                 tableDataQuery.isError ? <TableRow>
                                     <TableCell
-                                            colSpan={displayColumns.length + (enableRowsSelection ? 1 : 0)}// + (showRowNums ? 1 : 0) + (detailRow ? 1 : 0)}
+                                            colSpan={displayColumns.length + (enableRowsSelection ? 1 : 0)}// + (showRowNumbers ? 1 : 0) + (detailRow ? 1 : 0)}
                                             style={{ textAlign: "center" }}//, height: 36 }}
                                         >
                                             Ошибка загрузки данных: {tableDataQuery.error.message}
@@ -452,10 +394,10 @@ function ItnTableInner<T>(props: ITableProperties<T>, ref: React.ForwardedRef<IT
                                     tableData.rows.length === 0 ?
                                         <TableRow>
                                             <TableCell
-                                                colSpan={displayColumns.length + (enableRowsSelection ? 1 : 0)}// + (showRowNums ? 1 : 0) + (detailRow ? 1 : 0)}
+                                                colSpan={displayColumns.length + (enableRowsSelection ? 1 : 0)}// + (showRowNumbers ? 1 : 0) + (detailRow ? 1 : 0)}
                                                 style={{ textAlign: "center" }}//, height: 36 }}
                                             >
-                                                {tableDataQuery.isLoading ? loadingMessage : noDataMessage}
+                                                {tableDataQuery.isLoading ? locale.table.loadingText : locale.table.noDataText}
                                             </TableCell>
                                         </TableRow> :
                                         tableData.rows.map((row) => {

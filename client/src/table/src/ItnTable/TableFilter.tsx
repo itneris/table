@@ -1,14 +1,17 @@
 import { Autocomplete, Box, Checkbox, FormControlLabel, Radio, TextField, Typography } from '@mui/material';
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 import { FilterProperties } from "../props/FilterProperties";
 import { FilterType } from '../props/FilterType';
 import { FilterValueProperties } from '../props/FilterValueProperties';
 import { SET_FILTERS } from './tableReducer';
 import { useTableContext } from '../context/TableContext';
 import saveState from '../utils/saveState';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 function TableFilter<T>(props: { filter: FilterProperties }) {
     const tableCtx = useTableContext<T>();
+    const { locale } = useContext(ItnTableGlobalContext);
+
     const currentFilterValue = useMemo(() => (tableCtx.filtering ?? []).find(f => f.column === props.filter.column) ?? null, [tableCtx.filtering]); // eslint-disable-line react-hooks/exhaustive-deps
     const colName = useMemo(() => tableCtx.columns.find(_ => _.property === props.filter.column)?.displayName, []); // eslint-disable-line react-hooks/exhaustive-deps
     const filterLabel = props.filter.label ?? colName;
@@ -110,7 +113,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                         sx={{ width: 160 }}
                         type="number"
                         value={min}
-                        placeholder={tableCtx.filtersMinPlaceHolder}
+                        placeholder={locale.filtering.minPlaceholder}
                         inputProps={{ 'min': 0 }}
                         onChange={(e) => changeFilter("min", +e.target.value)}
                     />
@@ -118,7 +121,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                         style={{ width: 160 }}
                         type="number"
                         value={max}
-                        placeholder={tableCtx.filtersMaxPlaceHolder}
+                        placeholder={locale.filtering.maxPlaceholder}
                         inputProps={{ 'min': 0 }}
                         onChange={(e) => changeFilter("max", +e.target.value)}
                     />
@@ -171,7 +174,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                     fullWidth
                     disableClearable
                     disableCloseOnSelect
-                    options={["Все", ...props.filter.values!]}
+                    options={[locale.filtering.allValuesText, ...props.filter.values!]}
                     autoHighlight
                     value=""
                     getOptionLabel={(option) => option ? option.toString() : ""}
@@ -187,7 +190,7 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                         <li style={{ display: "flex", alignItems: "center" }} {...renderProps}>
                             {
                                 props.filter.multiple ?
-                                    option !== "Все" &&
+                                    option !== locale.filtering.allValuesText &&
                                     <Checkbox
                                         checked={
                                             currentFilterValue === null || currentFilterValue === undefined ? false :
@@ -216,10 +219,10 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                     }}
                     inputValue={autocompleteValue}
                     onInputChange={handleAutocompleteChange}
-                    noOptionsText={tableCtx.filterNoOptionsText}
-                    clearText={tableCtx.filterClearText}
-                    closeText={tableCtx.filterCloseText}
-                    openText={tableCtx.filterOpenText}
+                    noOptionsText={locale.filtering.noOptionsText}
+                    clearText={locale.filtering.clearText}
+                    closeText={locale.filtering.closeText}
+                    openText={locale.filtering.openText}
                     renderInput={(params) => (
                         <TextField
                             {...params}
@@ -228,8 +231,8 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
                             InputLabelProps={{ shrink: true }}
                             label={filterLabel}
                             placeholder={!props.filter.multiple ?
-                                currentFilterValue === null ? tableCtx.filterAllText : currentFilterValue.values![0] :
-                                `${tableCtx.filterSelectValuesText}: ${currentFilterValue === null ? tableCtx.filterAllText : currentFilterValue.values!.length}`
+                                currentFilterValue === null ? locale.filtering.allValuesText : currentFilterValue.values![0] :
+                                `${locale.filtering.selectValueText}: ${currentFilterValue === null ? locale.filtering.allValuesText : currentFilterValue.values!.length}`
                             }
                             inputProps={{
                                 ...params.inputProps,
@@ -242,13 +245,15 @@ function TableFilter<T>(props: { filter: FilterProperties }) {
         default: throw new Error();
     }
 
-    return <Box
-        width={props.filter.inToolbar ? '350px' : tableCtx.filters.filter(_ => !_.inToolbar).length > 1 ? "calc(50% - 8px)" : undefined}
-        flex={props.filter.inToolbar ? undefined : tableCtx.filters.filter(_ => !_.inToolbar).length === 1 ? 1 : undefined}
-        ml={props.filter.inToolbar ? "24px" : undefined}
-    >
-        {filterRender}
-    </Box>
+    return (
+        <Box
+            width={props.filter.inToolbar ? '350px' : tableCtx.filters.filter(_ => !_.inToolbar).length > 1 ? "calc(50% - 8px)" : undefined}
+            flex={props.filter.inToolbar ? undefined : tableCtx.filters.filter(_ => !_.inToolbar).length === 1 ? 1 : undefined}
+            ml={props.filter.inToolbar ? "24px" : undefined}
+        >
+            {filterRender}
+        </Box>
+    );
 }
 
 export default TableFilter;

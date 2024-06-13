@@ -1,7 +1,7 @@
 import { TableState } from "../props/TableState";
 
 /*
- * Interfacle for ItnTable userRef
+ * Interface for ItnTable userRef
  * */
 export interface ITableRef<T> {
     /*
@@ -17,11 +17,11 @@ export interface ITableRef<T> {
      * */
     setData: (rows: T[]) => void;
     /*
-     * Gets tablestate: filtering, searching, sorting, paging
+     * Gets table state: filtering, searching, sorting, paging
      * */
     getState: () => TableState;
     /*
-     * Sets tablestate: filtering, searching, sorting, paging
+     * Sets table state: filtering, searching, sorting, paging
      * */
     setState: (state: TableState) => void;
     /*

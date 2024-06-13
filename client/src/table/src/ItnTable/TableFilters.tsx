@@ -1,13 +1,16 @@
 import { FilterList } from '@mui/icons-material';
 import { Box, Button, IconButton, Popover, Tooltip, Typography } from '@mui/material';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
 import TableFilter from './TableFilter';
 import { RESET_FILTERS } from './tableReducer';
 import { useTableContext } from '../context/TableContext';
 import saveState from '../utils/saveState';
+import { ItnTableGlobalContext } from '../localization/ItnTableProvider';
 
 const TableFilters = <T,>() => {
     const tableCtx = useTableContext<T>();
+    const { locale } = useContext(ItnTableGlobalContext);
+
     const btn = useRef<HTMLButtonElement | null>(null);
 
     const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
@@ -32,7 +35,7 @@ const TableFilters = <T,>() => {
     return (
         <>
 
-            <Tooltip title={tableCtx.filterTooltipText}>
+            <Tooltip title={locale.filtering.filterTooltipText}>
                 <IconButton
                     ref={btn}
                     onClick={handleBtnClick}
@@ -67,7 +70,7 @@ const TableFilters = <T,>() => {
                         style={{ fontSize: 12, padding: "6px 8px" }}
                         onClick={handleResetFilters}
                     >
-                        {tableCtx.filtersResetText}
+                        {locale.filtering.resetText}
                     </Button>
                 </Box>
                 <Box
@@ -82,7 +85,7 @@ const TableFilters = <T,>() => {
                         tableCtx.filters.filter(f => !f.inToolbar)
                             .map((filter, i) =>
                                 <TableFilter
-                                    key={"tab-filt-" + i}
+                                    key={"tab-filter-" + i}
                                     filter={filter}
                                 />
                             )

@@ -4,7 +4,7 @@ import { ColumnOptionsBuilder } from "./ColumnOptionsBuilder";
 declare module "./ColumnOptionsBuilder" {
 	interface ColumnOptionsBuilder<T> {
 		/**
-		 * Defines a display name for current column and bold higlight.
+		 * Defines a display name for current column and bold highlight.
 		 * @param {string} displayName
 		 * @param {bool} bold default false
 		 * */
@@ -22,21 +22,21 @@ declare module "./ColumnOptionsBuilder" {
 		/**
 		 * Set default sort for the column
 		 * @param {boolean} ascending sort should be ascending
-		 * @param {number} order order of column in multisort
+		 * @param {number} order order of column in multi sort
 		 * */
 		WithDefaultSort(ascending?: boolean, order?: number): ColumnOptionsBuilder<T>;
 		/**
 		 * Replaces null value for column
-		 * @param {string} value string to render insted of null or empty valye
+		 * @param {string} value string to render instead of null or empty value
 		 * */
 		WithNullValue(value: string): ColumnOptionsBuilder<T>;
 		/**
 		 * Define percent width for column for strict table layout
-		 * @param {number} width width in pecent
+		 * @param {number} width width in percent
 		 * */
 		WithWidth(width: number): ColumnOptionsBuilder<T>;
 		/**
-		 * Sets the default fitlering for the column
+		 * Sets the default filtering for the column
 		 * @param {ColumnFilteringProperties} filtering filter for column
 		 * */
 		WithDefaultFilters(filtering: ColumnFilteringProperties): ColumnOptionsBuilder<T>;

@@ -6,8 +6,10 @@ import "./columnBuilder/DefaultOptionsExtensions";
 import { ITableRef } from './base/ITableRef';
 import { FilterType } from './props/FilterType';
 import { FilterValueProperties } from './props/FilterValueProperties';
+import ItnTableProvider from "./localization/ItnTableProvider";
+import { TableLocalizationType } from "./localization/TableLocalizationType";
 
 export default ItnTable;
-export { FilterProperties, AbstractColumnBuilder, ColumnFilteringProperties, FilterType, FilterValueProperties };
+export { FilterProperties, AbstractColumnBuilder, ColumnFilteringProperties, FilterType, FilterValueProperties, ItnTableProvider };
 
-export type { ITableRef };
+export type { ITableRef, TableLocalizationType };
