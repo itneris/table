@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { TableLocalizationType } from "../TableLocalizationType";
+import { ru } from "date-fns/locale";
 
 export const localeRu = {
     pagination: {
@@ -45,7 +46,7 @@ export const localeRu = {
     formatters: {
         number: (value: number) => value.toLocaleString("ru-RU"),
         date: (value: Date, withTime: boolean, dateFormat?: string) => {
-            return format(value, dateFormat ?? (withTime ? "dd.MM.yyyy HH:mm:ss" : "dd.MM.yyyy"));
+            return format(value, dateFormat ?? (withTime ? "dd.MM.yyyy HH:mm:ss" : "dd.MM.yyyy"), { locale: ru });
         },
         bool: (value: boolean) => (value ? "Да" : "Нет") as string
     }

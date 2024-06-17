@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { TableLocalizationType } from "../TableLocalizationType";
+import { enUS } from "date-fns/locale";
 
 export const localeEn = {
     pagination: {
@@ -43,9 +44,9 @@ export const localeEn = {
         loadingText: "Loading..."        
     },
     formatters: {
-        number: (value: number) => value.toLocaleString("ru-RU"),
+        number: (value: number) => value.toLocaleString("en-US"),
         date: (value: Date, withTime: boolean, dateFormat?: string) => {
-            return dateFormat ? format(value, dateFormat) : 
+            return dateFormat ? format(value, dateFormat, {locale: enUS}) : 
                 withTime ? value.toLocaleString("en-US") : 
                     value.toLocaleDateString("en-US");
         },
