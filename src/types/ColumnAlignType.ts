@@ -1,0 +1,1 @@
+export type ColumnAlignType = "left" | "center" | "right";

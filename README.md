@@ -2,6 +2,7 @@
 Custom ItNeris company grid based on MaterialUI
 ____
 ## Content
+0. [V4 Using](#V4-using)
 1. [Common props](#Common-props)
 2. [Methods](#Methods)
 3. [Client-side](#Client-side)
@@ -11,6 +12,62 @@ ____
 5. [Column properties](#Column-properties)
 6. [Custom actions and Redux compatability](#Custom-actions-and-Redux-compatability)
 7. [Additional classes](#Additional-classes)
+____
+## V4 using
+```ts
+import { DataColumn, DateColumn, ItnTable, TableState } from '@itneris/table-react'
+import { useQuery } from '@tanstack/react-query';
+import { cupDictionary, data } from './demoData';
+import { Cocktail } from './types/Cocktail';
+import calculateRows from './utils/calculateRows';
+import { useState } from 'react';
+
+const initialState = {
+    filtering: [],
+    page: 0,
+    pageSize: 10,
+    searching: "",
+    selectedRows: [],
+    sorting: [{ column: "name", ascending: true }]
+} satisfies TableState;
+
+function Demo() {
+    const [tableState, setTableState] = useState<TableState>(initialState);
+
+    const { data: rows, ...rowsQuery } = useQuery({
+        queryKey: ['bar_list', tableState],
+        queryFn: async () => {
+            await new Promise(res => setTimeout(res, 400));
+            const rows = calculateRows(data as Cocktail[], tableState);
+            return rows;
+        }
+    });
+
+    return (
+        <ItnTable
+            data={rows}
+            total={data?.length}
+            isFetching={rowsQuery.isFetching}
+            isError={rowsQuery.isError}
+            errorMessage={rowsQuery.error?.message}
+            isSuccess={rowsQuery.isSuccess}
+            onStateChange={state => setTableState(state)}
+            initialState={initialState}
+            serverSide
+        >
+            <DataColumn name={"name"} label='Name' />
+            <DataColumn name={"price"} label='Price' />
+            <DataColumn name={"ingredients"} label='Ingredients' />
+            <DateColumn name={"createDate"} label='Create Date' />
+            <DataColumn 
+                name="glassType" 
+                label='Glass Type'
+                component={val => cupDictionary.find(v => v .id === val as number)!.label} 
+            />
+        </ItnTable>
+    )
+}
+```
 ____
 ## Common props
 1. **onDownload: function([options](#Table-options)) || string** — действие по нажатию на иконку скачивания, если функция, или URL для выполнения GET запроса к серверу для получения [файла выгрузки](#File) в случае строки
